@@ -1,8 +1,13 @@
-# 2과제 유형 카탈로그
+---
+title: 2과제 유형 카탈로그
+description: 네 해 2과제 16개 유형 전부 — 요구, 왜 막히나, 핵심 조각.
+sidebar:
+  order: 8
+---
 
 > 문서 유형: reference
 
-4년치 2과제 전부다. 2023·2024는 파이프라인 한 줄기, 2025·2026은 독립 소문제 4개다. → [지형도 2-1절](00-competition-map.md)
+4년치 2과제 전부다. 2023·2024는 파이프라인 한 줄기, 2025·2026은 독립 소문제 4개다. → [지형도 2-1절](/guide/00-competition-map/)
 
 각 유형마다 **요구 / 왜 막히나 / 핵심 조각** 셋으로 정리한다.
 
@@ -119,7 +124,7 @@ resource "aws_instance" "app" {
 
 **요구.** 도쿄 리전. `/home/ec2-user/ec2-automation/` 에 스크립트 둘. `delete_old_instance.sh` 는 `Project=skills2022` 태그만, `delete_all_instance.sh` 는 Bastion 제외 전부.
 
-**왜 막히나.** 스크립트가 자기 Bastion을 지우면 이후 채점이 전부 불가하다. → [축 2, 6절](04-axis-bastion.md)
+**왜 막히나.** 스크립트가 자기 Bastion을 지우면 이후 채점이 전부 불가하다. → [축 2, 6절](/guide/04-axis-bastion/)
 
 **핵심 조각.**
 
@@ -145,7 +150,7 @@ IDS=$(aws ec2 describe-instances \
 
 **왜 막히나.** 채점 1-8이 **인스턴스를 전부 종료하고** ASG가 새로 띄운 것에서 마운트를 확인한다. 손으로 마운트한 것은 사라진다.
 
-**핵심 조각.** → [축 4, 4-5절](06-axis-data.md)
+**핵심 조각.** → [축 4, 4-5절](/guide/06-axis-data/)
 
 - user data에 `amazon-efs-utils` 설치 + `/etc/fstab` 등록.
 - 마운트 타깃 보안 그룹이 인스턴스 보안 그룹으로부터 **2049** 를 받아야 한다.
@@ -156,7 +161,7 @@ IDS=$(aws ec2 describe-instances \
 
 ### A-6. Athena 분석 (2026 ②)
 
-**요구·핵심 조각.** → [축 4, 4-6절](06-axis-data.md)
+**요구·핵심 조각.** → [축 4, 4-6절](/guide/06-axis-data/)
 
 가장 중요한 두 가지만 다시 적는다.
 

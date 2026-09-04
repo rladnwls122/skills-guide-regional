@@ -1,4 +1,9 @@
-# 축 1 — 네트워크
+---
+title: 축 1 — 네트워크
+description: 4년 연속 나왔고 2026엔 1과제 배점의 31%다. 가장 확실하게 회수하는 점수.
+sidebar:
+  order: 3
+---
 
 > 문서 유형: explanation
 

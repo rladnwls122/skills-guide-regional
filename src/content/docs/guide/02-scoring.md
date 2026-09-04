@@ -1,4 +1,9 @@
-# 채점 해부 — 스크립트가 실제로 보는 것
+---
+title: 채점 해부 — 스크립트가 실제로 보는 것
+description: 채점은 CLI 출력 대조다. 여기서 이 대회의 감점 규칙 거의 전부가 나온다.
+sidebar:
+  order: 2
+---
 
 > 문서 유형: explanation
 
@@ -91,7 +96,7 @@ aws dynamodb list-tables --query TableNames --output text
 
 `describe-flow-logs` 는 더 고약하다. 기대값이 "vpc id 2개"라서 Default VPC에 Flow log를 켜 둔 적이 있으면 3개가 나온다.
 
-→ 종료 전 정리는 [체크리스트](10-checklist.md)에 목록으로 있다.
+→ 종료 전 정리는 [체크리스트](/guide/10-checklist/)에 목록으로 있다.
 
 ## 4. 인덱스 0만 보는 명령
 

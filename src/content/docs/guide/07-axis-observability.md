@@ -1,4 +1,9 @@
-# 축 5 — 관측(CloudWatch)
+---
+title: 축 5 — 관측(CloudWatch)
+description: 배점 대비 시간이 가장 적게 드는 축. 로그 전송 항목만 연쇄다.
+sidebar:
+  order: 7
+---
 
 > 문서 유형: explanation
 

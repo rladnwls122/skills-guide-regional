@@ -1,12 +1,16 @@
 # skills-guide-regional
 
-지방기능경기대회 클라우드컴퓨팅 훈련 문서. [skills-guide](https://skills-learn.zenru.net/)(전국대회판)의 지방대회 버전이다.
+지방기능경기대회 클라우드컴퓨팅 훈련 문서 — Astro Starlight 문서 사이트. [skills-guide](https://skills-learn.zenru.net/)(전국대회판)의 지방대회 버전이다.
 
-전국판이 "한 달에 걸쳐 개념부터 쌓는다"라면 이 문서는 **4년치 지방 기출을 축으로 분해해 반복 출제 지점을 훈련한다**에 가깝다. 지방대회는 4시간 × 2과제이고, 과제 하나가 다루는 서비스 수는 많지만 각 항목의 깊이는 전국보다 얕다. 그래서 훈련 전략이 다르다 — 깊이보다 **속도와 누락 없음**이다.
+전국판이 "한 달에 걸쳐 개념부터 쌓는다"라면 이 문서는 **네 해 기출을 축으로 분해해 반복 출제 지점을 훈련한다**에 가깝다. 지방대회는 4시간 × 2과제이고, 과제 하나가 다루는 서비스 수는 많지만 각 항목의 깊이는 전국보다 얕다. 그래서 훈련 전략이 다르다 — 깊이보다 **속도와 누락 없음**이다.
+
+- 콘텐츠: `src/content/docs/` (랜딩 + `guide/00`~`11`)
+- 디자인: [starlight-theme-exquisitus](https://github.com/anaxite/starlight-theme-exquisitus) — 팔레트·서체는 테마가 전담
+- 한글 서체: 제목·본문 조선일보명조 · UI Pretendard · 코드 Elice Digital Coding — `src/styles/korean-fonts.css`
 
 ## 근거
 
-이 문서의 모든 수치·명령·이름표는 실제로 시행된 과제지·채점기준·채점 스크립트에서 왔다.
+모든 수치·명령·이름표는 실제로 시행된 과제지·채점기준·채점 스크립트에서 왔다.
 
 | 해 | 자료 | 1과제 | 2과제 |
 | --- | --- | --- | --- |
@@ -17,23 +21,46 @@
 
 추론한 내용에는 문서에서 "추정"이라고 적었다. 근거가 있는 것과 없는 것을 섞지 않는다.
 
-## 읽는 순서
+## 문서
 
 | 순서 | 문서 | 무엇을 얻나 |
 | --- | --- | --- |
-| 1 | [지방대회 지형도](docs/00-competition-map.md) | 형식·시간·배점·채점 흐름이 4년간 어떻게 바뀌었나 |
-| 2 | [기출 분해](docs/01-past-exams.md) | 2023~2026 과제 전문 요약과 축 대조표 |
-| 3 | [채점 해부](docs/02-scoring.md) | 채점 스크립트가 실제로 보는 것과 감점 지뢰 |
-| 4 | [축 1 — 네트워크](docs/03-axis-network.md) | 매년 나오고 배점이 가장 큰 축 |
-| 5 | [축 2 — Bastion·IAM](docs/04-axis-bastion.md) | 틀리면 나머지 전부가 0이 되는 축 |
-| 6 | [축 3 — 앱 배포와 ALB](docs/05-axis-compute.md) | 형태만 바뀌고 매년 나오는 축 |
-| 7 | [축 4 — 데이터 저장소](docs/06-axis-data.md) | 서비스는 바뀌어도 요구는 같은 축 |
-| 8 | [축 5 — 관측](docs/07-axis-observability.md) | 배점 대비 가장 싸게 얻는 축 |
-| 9 | [2과제 유형 카탈로그](docs/08-task2-catalog.md) | 4년치 2과제 16개 유형 전부 |
-| 10 | [훈련 계획과 드릴](docs/09-drills.md) | 무엇을 며칠에 어떤 순서로 |
-| 11 | [종료 전 체크리스트](docs/10-checklist.md) | 마지막 30분에 볼 것 |
-| 12 | [공식 문서 링크 맵](docs/11-links.md) | 축별로 어느 문서의 어느 절을 읽나 |
+| 1 | [지방대회 지형도](src/content/docs/guide/00-competition-map.md) | 형식·시간·배점·채점 흐름이 4년간 어떻게 바뀌었나 |
+| 2 | [기출 분해](src/content/docs/guide/01-past-exams.md) | 2023~2026 과제 전문 요약과 축 대조표 |
+| 3 | [채점 해부](src/content/docs/guide/02-scoring.md) | 채점 스크립트가 실제로 보는 것과 감점 지뢰 |
+| 4 | [축 1 — 네트워크](src/content/docs/guide/03-axis-network.md) | 매년 나오고 배점이 가장 큰 축 |
+| 5 | [축 2 — Bastion·IAM](src/content/docs/guide/04-axis-bastion.md) | 틀리면 나머지 전부가 0이 되는 축 |
+| 6 | [축 3 — 앱 배포와 ALB](src/content/docs/guide/05-axis-compute.md) | 형태만 바뀌고 매년 나오는 축 |
+| 7 | [축 4 — 데이터 저장소](src/content/docs/guide/06-axis-data.md) | 서비스는 바뀌어도 요구는 같은 축 |
+| 8 | [축 5 — 관측](src/content/docs/guide/07-axis-observability.md) | 배점 대비 가장 싸게 얻는 축 |
+| 9 | [2과제 유형 카탈로그](src/content/docs/guide/08-task2-catalog.md) | 4년치 2과제 16개 유형 전부 |
+| 10 | [훈련 계획과 드릴](src/content/docs/guide/09-drills.md) | 무엇을 며칠에 어떤 순서로 |
+| 11 | [종료 전 체크리스트](src/content/docs/guide/10-checklist.md) | 마지막 30분에 볼 것 |
+| 12 | [공식 문서 링크 맵](src/content/docs/guide/11-links.md) | 축별로 어느 문서의 어느 절을 읽나 |
 
-## 쓰는 법
+시간이 없으면 채점 해부 → 축 1 → 축 2 셋만 본다. 이 셋이 2026 1과제 배점의 절반 가까이(VPC 15.5 + 채점 전제인 Bastion)를 차지한다.
 
-시간이 없으면 [채점 해부](docs/02-scoring.md) → [축 1](docs/03-axis-network.md) → [축 2](docs/04-axis-bastion.md) 셋만 본다. 이 셋이 2026 1과제 배점의 절반 가까이(VPC 15.5 + 채점 전제인 Bastion)를 차지한다.
+## 개발
+
+Node 버전은 [mise](https://mise.jdx.dev) 로 고정한다(`.mise.toml`). 설치 후:
+
+```bash
+mise install     # .mise.toml 이 지정한 node 버전을 받아 프로젝트 전용으로 고정
+mise trust       # 최초 1회 — 이 디렉터리의 .mise.toml 을 신뢰
+```
+
+**mise 설치**
+
+| OS | 명령 |
+| --- | --- |
+| macOS | `brew install mise` |
+| Linux | `curl https://mise.run \| sh` |
+| Windows | `winget install jdx.mise` |
+
+```bash
+npm install
+npm run dev      # 로컬 미리보기
+npm run build    # 프로덕션 빌드 (starlight-links-validator 포함)
+```
+
+mise 셸 통합(`mise activate`)이 없으면 명령 앞에 `mise exec --` 를 붙인다.

@@ -1,4 +1,9 @@
-# 축 3 — 앱 배포와 로드밸런서
+---
+title: 축 3 — 앱 배포와 로드밸런서
+description: 수단은 ECS·EKS·ASG 로 회전해도 뼈대는 4년 내내 같다.
+sidebar:
+  order: 5
+---
 
 > 문서 유형: explanation
 
@@ -84,7 +89,7 @@ curl -sI http://$ALB_ENDPOINT/v1/users123 | head -n1   # 403 을 포함해야 �
 
 ### 2-5. curl POST → GET 왕복
 
-4년 내내 나온 항목이다. 앞의 모든 게 살아 있어야 통과한다. → [채점 해부 6절](02-scoring.md)
+4년 내내 나온 항목이다. 앞의 모든 게 살아 있어야 통과한다. → [채점 해부 6절](/guide/02-scoring/)
 
 ## 3. 수단별 함정
 

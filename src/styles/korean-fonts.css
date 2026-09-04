@@ -1,0 +1,101 @@
+/* 한글 서체 — 테마의 라틴 서체에는 한글 글리프가 없다.
+ *
+ * Exquisitus 는 "두 가지 일" 구조다: 세리프가 읽는 열(본문)을, 산세리프가
+ * 안내 역할(제목·사이드바·TOC·헤더)을 맡는다. 한글도 같은 구조로 짝을 붙인다.
+ *
+ *   제목·본문          ChosunSm             조선일보명조 — 읽는 열 전체를 이 서체로
+ *   UI 크롬            Pretendard           Alegreya Sans(산세리프)의 한글 짝, 가변 굵기
+ *   코드블록           Elice Digital Coding JetBrains Mono 의 한글 보조(고정폭)
+ *
+ * 이 선언들은 캐스케이드 레이어 밖에 있으므로 @layer exquisitus 안의 테마 토큰보다
+ * 우선한다 — customCss 순서와 무관하게 적용된다.
+ *
+ * 서브셋 파일은 skills-guide(전국판)에서 가져왔다. 다시 만들려면 그쪽 scripts/subset-font.py 를 쓴다.
+ */
+
+@font-face {
+	font-family: "Chosun Sm";
+	src: url("../fonts/chosun-sm.woff2") format("woff2");
+	/* 단일 굵기 파일이다. 400 만 선언해 700 은 브라우저 합성에 맡긴다 —
+	   `400 700` 으로 범위를 주면 합성이 꺼져 제목이 본문 굵기로 주저앉는다. */
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+/* 굵기가 파일로 갈려 있어 두 벌을 같은 패밀리로 묶는다 — 코드블록의 굵은 토큰이
+   합성 볼드가 아니라 진짜 Bold 로 나온다. */
+@font-face {
+	font-family: "Elice Digital Coding";
+	src: url("../fonts/elice-coding-400.woff2") format("woff2");
+	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Elice Digital Coding";
+	src: url("../fonts/elice-coding-700.woff2") format("woff2");
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Pretendard";
+	src: url("../fonts/pretendard.woff2") format("woff2");
+	font-weight: 100 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+:root {
+	/* 제목·카드/히어로 제목·aside·pagination — 한글은 조선일보명조, 라틴도 함께. */
+	--sl-exquisitus-font-register:
+		"Chosun Sm", "Alegreya Sans", "Alegreya Sans Fallback", system-ui,
+		-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+	/* 본문 reading column — 제목과 같은 조선일보명조. 라틴까지 함께 간다. */
+	--sl-exquisitus-font-reading:
+		"Chosun Sm", "Literata Variable", "Literata Fallback", Georgia,
+		"Times New Roman", serif;
+
+	/* 코드블록·인라인코드 — 라틴은 JetBrains Mono 유지, 한글(주석)만 Elice 로 받는다.
+	   테마가 Expressive Code 의 codeFontFamily 에 이 토큰을 넘기므로 코드블록까지 함께 적용된다. */
+	--sl-font-mono:
+		"JetBrains Mono Variable", "Elice Digital Coding", "JetBrains Mono Fallback",
+		ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+	/* 사이드바·TOC·헤더 등 UI 크롬 — 라틴은 Alegreya Sans 유지, 한글은 Pretendard. */
+	--sl-font:
+		"Alegreya Sans", "Pretendard", "Alegreya Sans Fallback", system-ui,
+		-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* 한글은 어절 중간에서 줄바꿈되면 안 된다.
+   브라우저 기본값은 한글을 음절 단위로 끊어서 "문법"이 "문 / 법"으로, "참조가"가
+   "참 / 조가"로 갈라진다 — 제목에서 특히 눈에 띈다. keep-all 은 공백(어절) 단위로만
+   끊게 만든다. 대신 긴 URL·식별자가 컨테이너를 넘칠 수 있어 overflow-wrap 으로
+   그때만 예외를 연다. 코드는 자체 줄바꿈 규칙이 있어 되돌린다. */
+html {
+	word-break: keep-all;
+	overflow-wrap: break-word;
+}
+
+:is(code, pre, kbd, samp) {
+	word-break: normal;
+}
+
+/* 명조 계열이라 Alegreya Sans 의 700 만큼 굵지 않다 — 굵기 대신 자간을 조여
+   밀도로 위계를 만든다. */
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6):not(:where(.not-content *)),
+.hero h1 {
+	letter-spacing: -0.02em;
+}
+
+/* Elice 는 한글 글리프가 고정폭 셀을 꽉 채워서 주석이 라틴 코드보다 성기게 보인다.
+   letter-spacing 은 폰트별로 못 주므로 코드 전체를 살짝 조인다 — JetBrains Mono 쪽은
+   이 정도 값에서 거의 티가 안 난다. */
+:is(code, pre, .expressive-code) {
+	letter-spacing: -0.01em;
+}

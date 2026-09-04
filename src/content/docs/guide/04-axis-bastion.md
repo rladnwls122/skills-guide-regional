@@ -1,4 +1,9 @@
-# 축 2 — Bastion·IAM·접근 경로
+---
+title: 축 2 — Bastion·IAM·접근 경로
+description: 배점은 작지만 무너지면 나머지 전부가 0이 되는 축.
+sidebar:
+  order: 4
+---
 
 > 문서 유형: explanation
 
@@ -22,7 +27,7 @@
 
 2025 2과제는 문제마다 Bastion을 따로 요구했다 — `order-bastion`(EKS 접근 + Administrator), `korea-bastion`(Default VPC + Administrator), `automation-bastion`(**종료 방지 활성화**).
 
-2026 2과제부터 CloudShell로 바뀌었다. → [지형도 2-2절](00-competition-map.md)
+2026 2과제부터 CloudShell로 바뀌었다. → [지형도 2-2절](/guide/00-competition-map/)
 
 ## 2. 채점자가 실제로 확인하는 것
 

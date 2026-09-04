@@ -1,4 +1,9 @@
-# 종료 전 체크리스트
+---
+title: 종료 전 체크리스트
+description: 과제 종료 30분 전에 여는 문서. 전부 실제 채점기준에서 나온 항목이다.
+sidebar:
+  order: 10
+---
 
 > 문서 유형: how-to
 
@@ -23,7 +28,7 @@ SSH 포트를 바꿨다면 **채점자에게 포트를 알린다.**
 
 ## 2. 잔여 리소스를 지운다
 
-계정 전체를 훑는 채점 명령이 있어서, 연습 잔해가 정답을 밀어낸다. → [채점 해부 3절](02-scoring.md)
+계정 전체를 훑는 채점 명령이 있어서, 연습 잔해가 정답을 밀어낸다. → [채점 해부 3절](/guide/02-scoring/)
 
 ```bash
 # ASG — 과제가 요구한 것 하나만 남아야 한다
@@ -84,7 +89,7 @@ done
 
 ## 5. 앱이 살아 있는지 다시 본다
 
-채점의 연쇄 항목이 여기 걸린다. → [채점 해부 6절](02-scoring.md)
+채점의 연쇄 항목이 여기 걸린다. → [채점 해부 6절](/guide/02-scoring/)
 
 ```bash
 ALB=$(aws elbv2 describe-load-balancers --names <alb-name> --query LoadBalancers[].DNSName --output text)

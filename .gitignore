@@ -1,3 +1,9 @@
 node_modules/
+dist/
+.astro/
+
+# 개인 설정 — .claude/rules 는 공유하고 이것만 제외한다
+.claude/settings.local.json
+
 .DS_Store
 *.zip

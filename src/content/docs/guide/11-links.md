@@ -1,4 +1,9 @@
-# 공식 문서 링크 맵
+---
+title: 공식 문서 링크 맵
+description: 축별로 어느 문서의 어느 절을 읽어야 하는지.
+sidebar:
+  order: 11
+---
 
 > 문서 유형: reference
 
@@ -6,7 +11,7 @@
 
 읽는 기준 하나 — **"왜 그렇게 동작하는지"가 궁금하면 문서를 읽고, "인자가 뭐였지"가 궁금하면 `aws <service> <command> help` 를 친다.**
 
-## 1. 네트워크 → [축 1](03-axis-network.md)
+## 1. 네트워크 → [축 1](/guide/03-axis-network/)
 
 | 문서 | 읽을 절 | 왜 |
 | --- | --- | --- |
@@ -21,7 +26,7 @@
 | [Gateway 엔드포인트](https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html) | 첫 절 | Interface 와 무엇이 다른지 |
 | [VPC Flow Logs](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-cwl.html) | "IAM role for publishing" | CLI 로 만들 때 필요한 role |
 
-## 2. Bastion·IAM → [축 2](04-axis-bastion.md)
+## 2. Bastion·IAM → [축 2](/guide/04-axis-bastion/)
 
 | 문서 | 읽을 절 | 왜 |
 | --- | --- | --- |
@@ -34,7 +39,7 @@
 | [IAM 조건 연산자](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition_operators.html) | "Multivalued context keys" | `ForAllValues:` 접두사의 의미 |
 | [CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-cloudshell.html) | "Persistent storage" | 리전별로 별개다 |
 
-## 3. 컴퓨팅·로드밸런서 → [축 3](05-axis-compute.md)
+## 3. 컴퓨팅·로드밸런서 → [축 3](/guide/05-axis-compute/)
 
 | 문서 | 읽을 절 | 왜 |
 | --- | --- | --- |
@@ -54,7 +59,7 @@
 | [EKS Fargate 프로파일](https://docs.aws.amazon.com/eks/latest/userguide/fargate-profile.html) | "Considerations" | DaemonSet 이 안 되는 이유 |
 | [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/autoscaling.html) | "Cluster Autoscaler" | Pod 가 늘면 Node 도 늘게 |
 
-## 4. 데이터 → [축 4](06-axis-data.md)
+## 4. 데이터 → [축 4](/guide/06-axis-data/)
 
 | 문서 | 읽을 절 | 왜 |
 | --- | --- | --- |
@@ -75,7 +80,7 @@
 | [Athena 워크그룹 제어](https://docs.aws.amazon.com/athena/latest/ug/workgroups-setting-control-limits-cloudwatch.html) | "Per query data limit" | 1GB = 1073741824 |
 | [Secrets Manager 암호화](https://docs.aws.amazon.com/secretsmanager/latest/userguide/security-encryption.html) | "Permissions for the KMS key" | 읽는 쪽에 kms:Decrypt 가 필요한 이유 |
 
-## 5. 관측 → [축 5](07-axis-observability.md)
+## 5. 관측 → [축 5](/guide/07-axis-observability/)
 
 | 문서 | 읽을 절 | 왜 |
 | --- | --- | --- |
@@ -86,7 +91,7 @@
 | [알람 누락 데이터](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data) | 전체 | notBreaching 이 필요한 이유 |
 | [Container Insights (ECS)](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-ECS.html) | "Enabling" | 기존 Task 에 소급 안 됨 |
 
-## 6. 2과제 유형별 → [카탈로그](08-task2-catalog.md)
+## 6. 2과제 유형별 → [카탈로그](/guide/08-task2-catalog/)
 
 | 유형 | 문서 |
 | --- | --- |
@@ -129,4 +134,4 @@ aws configure set region ap-northeast-2
 ## 8. 대회 자료
 
 - [한국산업인력공단 기능경기대회](https://meister.hrdkorea.or.kr/) — 시행 공고와 과제 배포
-- 과제지·채점기준은 대회 전후로 공개되는 해와 아닌 해가 있다. **이 문서의 근거 자료 목록은 [README](../README.md)에 있다.**
+- 과제지·채점기준은 대회 전후로 공개되는 해와 아닌 해가 있다. **이 문서의 근거 자료 목록은 [README](/)에 있다.**

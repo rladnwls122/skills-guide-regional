@@ -1,4 +1,9 @@
-# 축 4 — 데이터 저장소
+---
+title: 축 4 — 데이터 저장소
+description: 서비스는 매년 바뀌지만 요구 목록 열 줄은 그대로다.
+sidebar:
+  order: 6
+---
 
 > 문서 유형: explanation
 
@@ -170,7 +175,7 @@ WHERE CAST(e.salary AS BIGINT) >= 70000;
 
 컬럼 타입을 문자열로 크롤링했다면 `CAST` 가 필요하다. 별칭 `AS result` 를 빠뜨리면 컬럼 이름이 `_col0` 이 되어 "result라는 column 하나만" 조건이 깨진다.
 
-**기대값 불일치를 미리 안다.** 채점기준은 3.8·4.5를 기대한다고 적었지만 배포된 CSV로 계산하면 4.05·4.333…이다. → [채점 해부 7절](02-scoring.md)
+**기대값 불일치를 미리 안다.** 채점기준은 3.8·4.5를 기대한다고 적었지만 배포된 CSV로 계산하면 4.05·4.333…이다. → [채점 해부 7절](/guide/02-scoring/)
 
 ## 5. Secrets Manager (2024·2026)
 
@@ -196,7 +201,7 @@ GRANT SELECT, INSERT ON worldpay.users TO 'app'@'%';
 
 이것이 "애플리케이션이 과도한 권한을 갖지 않도록" 요구의 실제 모습이다.
 
-CMK 암호화는 secret 생성 시 KMS 키를 지정하면 된다. **secret을 읽는 주체(EC2 인스턴스 프로파일, Lambda 실행 역할)에 `kms:Decrypt` 를 줘야 한다.** → [축 3, 3-3절](05-axis-compute.md)
+CMK 암호화는 secret 생성 시 KMS 키를 지정하면 된다. **secret을 읽는 주체(EC2 인스턴스 프로파일, Lambda 실행 역할)에 `kms:Decrypt` 를 줘야 한다.** → [축 3, 3-3절](/guide/05-axis-compute/)
 
 ## 6. 드릴
 
