@@ -1,0 +1,194 @@
+/* 도식 색을 CSS 변수로 걷어낸다 — 테마 전환에 재렌더가 필요 없다.
+ *
+ * 원래는 astro-mermaid 의 autoTheme 가 `data-theme` 를 지켜보다가 값이 바뀌면
+ * 모든 도식의 `data-processed` 를 떼고 mermaid 를 통째로 다시 돌렸다. 도식 6개짜리
+ * 페이지에서 다크↔라이트를 누르면 전부가 한 번에 빈 칸이 됐다가 수백 ms 뒤 다시
+ * 나타난다 — 모바일에서는 더 길다. 게다가 mermaid 는 렌더 시작 시점의 테마를 한 번만
+ * 읽어서, 그 1회를 놓치면 다크모드인데 라이트 색으로 굳는 버그가 따라왔다.
+ *
+ * 그래서 `autoTheme: false` 로 재렌더를 끄고, mermaid 는 항상 같은 테마('default')로
+ * 한 번만 그린다. 색은 mermaid 가 svg 안 <style> 에 박아둔 값을 여기서 전부 되받아
+ * Starlight 의 `--sl-color-*` 로 갈아끼운다. 그 변수들은 `data-theme` 를 따라 이미
+ * 뒤집히므로, 테마 전환은 브라우저의 값 재계산 한 번으로 끝난다 — JS 도, 재렌더도 없다.
+ *
+ * !important 가 필요한 이유: mermaid 의 규칙은 `#mermaid-xxx .node rect` 처럼 ID
+ * 선택자다. 특이도로는 클래스·속성 선택자를 아무리 쌓아도 못 이긴다. 대신 그쪽은
+ * !important 를 쓰지 않으므로(단 하나, `.root .anchor path` 만 예외 — 우리 도식엔
+ * 안 나온다) 이쪽에서 !important 를 걸면 이긴다.
+ *
+ * 이 파일은 @layer 밖에 둔다. !important 끼리는 레이어 우선순위가 뒤집히지만, 상대인
+ * mermaid 의 <style> 도 레이어 밖이라 특이도 비교로 곧장 넘어간다.
+ *
+ * 전이(transition)는 절대 넣지 않는다. `svg[id^='mermaid-'] *` 에 전이가 걸리면
+ * mermaid 의 viewBox 계산이 깨진다 — 자세한 것은 mermaid.css 맨 위 주석.
+ *
+ * 선택자를 `svg[id^='mermaid-']` 로 잡는 이유: 전체화면 뷰어는 svg 를 cloneNode 해서
+ * body 직속 오버레이에 붙인다. `pre.mermaid` 기준으로 잡으면 거기서 색이 빠진다.
+ */
+
+:root {
+	--mmd-text: var(--sl-color-white);
+	--mmd-node-bg: var(--sl-color-gray-6);
+	--mmd-node-border: var(--sl-color-gray-4);
+	--mmd-cluster-bg: var(--sl-color-gray-7);
+	--mmd-cluster-border: var(--sl-color-gray-5);
+	--mmd-line: var(--sl-color-gray-3);
+	/* 간선 라벨·아이콘 라벨이 앉는 칩. 도식 배경(프레임)과 같은 색이라야 선을 깔끔히 가린다. */
+	--mmd-label-bg: var(--sl-color-bg);
+	--mmd-icon-bg: var(--sl-color-gray-6);
+	--mmd-icon-border: var(--sl-color-gray-4);
+	/* 단색 아이콘(mdi 등)이 currentColor 로 받는 색. 컬러 아이콘(aws·logos)은 영향 없다. */
+	--mmd-icon-fg: var(--sl-color-gray-2);
+	--mmd-note-bg: var(--sl-color-accent-low);
+	--mmd-note-border: var(--sl-color-accent);
+}
+
+/* svg 루트의 fill 은 클래스가 안 붙은 텍스트의 기본색이다. */
+svg[id^='mermaid-'] {
+	fill: var(--mmd-text) !important;
+}
+
+/* ── 글자 ────────────────────────────────────────────────
+   mermaid 는 라벨을 foreignObject 안 HTML 로 그린다 — 그래서 fill 과 color 를
+   둘 다 덮어야 한다(text 는 fill, span/p 는 color).
+
+   span·p 까지 훑는 이유: mermaid 의 `#mermaid-x span{color:#333}` 는 라벨 안 모든
+   span 에 직접 걸린다. 상속으로는 못 이기므로(직접 걸린 규칙이 상속을 이긴다) 같은
+   범위를 이쪽에서도 직접 덮어야 한다. 이걸 빼면 간선 라벨만 다크에서 검게 남는다.
+   subgraph 라벨의 아이콘 span 은 배경 이미지라 color 의 영향을 받지 않는다. */
+svg[id^='mermaid-'] :is(.label, .cluster-label span, .cluster span, span, p) {
+	color: var(--mmd-text) !important;
+}
+
+svg[id^='mermaid-'] :is(
+		.label text,
+		span,
+		.cluster-label text,
+		.cluster text,
+		.flowchartTitleText
+	) {
+	fill: var(--mmd-text) !important;
+}
+
+/* ── 노드 ──────────────────────────────────────────────── */
+svg[id^='mermaid-'] .node :is(rect, circle, ellipse, polygon, path) {
+	fill: var(--mmd-node-bg) !important;
+	stroke: var(--mmd-node-border) !important;
+}
+
+/* ── 간선·화살촉 ───────────────────────────────────────── */
+svg[id^='mermaid-'] :is(
+		.edgePath .path,
+		.flowchart-link,
+		.messageLine0,
+		.messageLine1
+	) {
+	stroke: var(--mmd-line) !important;
+}
+
+svg[id^='mermaid-'] :is(.marker, .marker.cross, [id$='-arrowhead'] path, [id$='-crosshead'] path) {
+	fill: var(--mmd-line) !important;
+	stroke: var(--mmd-line) !important;
+}
+
+/* 화살촉은 채움만 덮는다 — stroke 를 얹으면 촉이 두꺼워진다. */
+svg[id^='mermaid-'] :is(.arrowheadPath, [id$='-sequencenumber']) {
+	fill: var(--mmd-line) !important;
+}
+
+/* ── 간선 라벨·아이콘 라벨 칩 ──────────────────────────── */
+svg[id^='mermaid-'] :is(
+		.edgeLabel,
+		.edgeLabel p,
+		.icon-shape,
+		.icon-shape p,
+		.image-shape,
+		.image-shape p
+	) {
+	background-color: var(--mmd-label-bg) !important;
+}
+
+svg[id^='mermaid-'] :is(.edgeLabel rect, .icon-shape .label rect, .image-shape .label rect) {
+	fill: var(--mmd-label-bg) !important;
+}
+
+svg[id^='mermaid-'] .labelBkg {
+	background-color: color-mix(in oklab, var(--mmd-label-bg) 60%, transparent) !important;
+}
+
+/* ── subgraph(cluster) ─────────────────────────────────── */
+svg[id^='mermaid-'] .cluster rect {
+	fill: var(--mmd-cluster-bg) !important;
+	stroke: var(--mmd-cluster-border) !important;
+}
+
+/* ── 아이콘 노드 ───────────────────────────────────────────
+   `@{ icon: ..., form: "square" }` 노드의 테두리. mermaid 가 roughjs 로 그린 path
+   두 장을 mermaid-fullscreen.js 가 이 rect 한 장으로 갈아끼운다 — path 의 모서리
+   반경은 0.1px 로 박혀 있고 색도 렌더 시점에 attribute 로 들어가서, 그대로 두면
+   둥글게도 테마에 따라 바꾸지도 못한다. rect 는 rx 와 색이 전부 CSS 다.
+
+   경쟁하는 mermaid 규칙이 없으므로 !important 는 필요 없다(.icon-shape 노드는
+   `.node` 클래스를 달지 않아 `.node rect` 규칙에 걸리지 않는다). */
+svg[id^='mermaid-'] .mfs-icon-box {
+	rx: 10px;
+	ry: 10px;
+	fill: var(--mmd-icon-bg);
+	stroke: var(--mmd-icon-border);
+	stroke-width: 1.5px;
+}
+
+/* 아이콘 자체의 색. mermaid 가 `style="color: #9370DB"` 를 인라인으로 박으므로
+   !important 가 필요하다(CSS !important 는 인라인 비-important 를 이긴다). */
+svg[id^='mermaid-'] .icon-shape g {
+	color: var(--mmd-icon-fg) !important;
+}
+
+/* ── 시퀀스 다이어그램 ─────────────────────────────────── */
+svg[id^='mermaid-'] :is(.actor, .actor-man circle, .actor-man line) {
+	fill: var(--mmd-node-bg) !important;
+	stroke: var(--mmd-node-border) !important;
+}
+
+svg[id^='mermaid-'] .actor-line {
+	stroke: var(--mmd-node-border) !important;
+}
+
+svg[id^='mermaid-'] :is(
+		text.actor > tspan,
+		.messageText,
+		.labelText,
+		.labelText > tspan,
+		.loopText,
+		.loopText > tspan,
+		.sectionTitle,
+		.sectionTitle > tspan,
+		.noteText,
+		.noteText > tspan
+	) {
+	fill: var(--mmd-text) !important;
+}
+
+svg[id^='mermaid-'] :is(.labelBox, g rect.rect) {
+	fill: var(--mmd-node-bg) !important;
+	stroke: var(--mmd-node-border) !important;
+}
+
+svg[id^='mermaid-'] .loopLine {
+	fill: var(--mmd-node-border) !important;
+	stroke: var(--mmd-node-border) !important;
+}
+
+svg[id^='mermaid-'] .note {
+	fill: var(--mmd-note-bg) !important;
+	stroke: var(--mmd-note-border) !important;
+}
+
+svg[id^='mermaid-'] :is(.activation0, .activation1, .activation2) {
+	fill: var(--mmd-cluster-bg) !important;
+	stroke: var(--mmd-cluster-border) !important;
+}
+
+svg[id^='mermaid-'] .sequenceNumber {
+	fill: var(--mmd-label-bg) !important;
+}

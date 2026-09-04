@@ -7,11 +7,11 @@ hero:
   tagline: 네 해 기출의 과제지·채점기준·채점 스크립트를 분해했다. 매년 나오는 축을 찾아 반복 훈련한다.
   actions:
     - text: 지형도부터 보기
-      link: /guide/00-competition-map/
+      link: /exam/00-competition-map/
       icon: right-arrow
       variant: primary
-    - text: 채점부터 보기
-      link: /guide/02-scoring/
+    - text: AWS 가 처음이라면
+      link: /basics/00-index/
       variant: minimal
 ---
 
@@ -21,19 +21,25 @@ import { CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
 
 지방대회는 4시간 × 2과제이고, 과제 하나가 다루는 서비스 수는 많지만 각 항목의 깊이는 전국보다 얕다. 그래서 훈련 전략이 다르다 — 깊이보다 **속도와 누락 없음**이다.
 
+**AWS 를 처음 만지는 사람 기준으로 썼다.** 서버·네트워크가 뭔지부터 궁금하면 [사전 지식](/basics/00-index/) 15편을 먼저 본다. 필요한 것만 골라 봐도 된다.
+
 ## 시간이 없다면
 
 <Steps>
 
-1. **[채점 해부](/guide/02-scoring/)** 를 먼저 읽는다
+0. **AWS 가 처음이면 [사전 지식 01·02·03](/basics/00-index/)** 부터 (반나절)
+
+   셸과 AWS CLI, VPC, IAM 셋만 알면 나머지 문서가 읽힌다.
+
+1. **[채점 해부](/exam/02-scoring/)** 를 먼저 읽는다
 
    채점이 CLI 출력 대조라는 사실 하나에서 이 대회의 감점 규칙 거의 전부가 나온다.
 
-2. **[축 1 — 네트워크](/guide/03-axis-network/)** 로 간다
+2. **[축 1 — 네트워크](/axis/03-axis-network/)** 로 간다
 
    4년 연속 나왔고 2026엔 1과제 배점의 31%다.
 
-3. **[축 2 — Bastion·IAM](/guide/04-axis-bastion/)** 을 확인한다
+3. **[축 2 — Bastion·IAM](/axis/04-axis-bastion/)** 을 확인한다
 
    배점은 작지만 무너지면 나머지 전부가 0이다.
 
@@ -55,16 +61,17 @@ import { CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
 ## 문서
 
 <CardGrid>
-  <LinkCard title="지방대회 지형도" href="/guide/00-competition-map/" description="형식·시간·배점·채점 흐름이 4년간 어떻게 바뀌었나." />
-  <LinkCard title="기출 분해" href="/guide/01-past-exams/" description="2023~2026 과제 전문 요약과 축 대조표." />
-  <LinkCard title="채점 해부" href="/guide/02-scoring/" description="채점 스크립트가 실제로 보는 것과 감점 지뢰." />
-  <LinkCard title="축 1 — 네트워크" href="/guide/03-axis-network/" description="매년 나오고 배점이 가장 큰 축." />
-  <LinkCard title="축 2 — Bastion·IAM" href="/guide/04-axis-bastion/" description="틀리면 나머지 전부가 0이 되는 축." />
-  <LinkCard title="축 3 — 앱 배포와 ALB" href="/guide/05-axis-compute/" description="형태만 바뀌고 매년 나오는 축." />
-  <LinkCard title="축 4 — 데이터 저장소" href="/guide/06-axis-data/" description="서비스는 바뀌어도 요구는 같은 축." />
-  <LinkCard title="축 5 — 관측" href="/guide/07-axis-observability/" description="배점 대비 가장 싸게 얻는 축." />
-  <LinkCard title="2과제 유형 카탈로그" href="/guide/08-task2-catalog/" description="4년치 2과제 16개 유형 전부." />
-  <LinkCard title="훈련 계획과 드릴" href="/guide/09-drills/" description="무엇을 며칠에 어떤 순서로." />
-  <LinkCard title="종료 전 체크리스트" href="/guide/10-checklist/" description="마지막 30분에 볼 것." />
-  <LinkCard title="공식 문서 링크 맵" href="/guide/11-links/" description="축별로 어느 문서의 어느 절을 읽나." />
+  <LinkCard title="사전 지식 (15편)" href="/basics/00-index/" description="AWS 가 처음이라면 여기부터. 지방 기출에 실제로 나온 것만." />
+  <LinkCard title="지방대회 지형도" href="/exam/00-competition-map/" description="형식·시간·배점·채점 흐름이 4년간 어떻게 바뀌었나." />
+  <LinkCard title="기출 분해" href="/exam/01-past-exams/" description="2023~2026 과제 전문 요약과 축 대조표." />
+  <LinkCard title="채점 해부" href="/exam/02-scoring/" description="채점 스크립트가 실제로 보는 것과 감점 지뢰." />
+  <LinkCard title="축 1 — 네트워크" href="/axis/03-axis-network/" description="매년 나오고 배점이 가장 큰 축." />
+  <LinkCard title="축 2 — Bastion·IAM" href="/axis/04-axis-bastion/" description="틀리면 나머지 전부가 0이 되는 축." />
+  <LinkCard title="축 3 — 앱 배포와 ALB" href="/axis/05-axis-compute/" description="형태만 바뀌고 매년 나오는 축." />
+  <LinkCard title="축 4 — 데이터 저장소" href="/axis/06-axis-data/" description="서비스는 바뀌어도 요구는 같은 축." />
+  <LinkCard title="축 5 — 관측" href="/axis/07-axis-observability/" description="배점 대비 가장 싸게 얻는 축." />
+  <LinkCard title="2과제 유형 카탈로그" href="/axis/08-task2-catalog/" description="4년치 2과제 16개 유형 전부." />
+  <LinkCard title="훈련 계획과 드릴" href="/drill/09-drills/" description="무엇을 며칠에 어떤 순서로." />
+  <LinkCard title="종료 전 체크리스트" href="/drill/10-checklist/" description="마지막 30분에 볼 것." />
+  <LinkCard title="공식 문서 링크 맵" href="/drill/11-links/" description="축별로 어느 문서의 어느 절을 읽나." />
 </CardGrid>

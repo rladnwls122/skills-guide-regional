@@ -1,0 +1,18 @@
+/* Tailwind — 랜딩의 척도(DayRail.svelte)에서만 쓴다.
+ *
+ * 나머지 문서 스타일은 손으로 쓴 CSS 그대로다. 두 체계를 섞어 두는 이유는 하나다:
+ * Starlight 내부 클래스(.sl-markdown-content, .sl-heading-wrapper 같은)는 유틸리티로
+ * 도달할 수 없어서, 그쪽은 계속 CSS 로 덮어야 한다. Tailwind 는 우리가 직접 만든
+ * 마크업에만 쓴다.
+ *
+ * 레이어 순서가 이 파일의 본체다. 뒤에 선언한 레이어가 이긴다 —
+ * utilities > components > theme > starlight > base. 그리고 레이어에 들어가지 않은
+ * 규칙은 이 전부를 이긴다. 그래서 기존 CSS 파일들(layout·scrollbar·landing 등)은
+ * 여전히 테마를 이기고, Tailwind 유틸리티는 테마를 이기되 그 CSS 들에는 진다.
+ * 척도 마크업에는 겹치는 손 CSS 가 없으므로 충돌하지 않는다.
+ */
+@layer base, starlight, theme, components, utilities;
+
+@import '@astrojs/starlight-tailwind';
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);

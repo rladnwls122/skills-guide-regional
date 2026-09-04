@@ -1,0 +1,284 @@
+---
+title: 15 Terraform (선수 학습, 약 2시간)
+description: 인프라를 코드로 적는 방법. 2025 2과제 ③ 에 나왔고 채점자가 직접 apply 를 돌린다.
+sidebar:
+  order: 15
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 15/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+지금까지는 콘솔에서 버튼을 눌러 리소스를 만들었다. 그런데 같은 걸 열 번 만들어야 하면? 어제 만든 것과 오늘 만든 것이 같은지 어떻게 확인하나?
+
+Terraform 은 **"무엇이 있어야 하는지" 를 파일에 적어 두고, 그대로 만들어 주는 도구**다. 코드로 인프라를 적는다고 해서 IaC(Infrastructure as Code)라고 부른다.
+
+2025 2과제 ③ 은 **채점자가 직접 `destroy` 하고 `apply` 를 돌린다.** 코드가 처음부터 끝까지 성공해야 점수가 나온다.
+
+## ① 학습 목표
+
+- [ ] `init`·`plan`·`apply`·`destroy` 가 각각 무엇을 하는지 안다
+- [ ] 상태 파일(tfstate)이 무엇을 담는지 안다
+- [ ] resource 블록의 문법을 읽을 수 있다
+- [ ] 리소스끼리 참조하는 방법을 안다
+- [ ] `default_tags` 로 태그를 한 번에 붙일 줄 안다
+
+## ② 핵심 개념
+
+### 명령 네 개
+
+| 명령 | 하는 일 | 언제 |
+| --- | --- | --- |
+| `terraform init` | 필요한 플러그인(provider)을 내려받는다 | 폴더에서 처음 한 번 |
+| `terraform plan` | **무엇이 바뀔지 미리 보여 준다.** 실제로 안 바꾼다 | 항상 apply 전에 |
+| `terraform apply` | 코드대로 실제로 만든다 | |
+| `terraform destroy` | 코드로 만든 것을 지운다 | 정리할 때 |
+
+<Aside type="tip" title="plan 을 습관으로">
+`plan` 은 안전하다. 아무것도 바꾸지 않는다. "이거 지워도 되나?" 싶을 때 먼저 돌려 보면 `- destroy` 표시로 알려 준다.
+</Aside>
+
+### 상태 파일
+
+Terraform 은 자기가 만든 것을 `terraform.tfstate` 파일에 기록한다. "코드에 적힌 것" 과 "실제 AWS" 를 이어 주는 장부다.
+
+```
+코드(main.tf)  ←→  상태 파일(tfstate)  ←→  실제 AWS 리소스
+```
+
+여기서 두 가지가 따라 나온다.
+
+1. **`destroy` 는 자기가 만든 것만 지운다.** 콘솔에서 손으로 만든 것은 그대로 남는다.
+2. **상태 파일을 지우면 Terraform 이 리소스를 잊는다.** 리소스는 살아 있는데 관리에서 빠진다.
+
+<Aside type="danger" title="2025 채점이 여기서 갈린다">
+채점자가 `destroy` → `apply` 를 돌린다. 콘솔로 만들어 둔 잔해가 남아 있으면 **이름 충돌로 apply 가 실패**한다. 문제지가 "채점 전에 Default VPC 와 Bastion 을 제외한 모든 리소스를 삭제" 하라고 한 이유가 이것이다.
+</Aside>
+
+### 파일 하나 읽어 보기
+
+```hcl
+provider "aws" {
+  region = "ap-northeast-2"
+  default_tags {
+    tags = { Project = "KoreaSkills" }
+  }
+}
+
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+  tags       = { Name = "korea-vpc" }
+}
+
+resource "aws_subnet" "public_a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.0.0/24"
+  availability_zone = "ap-northeast-2a"
+  tags              = { Name = "korea-public-subnet-a" }
+}
+```
+
+| 조각 | 뜻 |
+| --- | --- |
+| `provider "aws"` | 어느 클라우드에 만들지, 어느 리전에 |
+| `resource "aws_vpc" "main"` | **`aws_vpc` 타입**의 리소스를 만들고 코드 안에서 **`main`** 이라 부르겠다 |
+| `aws_vpc.main.id` | 위에서 만든 VPC 의 ID 를 가져다 쓴다 |
+
+`main` 은 코드 안에서만 쓰는 별명이고, AWS 콘솔에 보이는 이름은 `tags` 의 `Name` 이다. **둘을 헷갈리지 않는다.**
+
+### 참조가 순서를 정한다
+
+`aws_subnet.public_a` 가 `aws_vpc.main.id` 를 쓰고 있으니 Terraform 은 **VPC 를 먼저 만들고 서브넷을 나중에** 만든다. 순서를 따로 적을 필요가 없다.
+
+참조가 없는데 순서가 중요하면 `depends_on` 을 명시한다.
+
+```hcl
+resource "aws_nat_gateway" "this" {
+  # ...
+  depends_on = [aws_internet_gateway.this]
+}
+```
+
+### default_tags
+
+2025 는 "모든 리소스가 `Project=KoreaSkills` 태그를 갖도록" 을 요구했다. 리소스마다 손으로 넣지 않는다.
+
+```hcl
+provider "aws" {
+  region = "ap-northeast-2"
+  default_tags { tags = { Project = "KoreaSkills" } }
+}
+```
+
+이 한 블록으로 provider 가 만드는 모든 리소스에 붙는다. 리소스의 `tags` 에 적은 것과 **합쳐진다.**
+
+## ③ 대회에서 어떻게 쓰이나
+
+2025 2과제 ③, 12.5점. 코드는 `/home/ec2-user/korea/` 에 둔다.
+
+채점 절차가 이렇다.
+
+```bash
+cd /home/ec2-user/korea
+terraform init && terraform destroy -auto-approve
+terraform apply -auto-approve
+```
+
+그다음 만들어진 것을 하나씩 확인한다.
+
+| 채점 | 확인 대상 |
+| --- | --- |
+| 3-1 | EC2 `korea-instance` 가 생겼는지 |
+| 3-2 | VPC `korea-vpc` CIDR 이 `10.0.0.0/16` |
+| 3-3 | 서브넷이 `ap-northeast-2a` |
+| 3-4 | IGW 가 VPC 에 붙었는지 |
+| 3-5 | 인스턴스 타입 `t3.micro` |
+| 3-6 | 인스턴스가 `korea-public-subnet-a` 에 있는지 |
+| 3-7 | EBS 암호화 `true` |
+| 3-8 | IAM 역할이 붙었는지 |
+| 3-9 | SSM 으로 `Online` 인지 |
+
+3-9 까지 되려면 인스턴스가 인터넷으로 나갈 수 있어야 한다 — **퍼블릭 서브넷 + 퍼블릭 IP 자동 할당 + IGW 경로** 셋이 다 필요하다.
+
+## ④ 미니 실습 (60분)
+
+<Steps>
+
+1. 폴더를 만들고 `main.tf` 를 쓴다. 위 ② 절 코드에서 시작한다.
+
+2. `terraform init` 을 돌린다. `.terraform/` 폴더와 잠금 파일이 생긴다.
+
+3. `terraform plan` 을 돌린다. **`+ create` 가 몇 개인지 세어 본다.**
+
+4. `terraform apply` 를 돌리고 콘솔에서 실제로 생겼는지 확인한다.
+
+5. `main.tf` 의 CIDR 을 `10.1.0.0/16` 으로 바꾸고 `plan` 을 다시 돌린다. **`-/+ destroy and then create`** 가 뜨는지 본다 — CIDR 은 바꿀 수 없는 속성이라 재생성이다.
+
+6. `terraform destroy` 로 지운다.
+
+7. **한 번 더 `apply` 를 돌려 본다.** 처음부터 끝까지 성공하는지 확인한다. 이게 채점 방식이다.
+
+</Steps>
+
+7번을 습관으로 만든다. 한 번 성공한 코드가 두 번째에 깨지는 일이 흔하다.
+
+## ⑤ 심화 개념
+
+### 자주 만나는 오류 셋
+
+| 오류 | 원인 | 고치는 법 |
+| --- | --- | --- |
+| `EntityAlreadyExists` | IAM 역할 이름이 이미 있다 | 콘솔 잔해를 지우거나 이름을 바꾼다 |
+| `DependencyViolation` | 다른 리소스가 붙어 있어 못 지운다 | `destroy` 를 다시 돌리거나 순서를 본다 |
+| `InvalidSubnet.Conflict` | 서브넷 CIDR 이 겹친다 | 기존 리소스를 정리한다 |
+
+첫 줄이 2025 채점에서 가장 많이 나온다. **코드 밖에서 만든 것이 있으면 안 된다.**
+
+### AMI 를 하드코딩하지 않는다
+
+AMI ID 는 리전마다 다르고 시간이 지나면 바뀐다. 데이터 소스로 최신을 찾는다.
+
+```hcl
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "name"
+    values = ["al2023-ami-*-x86_64"]
+  }
+}
+
+resource "aws_instance" "app" {
+  ami           = data.aws_ami.al2023.id
+  instance_type = "t3.micro"
+  # ...
+}
+```
+
+`data` 블록은 **만드는 게 아니라 찾아오는** 것이다.
+
+### EBS 암호화와 IAM 역할
+
+2025 채점 3-7·3-8 이 보는 부분이다.
+
+```hcl
+resource "aws_iam_instance_profile" "ssm" {
+  name = "korea-ssm-profile"
+  role = aws_iam_role.ssm.name
+}
+
+resource "aws_instance" "app" {
+  # ...
+  iam_instance_profile = aws_iam_instance_profile.ssm.name
+  root_block_device { encrypted = true }
+}
+```
+
+EC2 에 붙는 것은 역할이 아니라 **인스턴스 프로파일**이다. → [03 IAM](/basics/03-iam/)
+
+### 변수와 출력
+
+대회 규모에서는 없어도 되지만 알아 두면 코드가 짧아진다.
+
+```hcl
+variable "prefix" { default = "korea" }
+output "instance_id" { value = aws_instance.app.id }
+```
+
+`apply` 가 끝나면 `output` 값이 화면에 찍힌다. 확인용으로 쓸 만하다.
+
+<Aside type="caution" title="시간 배분">
+Terraform 문제는 12.5점이고 `apply` 가 한 번에 도는지가 전부다. **완벽한 코드보다 도는 코드**가 낫다. 변수·모듈 같은 정리는 시간이 남을 때 한다.
+</Aside>
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="destroy 가 안 지우는 것">
+`terraform destroy` 를 돌렸는데 콘솔에 리소스가 남아 있다. 왜인가?
+
+- [x] 그 리소스는 Terraform 이 만든 것이 아니라 콘솔에서 손으로 만든 것이다
+- [ ] destroy 가 실패했다
+  > 실패했다면 오류가 났을 것이다. 조용히 남았다면 상태 파일에 없는 것이다.
+- [ ] 삭제에 시간이 걸린다
+  > 일부는 그렇지만 영구히 남지는 않는다.
+- [ ] 태그가 없어서 못 찾는다
+  > Terraform 은 태그가 아니라 상태 파일로 찾는다.
+
+**Terraform 은 상태 파일에 적힌 것만 안다.** 2025 채점 전에 코드 밖 리소스를 정리하라는 지시가 이 때문이다.
+</Quiz>
+
+<Quiz title="참조와 순서">
+서브넷 코드에서 `vpc_id = aws_vpc.main.id` 를 쓰면?
+
+- [x] Terraform 이 VPC 를 먼저 만들고 서브넷을 나중에 만든다
+- [ ] 순서를 `depends_on` 으로 따로 적어야 한다
+  > 참조가 있으면 자동으로 순서가 정해진다. `depends_on` 은 참조가 없을 때 쓴다.
+- [ ] 파일에 적은 순서대로 만들어진다
+  > 파일의 위아래 순서는 의미가 없다.
+- [ ] 동시에 만들어진다
+  > 의존이 있으면 순서대로 만든다.
+
+**참조가 곧 순서다.** 그래서 리소스를 파일 어디에 적어도 상관없다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+사전 지식은 여기까지다. 이제 기출로 간다.
+
+<LinkButton href="/exam/01-past-exams/" icon="right-arrow">기출 분해</LinkButton>
+<LinkButton href="/drill/09-drills/" variant="minimal">훈련 계획과 드릴</LinkButton>
+
+## 공식 문서
+
+- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) — 리소스 타입 전체
+- [default_tags](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#default_tags)
+- [aws_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) — `root_block_device` 절
+- [상태 파일](https://developer.hashicorp.com/terraform/language/state) — 무엇을 담는지
+- [의존 관계](https://developer.hashicorp.com/terraform/language/meta-arguments/depends_on)

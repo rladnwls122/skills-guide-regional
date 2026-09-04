@@ -1,0 +1,1 @@
+import{t as e}from"./tracker.D_iRK2L-.js";function t(t,n){t.querySelector(n)?.addEventListener(`click`,()=>{let n=t.dataset.confirmLabel;(!n||window.confirm(n))&&e().resetAll()})}function n(e,t,n){for(let r of e.querySelectorAll(t))r.textContent=n}export{t as n,n as t};

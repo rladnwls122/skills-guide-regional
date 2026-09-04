@@ -1,0 +1,204 @@
+---
+title: 06 컨테이너와 ECS (선수 학습, 약 2시간)
+description: 이미지·ECR·태스크 정의·서비스. 2023·2024·2025 세 해 연속 나온 축이다.
+sidebar:
+  order: 6
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 6/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+프로그램을 다른 컴퓨터에서 돌리려면 보통 이런 일을 겪는다. "내 컴퓨터에서는 되는데 서버에서는 안 되네?"
+
+**컨테이너는 프로그램과 그게 필요로 하는 것들을 통째로 상자에 담는 방법**이다. 상자째 옮기면 어디서든 똑같이 돈다.
+
+ECS 는 그 상자를 AWS 에서 돌려 주는 서비스다. 2026 1과제에는 안 나왔지만 그 전 3년 연속 나왔으니 버리지 않는다.
+
+## ① 학습 목표
+
+- [ ] 이미지·컨테이너·레지스트리를 구분한다
+- [ ] Dockerfile 의 레이어와 이미지 크기가 취약점 수에 어떻게 연결되는지 안다
+- [ ] ECR 의 스캔·태그 불변성·암호화 옵션을 안다
+- [ ] 태스크 정의·서비스·클러스터의 역할을 구분한다
+- [ ] Fargate 와 EC2 시작 유형의 차이를 안다
+
+## ② 핵심 개념
+
+### 용어표
+
+| 용어 | 한 줄 정의 |
+| --- | --- |
+| 이미지 | 실행할 파일과 설정을 담은 읽기 전용 묶음. 레이어가 쌓여 있다 |
+| 컨테이너 | 이미지를 실제로 돌린 프로세스 |
+| 레지스트리 | 이미지를 보관하는 곳. AWS 에서는 ECR |
+| 태그 | 이미지의 버전 이름. `v1.0.0`, `latest` |
+| 태스크 정의 | "컨테이너를 어떻게 띄울까" 설계도. 이미지·CPU·메모리·환경 변수·로그 설정 |
+| 태스크 | 태스크 정의로 실제로 뜬 실행 단위 |
+| 서비스 | 태스크를 **몇 개 유지할까**를 담당. ALB 타깃 그룹과 연결 |
+| 클러스터 | 서비스와 태스크가 사는 논리적 묶음 |
+
+Launch Template : ASG = 태스크 정의 : 서비스 라고 생각하면 [04 문서](/basics/04-ec2-asg/)와 대응이 맞는다.
+
+### 이미지가 가벼워야 하는 실전 이유
+
+2023·2024·2025 모두 **ECR 스캔 결과에 취약점이 없어야** 득점한다.
+
+```bash
+aws ecr describe-image-scan-findings --repository-name product \
+  --image-id imageTag=v1.0.0 --query "imageScanFindings.findingSeverityCounts"
+# → {} 여야 한다
+```
+
+취약점은 대부분 **베이스 이미지의 시스템 패키지**에서 나온다. `ubuntu:20.04` 로 시작하면 수십 개가 잡히고, `alpine:latest` 나 `scratch` 로 시작하면 대개 비어 있다.
+
+```dockerfile
+FROM alpine:3.21
+RUN apk add --no-cache curl
+COPY product /usr/local/bin/product
+ENTRYPOINT ["/usr/local/bin/product"]
+```
+
+2025 는 "컨테이너 이미지에서 curl 사용 가능" 도 요구했다. `--no-cache` 는 패키지 목록을 이미지에 남기지 않는다.
+
+### ECR 옵션 셋
+
+| 옵션 | 무엇 | 순서 주의 |
+| --- | --- | --- |
+| 스캔 온 푸시 | 올릴 때 자동 취약점 검사 | 미리 켠다 |
+| 태그 불변성(immutable) | 같은 태그 재푸시 금지 | **이미지를 먼저 올리고 나중에 켠다** |
+| 암호화 | KMS 로 저장 암호화 | 리포지토리 생성 시 |
+
+태그 불변성을 먼저 켜면 수정할 때마다 태그를 새로 붙여야 해서 시간이 샌다.
+
+### 시작 유형 두 가지
+
+| | EC2 | Fargate |
+| --- | --- | --- |
+| 컴퓨팅 | 내가 EC2 를 관리 | AWS 가 관리 |
+| 네트워크 모드 | bridge / awsvpc | awsvpc 고정 |
+| 대회 | 2025(t3.small) | 2023, 2024 2과제 |
+
+`awsvpc` 는 태스크마다 ENI 를 받아 **자기 IP 와 보안 그룹**을 갖는다. 그래서 서비스 정의에 서브넷 목록이 들어가고, 채점이 "서브넷 2개 이상" 을 그 필드로 확인한다.
+
+## ③ 대회에서 어떻게 쓰이나
+
+| 해 | 요구 |
+| --- | --- |
+| 2023 | `wsi-ecs`, 서비스 2개, 태그 `latest`, 스캔 취약점 0 |
+| 2024 | ECR `user`·`token` (KMS·스캔·immutable), 실행은 EKS |
+| 2025 | `ws-cluster` on EC2, **latest 금지**, ECS Exec, Service Connect |
+
+## ④ 미니 실습 (50분)
+
+<Steps>
+
+1. 작은 HTTP 앱을 하나 쓰고 위 Dockerfile 로 이미지를 만든다.
+
+2. ECR 리포지토리를 만든다(스캔 온 푸시 켜기, 암호화 켜기, **불변성은 아직 끄기**).
+
+3. 로그인하고 푸시한다.
+
+   ```bash
+   aws ecr get-login-password | docker login --username AWS --password-stdin <계정>.dkr.ecr.ap-northeast-2.amazonaws.com
+   docker tag myapp:v1.0.0 <계정>.dkr.ecr.ap-northeast-2.amazonaws.com/myapp:v1.0.0
+   docker push <계정>.dkr.ecr.ap-northeast-2.amazonaws.com/myapp:v1.0.0
+   ```
+
+4. 스캔 결과를 확인한다. 취약점이 나오면 베이스를 바꿔 다시 만든다.
+
+5. 불변성을 켜고 같은 태그로 다시 푸시해 **거부되는 것**을 확인한다.
+
+6. ECS 클러스터·태스크 정의·서비스를 만들고 ALB 타깃 그룹에 붙인다.
+
+</Steps>
+
+## ⑤ 심화 개념
+
+### 로그는 태스크 정의에서 정한다
+
+```json
+"logConfiguration": {
+  "logDriver": "awslogs",
+  "options": {
+    "awslogs-group": "/ws/ecs/product",
+    "awslogs-region": "ap-northeast-2",
+    "awslogs-stream-prefix": "ecs"
+  }
+}
+```
+
+**로그 그룹이 미리 없으면 태스크가 기동에 실패한다**(자동 생성 옵션을 안 켠 경우). 로그 그룹을 먼저 만드는 습관이 여기서도 이득이다.
+
+### ECS Exec (2025)
+
+컨테이너 안으로 셸을 여는 기능이다. 세 가지가 필요하다.
+
+1. 태스크 역할에 `ssmmessages:CreateControlChannel` 등 4개 권한
+2. 서비스의 `enableExecuteCommand = true`
+3. 태스크가 SSM 엔드포인트로 나갈 수 있을 것
+
+```bash
+aws ecs execute-command --cluster ws-cluster --task <id> \
+  --container gateway --interactive --command "/bin/sh"
+```
+
+### Service Connect (2025)
+
+같은 네임스페이스 안에서 `http://<서비스 이름>` 으로 서로를 부른다. 사이드카 프록시가 태스크에 자동으로 붙고 환경 변수(`CONN_GATEWAY`, `CONN_PRODUCT`)가 주입된다.
+
+**채점기준이 "편법으로 판단되면 ECS namespace 와 proxy-container 를 확인한다"고 적어 두었다** — `/etc/hosts` 조작은 잡힌다.
+
+### latest 를 쓰면 안 되는 이유
+
+`latest` 는 "가장 최신" 을 보장하지 않는다. 그냥 흔히 쓰는 이름일 뿐이고, 서비스가 태스크를 다시 띄울 때 어떤 이미지가 올지 알 수 없다. 그래서 운영에서는 금지고, 2025 채점도 이미지 문자열 끝이 `latest` 가 아닌지 본다.
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="ECR 옵션 순서">
+스캔·불변성·암호화를 켜고 이미지를 올리려 한다. 가장 시간을 아끼는 순서는?
+
+- [x] 리포지토리 생성 시 암호화·스캔을 켜고 → 이미지 푸시 → 마지막에 불변성
+- [ ] 셋 다 켜고 → 이미지 푸시
+  > 불변성이 켜져 있으면 수정할 때마다 태그를 새로 붙여야 한다. 스캔에서 취약점이 나오면 여러 번 고치게 된다.
+- [ ] 이미지를 먼저 올리고 → 셋 다 켠다
+  > 암호화는 리포지토리 생성 시점 설정이라 나중에 못 켠다.
+- [ ] 순서는 상관없다
+  > 암호화는 생성 시, 불변성은 나중이 유리하다.
+
+**암호화는 생성 시, 불변성은 마지막.** 스캔은 언제 켜도 되지만 미리 켜야 푸시할 때 자동으로 돈다.
+</Quiz>
+
+<Quiz title="awsvpc 네트워크 모드">
+2025 채점이 서비스의 `networkConfiguration.awsvpcConfiguration.subnets` 가 2개 이상인지 본다. 이 필드가 존재하는 이유는?
+
+- [x] `awsvpc` 모드에서 태스크마다 ENI 를 받으므로 어느 서브넷에 둘지 지정해야 한다
+- [ ] ECS 클러스터가 여러 VPC 에 걸쳐 있어서
+  > 클러스터는 VPC 하나 안에 있다.
+- [ ] ALB 가 서브넷을 2개 요구해서
+  > ALB 서브넷과 태스크 서브넷은 별개 설정이다.
+- [ ] EC2 시작 유형에서만 나오는 필드라서
+  > `awsvpc` 를 쓰는 서비스면 시작 유형과 무관하게 나온다.
+
+**태스크가 자기 IP 를 갖기 때문이다.** 서브넷을 둘 이상 주는 것이 곧 AZ 분산이다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+<LinkButton href="/basics/07-k8s-eks/" icon="right-arrow">다음 — 07 쿠버네티스·EKS</LinkButton>
+<LinkButton href="/axis/05-axis-compute/" variant="minimal">축 3 — 앱 배포와 ALB</LinkButton>
+
+## 공식 문서
+
+- [ECS 태스크 정의 파라미터](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html) — `logConfiguration` 절
+- [ECR 이미지 스캔](https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html)
+- [ECR 태그 변경 불가](https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html)
+- [ECS Exec](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html) — 필요한 IAM 권한
+- [ECS Service Connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html)

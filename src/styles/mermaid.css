@@ -1,0 +1,209 @@
+/* mermaid 도식 프레임 + 전체화면 뷰어 (src/scripts/mermaid-fullscreen.js 와 한 쌍) */
+
+/* 도식 안에서는 전이(transition)를 완전히 끈다.
+ *
+ * starlight-theme-exquisitus 는 reduced-motion 을 요청한 사용자에게 흔한 관용구인
+ * `*, *::before, *::after { transition-duration: 0.01ms !important }` 를 건다.
+ * transition-property 기본값이 `all` 이라, 이 한 줄은 "모든 요소의 모든 속성이
+ * 전이 대상" 이라는 뜻이 된다 — 원래 전이가 없던 것까지 포함해서.
+ *
+ * mermaid 는 노드를 붙인 직후 `transform` 을 얹어 배치하고, 그 상태에서 곧바로
+ * getBBox() 를 읽어 viewBox 를 정한다. transform 이 전이 중이면 그 측정이 배치
+ * 전 좌표를 물어, viewBox 가 실제 내용보다 8배 넘게 부풀었다(2노드 도식이
+ * 2067x2044, subgraph 가 끼면 16451x16428). svg 는 그 viewBox 대로 그려지므로
+ * 도식은 프레임 한구석의 점이 되고, 좁은 화면에서는 사실상 빈 칸으로 보인다.
+ *
+ * 모바일에서만 신고된 이유는 reduced-motion 때문이다 — iOS 손쉬운 사용의 "동작
+ * 줄이기", 안드로이드 "애니메이션 제거", 저전력 모드가 이 설정을 켠다.
+ *
+ * `@layer base` 안에 두는 것이 핵심이다. `!important` 선언끼리는 레이어 우선순위가
+ * 뒤집혀 **먼저 선언된 레이어가 이긴다** — base 는 tailwind.css 의 레이어 순서에서
+ * 맨 앞이라 exquisitus 의 !important 를 이긴다. 레이어 밖에 두면 진다.
+ *
+ * 선택자는 svg 의 id 로 잡는다. mermaid 는 최종 위치가 아니라 body 에 잠깐 붙인
+ * 임시 컨테이너 안에서 측정하므로, `pre.mermaid` 를 기준으로 잡으면 정작 측정
+ * 시점에는 규칙이 걸리지 않는다. */
+@layer base {
+	svg[id^='mermaid-'],
+	svg[id^='mermaid-'] * {
+		transition-duration: 0s !important;
+	}
+}
+
+.mfs-frame {
+	position: relative;
+	margin: 1.5rem 0;
+	padding: 0;
+	border: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	border-radius: 0.75rem;
+	background: var(--sl-color-bg-sidebar, var(--sl-color-gray-6));
+	overflow: hidden;
+}
+
+/* 본문 폭보다 넓은 도식은 프레임 안에서 가로 스크롤 — 페이지 자체가 밀리면 안 된다.
+   justify-content:center(astro-mermaid 기본값)로 두면 넘친 만큼이 좌우로 똑같이
+   삐져나가는데, flex 컨테이너에서 중앙 정렬된 콘텐츠의 넘친 영역은 스크롤로 온전히
+   못 돌아온다(왼쪽 절반이 영영 안 보이는 브라우저 버그성 동작) — flex-start 로
+   왼쪽부터 쌓아야 스크롤이 처음부터 끝까지 닿는다. */
+.mfs-frame > pre.mermaid {
+	margin: 0;
+	padding: 1rem;
+	overflow-x: auto;
+	justify-content: flex-start;
+	background: none;
+	border: 0;
+}
+
+/* mermaid 는 svg 에 width="100%" 를 박아 컨테이너 폭에 맞춰 축소시킨다 — 도식이
+   본문보다 넓으면 글자까지 같이 쪼그라들어 못 읽게 된다(노트북·모바일에서 특히).
+   실제 픽셀 width 는 mermaid-fullscreen.js 가 viewBox 에서 읽어 인라인으로 박아준다.
+   여기서는 max-width 를 풀어주고(안 풀면 mermaid 가 박은 원본 max-width 만 남음),
+   flex-shrink:0 을 줘야 한다 — pre.mermaid 가 display:flex 라 기본 flex-shrink:1 이면
+   width 를 아무리 정해도 컨테이너 폭에 맞춰 다시 쪼그라든다. 넘치는 부분은 위
+   overflow-x:auto 로 스크롤한다.
+
+   hover 로 크기를 바꾸던 이전 시도(ebe13c8)는 걷어냈다 — 평상시/호버 크기가
+   달라져 도식이 튀고, 터치 기기에는 hover 가 없어 영영 작은 채로 남는다. */
+.mfs-frame > pre.mermaid svg {
+	flex-shrink: 0;
+	max-width: none;
+	height: auto;
+}
+
+.mfs-open-btn {
+	position: absolute;
+	inset-block-start: 0.5rem;
+	inset-inline-end: 0.5rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35em;
+	padding: 0.35rem 0.7rem;
+	font: inherit;
+	font-size: 0.8rem;
+	line-height: 1;
+	color: var(--sl-color-gray-2);
+	background: var(--sl-color-bg, var(--sl-color-black));
+	border: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	border-radius: 9999px;
+	cursor: pointer;
+	transition: opacity 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.mfs-open-btn:is(:hover, :focus-visible) {
+	color: var(--sl-color-white);
+	border-color: var(--sl-color-accent);
+}
+
+/* 포인터가 있는 환경에서만 숨긴다 — 터치 기기는 hover 가 없어 영영 못 누른다.
+   opacity 만 0 으로 두므로 탭 이동·포커스는 그대로 살아 있다(visibility 는 금물). */
+@media (hover: hover) {
+	.mfs-open-btn {
+		opacity: 0;
+	}
+
+	.mfs-frame:hover .mfs-open-btn,
+	.mfs-frame:focus-within .mfs-open-btn,
+	.mfs-open-btn:focus-visible {
+		opacity: 1;
+	}
+}
+
+/* ── 오버레이 ───────────────────────────────────────────── */
+
+html.mfs-open {
+	overflow: hidden; /* 뒤 페이지가 같이 스크롤되지 않게 */
+}
+
+.mfs-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	/* --sl-color-black 은 라이트 테마에서 흰색으로 뒤집힌다 — 스크림에 쓰면
+	   뒤 페이지가 그대로 비친다. 페이지 배경색을 불투명하게 깐다. */
+	background: var(--sl-color-bg, var(--sl-color-gray-7));
+}
+
+.mfs-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.6rem 0.9rem;
+	border-block-end: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	background: var(--sl-color-bg, var(--sl-color-black));
+}
+
+.mfs-caption {
+	min-width: 0;
+	overflow: hidden;
+	font-size: 0.85rem;
+	color: var(--sl-color-gray-3);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.mfs-actions {
+	display: flex;
+	flex: none;
+	gap: 0.35rem;
+}
+
+.mfs-btn {
+	min-width: 2.5rem;
+	min-height: 2.5rem; /* 터치 타깃 */
+	padding: 0 0.6rem;
+	font: inherit;
+	font-size: 0.9rem;
+	color: var(--sl-color-white);
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	border-radius: 0.5rem;
+	cursor: pointer;
+}
+
+.mfs-btn:is(:hover, :focus-visible) {
+	border-color: var(--sl-color-accent);
+}
+
+/* 넘친 도식은 무대가 직접 스크롤한다 — overflow:hidden + 가운데 정렬이면 넓은
+   도식의 좌우가 잘린 채 되돌아올 방법이 없다. */
+.mfs-stage {
+	flex: 1;
+	display: flex;
+	overflow: auto;
+	cursor: grab;
+	touch-action: none; /* 핀치·드래그를 스크립트가 직접 처리한다 */
+}
+
+.mfs-stage:active {
+	cursor: grabbing;
+}
+
+/* 가운데 정렬은 margin:auto 로 한다. justify-content:center / place-items:center 는
+   내용이 컨테이너보다 커지는 순간 시작 쪽(왼쪽·위)이 스크롤로 닿지 않는 영역이 된다.
+   margin:auto 는 작을 때만 가운데로 밀고, 클 때는 0 으로 접혀 전부 스크롤된다.
+   크기는 스크립트가 인라인 width 로 정한다(레이아웃 확대 = 화질 유지) — 여기서
+   transform 이나 will-change 를 얹으면 합성 레이어가 생겨 다시 뭉개진다. */
+.mfs-canvas {
+	margin: auto;
+}
+
+@media (max-width: 50rem) {
+	.mfs-caption {
+		display: none; /* 좁은 화면에선 버튼에 자리를 준다 */
+	}
+
+	.mfs-btn {
+		min-width: 2.75rem; /* 좁은 화면일수록 터치 타깃을 넉넉히 */
+	}
+
+	/* 도식을 원래 크기로 두면 세로로도 긴 아키텍처는 프레임 하나가 화면을 통째로
+	   먹는다(모바일에서 스크롤이 도식에 갇힌다). 글자 크기는 그대로 두고 프레임의
+	   높이만 잘라, 넘치는 만큼은 프레임 안에서 위아래로 스크롤시킨다. */
+	.mfs-frame > pre.mermaid {
+		max-height: 60vh;
+		overflow: auto;
+	}
+}

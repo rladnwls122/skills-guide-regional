@@ -1,0 +1,422 @@
+<!DOCTYPE html><html lang="ko" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-vdxcvpsm"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>지방대회 지형도 | skills-guide-regional</title><link rel="stylesheet" href="https://api.iconify.design/logos.css?icons=aws,aws-kms,aws-s3,aws-vpc,aws-eks,aws-ec2,aws-lambda,aws-dynamodb,aws-iam,aws-cloudfront,aws-cloudwatch,aws-elb,aws-sqs,aws-sns,aws-eventbridge,aws-kinesis,aws-api-gateway,aws-ecs,aws-fargate,aws-rds,aws-route53,aws-secrets-manager,aws-xray,aws-step-functions,aws-cloudformation,aws-waf,aws-cognito,aws-elasticache,aws-glue,aws-cloudtrail,aws-config,aws-msk,aws-documentdb,kubernetes,docker-icon,terraform-icon,prometheus,grafana,helm,nginx,apache-flink,opentelemetry"/><link rel="stylesheet" href="https://api.iconify.design/mdi.css?icons=lan-connect,layers-outline,script-text-outline,console-line,server-network,web,routes,card-text-outline&amp;color=%238ab"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.3.1"/><meta name="generator" content="Starlight v0.41.11"/><meta property="og:title" content="지방대회 지형도"/><meta property="og:type" content="article"/><meta property="og:locale" content="ko"/><meta property="og:description" content="4년간 형식·시간·배점·채점 흐름이 어떻게 바뀌었나. 두 번의 전환점과 등장 서비스 누적표."/><meta property="og:site_name" content="skills-guide-regional"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="4년간 형식·시간·배점·채점 흐름이 어떻게 바뀌었나. 두 번의 전환점과 등장 서비스 누적표."/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/_astro/common.De8rqUYR.css"><style>@layer starlight.components{.card-grid:where(.astro-lmor3ela){grid-template-columns:100%;gap:1rem;display:grid}.card-grid:where(.astro-lmor3ela)>*{margin-top:0!important}@media (width>=50rem){.card-grid:where(.astro-lmor3ela){grid-template-columns:1fr 1fr;gap:1.5rem}.stagger:where(.astro-lmor3ela){--stagger-height:5rem;padding-bottom:var(--stagger-height)}.stagger:where(.astro-lmor3ela)>:nth-child(2n){transform:translateY(var(--stagger-height))}}.sl-link-card:where(.astro-vodiqeol){border:1px solid var(--sl-color-gray-5);box-shadow:var(--sl-shadow-sm);border-radius:.5rem;grid-template-columns:1fr auto;gap:.5rem;padding:1rem;display:grid;position:relative}a:where(.astro-vodiqeol){line-height:var(--sl-line-height-headings);text-decoration:none}a:where(.astro-vodiqeol):before{content:"";position:absolute;inset:0}.stack:where(.astro-vodiqeol){flex-direction:column;gap:.5rem}.title:where(.astro-vodiqeol){color:var(--sl-color-white);font-weight:600;font-size:var(--sl-text-lg)}.description:where(.astro-vodiqeol){color:var(--sl-color-gray-3);line-height:1.5}.icon:where(.astro-vodiqeol){color:var(--sl-color-gray-3)}.sl-link-card:where(.astro-vodiqeol):hover{background:var(--sl-color-gray-7,var(--sl-color-gray-6));border-color:var(--sl-color-gray-2)}.sl-link-card:where(.astro-vodiqeol):hover .icon:where(.astro-vodiqeol){color:var(--sl-color-white)}}
+@layer starlight.components{svg:where(.astro-n5k4ipy7){color:var(--sl-icon-color);font-size:var(--sl-icon-size,1em);width:1em;height:1em}}
+@layer starlight.components{.sl-steps{--bullet-size:calc(var(--sl-line-height) * 1rem);--bullet-margin:.375rem;counter-reset:steps-counter var(--sl-steps-start,0);padding-inline-start:0;list-style:none}.sl-steps>li{counter-increment:steps-counter;padding-inline-start:calc(var(--bullet-size) + 1rem);min-height:calc(var(--bullet-size) + var(--bullet-margin));padding-bottom:1px;position:relative}.sl-steps>li+li{margin-top:0}.sl-steps>li:before{content:counter(steps-counter);top:0;width:var(--bullet-size);height:var(--bullet-size);line-height:var(--bullet-size);font-size:var(--sl-text-xs);text-align:center;color:var(--sl-color-white);background-color:var(--sl-color-gray-6);box-shadow:inset 0 0 0 1px var(--sl-color-gray-5);border-radius:99rem;font-weight:600;position:absolute;inset-inline-start:0}.sl-steps>li:after{--guide-width:1px;content:"";top:calc(var(--bullet-size) + var(--bullet-margin));bottom:var(--bullet-margin);width:var(--guide-width);background-color:var(--sl-color-hairline-light);position:absolute;inset-inline-start:calc((var(--bullet-size) - var(--guide-width)) / 2)}}@layer starlight.content{.sl-steps>li>:first-child{--lh:calc(1em * var(--sl-line-height));--shift-y:calc(.5 * (var(--bullet-size) - var(--lh)));transform:translateY(var(--shift-y));margin-bottom:var(--shift-y)}.sl-steps>li>:first-child:where(h1,h2,h3,h4,h5,h6){--lh:calc(1em * var(--sl-line-height-headings))}@supports (--prop:1lh){.sl-steps>li>:first-child{--lh:1lh}}}
+@layer starlight.components{.sl-link-button:where(.astro-hlbqph7b){font-size:var(--sl-text-sm);outline-offset:.25rem;border:1px solid #0000;border-radius:999rem;align-items:center;gap:.5em;padding:.4375rem 1.125rem;line-height:1.1875;text-decoration:none;display:inline-flex}.sl-link-button:where(.astro-hlbqph7b).primary{background:var(--sl-color-text-accent);border-color:var(--sl-color-text-accent);color:var(--sl-color-black)}.sl-link-button:where(.astro-hlbqph7b).primary:hover{color:var(--sl-color-black)}.sl-link-button:where(.astro-hlbqph7b).secondary{border-color:inherit;color:var(--sl-color-white)}.sl-link-button:where(.astro-hlbqph7b).minimal{color:var(--sl-color-white);padding-inline:0}.sl-link-button:where(.astro-hlbqph7b) svg{flex-shrink:0}@media (width>=50rem){.sl-link-button:where(.astro-hlbqph7b){font-size:var(--sl-text-base);padding:.9375rem 1.25rem}}.sl-markdown-content .sl-link-button:where(.astro-hlbqph7b){margin-inline-end:1rem}.sl-markdown-content .sl-link-button:where(.astro-hlbqph7b):not(:where(p *)){margin-block:1rem}}
+</style><script type="module" src="/_astro/page.BPG55g24.js"></script></head><body class="astro-vdxcvpsm"><a class="sl-skip-link astro-vxeigawq" href="#_top">콘텐츠로 이동</a><div class="page sl-flex astro-gqpr5s5a"><header class="header astro-gqpr5s5a"><div class="header astro-nczgtkxc"><div class="title-wrapper sl-flex astro-nczgtkxc"><a href="/" class="site-title sl-flex astro-clw6ags5"><span class="astro-clw6ags5" translate="no">skills-guide-regional</span></a></div><div class="sl-flex print:hidden astro-nczgtkxc"><site-search class="astro-nczgtkxc astro-r5ar4xm7" data-translations="{&quot;placeholder&quot;:&quot;검색&quot;}"><button data-open-modal disabled aria-label="검색" aria-keyshortcuts="Control+K" class="astro-r5ar4xm7"><svg aria-hidden="true" class="astro-r5ar4xm7 astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-r5ar4xm7" aria-hidden="true">검색</span><kbd class="sl-hidden md:sl-flex astro-r5ar4xm7" style="display: none;"><kbd class="astro-r5ar4xm7">Ctrl</kbd><kbd class="astro-r5ar4xm7">K</kbd></kbd></button><dialog style="padding:0" aria-label="검색" class="astro-r5ar4xm7"><div class="dialog-frame sl-flex astro-r5ar4xm7"><button data-close-modal class="sl-flex md:sl-hidden astro-r5ar4xm7">취소</button><div class="search-container astro-r5ar4xm7"><div id="starlight__search" class="astro-r5ar4xm7"></div></div></div></dialog></site-search><script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/_astro/Search.astro_astro_type_script_index_0_lang.Bz_VK90W.js"></script></div><div class="sl-hidden md:sl-flex print:hidden right-group astro-nczgtkxc"><div class="sl-flex social-icons astro-nczgtkxc"><a href="https://github.com/rladnwls122/skills-guide-regional" rel="me" class="sl-flex astro-cg55etiy"><span class="sr-only astro-cg55etiy">GitHub</span><svg aria-hidden="true" class="astro-cg55etiy astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-r2p65idu"><span class="sr-only astro-r2p65idu">테마 선택</span><svg aria-hidden="true" class="icon label-icon astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-r2p65idu"><option value="dark" class="astro-r2p65idu">어두운 테마</option><option value="light" class="astro-r2p65idu">밝은 테마</option><option value="auto" selected class="astro-r2p65idu">자동</option></select><svg aria-hidden="true" class="icon caret astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script></div></div></header><nav class="sidebar print:hidden astro-gqpr5s5a" aria-label="메인"><starlight-menu-button class="print:hidden astro-vvx7mffu"><button aria-expanded="false" aria-label="메뉴" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-vvx7mffu"><svg aria-hidden="true" class="open-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-vvx7mffu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg></button></starlight-menu-button><script type="module">var e=class extends HTMLElement{btn=this.querySelector(`button`);constructor(){super(),this.btn.addEventListener(`click`,()=>this.toggleExpanded());let e=this.closest(`nav`);e&&e.addEventListener(`keyup`,e=>this.closeOnEscape(e)),matchMedia(`(min-width: 50em)`).addEventListener(`change`,()=>this.setExpanded(!1))}setExpanded(e){this.setAttribute(`aria-expanded`,String(e)),document.body.toggleAttribute(`data-mobile-menu-expanded`,e),document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}toggleExpanded(){this.setExpanded(this.getAttribute(`aria-expanded`)!==`true`)}closeOnEscape(e){e.code===`Escape`&&(this.setExpanded(!1),this.btn.focus())}};customElements.define(`starlight-menu-button`,e);</script><div id="starlight__sidebar" class="sidebar-pane astro-gqpr5s5a"><div class="sidebar-content sl-flex astro-gqpr5s5a"><ul class="starlight-sidebar-topics astro-weqivxqx"><li class="astro-weqivxqx"><a href="/basics/00-index/" class="astro-weqivxqx"><div class="starlight-sidebar-topics-icon astro-weqivxqx"><svg aria-hidden="true" class="astro-weqivxqx astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M4.314 0.198L16.746 0.198Q17.838 0.198 18.615 0.975Q19.392 1.752 19.392 2.844L19.392 2.844L19.392 21.156Q19.392 22.248 18.615 23.025Q17.838 23.802 16.746 23.802L16.746 23.802L4.314 23.802Q3.222 23.802 2.445 23.025Q1.668 22.248 1.668 21.156L1.668 21.156L1.668 2.844Q1.668 1.752 2.445 0.975Q3.222 0.198 4.314 0.198L4.314 0.198ZM21.450 15.528L20.568 15.528L21.450 15.528Q21.786 15.528 22.038 15.759Q22.290 15.990 22.332 16.326L22.332 16.326L22.332 18.216Q22.332 18.552 22.122 18.783Q21.912 19.014 21.576 19.098L21.576 19.098L20.568 19.098L20.568 15.528L21.450 15.528ZM21.450 10.824L20.568 10.824L21.450 10.824Q21.786 10.824 22.038 11.034Q22.290 11.244 22.332 11.580L22.332 11.580L22.332 13.470Q22.332 13.806 22.122 14.058Q21.912 14.310 21.576 14.352L21.576 14.352L20.568 14.352L20.568 10.824L21.450 10.824ZM21.450 6.078L20.568 6.078L21.450 6.078Q21.786 6.078 22.038 6.309Q22.290 6.540 22.332 6.876L22.332 6.876L22.332 8.766Q22.332 9.102 22.122 9.333Q21.912 9.564 21.576 9.648L21.576 9.648L20.568 9.648L20.568 6.078L21.450 6.078ZM14.352 4.314L14.352 4.314L6.708 4.314Q6.372 4.314 6.120 4.545Q5.868 4.776 5.826 5.070L5.826 5.070L5.784 7.002Q5.784 7.296 6.015 7.548Q6.246 7.800 6.582 7.842L6.582 7.842L14.352 7.884Q14.688 7.884 14.940 7.653Q15.192 7.422 15.234 7.086L15.234 7.086L15.276 5.196Q15.276 4.818 15.003 4.566Q14.730 4.314 14.352 4.314Z"/></svg></div><div class="astro-weqivxqx">사전 지식</div></a></li><li class="astro-weqivxqx"><a href="/exam/00-competition-map/" class="starlight-sidebar-topics-current astro-weqivxqx"><div class="starlight-sidebar-topics-icon astro-weqivxqx"><svg aria-hidden="true" class="astro-weqivxqx astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.17 2.06A13.1 13.1 0 0 0 19 1.87a12.94 12.94 0 0 0-7 2.05 12.94 12.94 0 0 0-7-2 13.1 13.1 0 0 0-2.17.19 1 1 0 0 0-.83 1v12a1 1 0 0 0 1.17 1 10.9 10.9 0 0 1 8.25 1.91l.12.07h.11a.91.91 0 0 0 .7 0h.11l.12-.07A10.899 10.899 0 0 1 20.83 16 1 1 0 0 0 22 15V3a1 1 0 0 0-.83-.94ZM11 15.35a12.87 12.87 0 0 0-6-1.48H4v-10c.333-.02.667-.02 1 0a10.86 10.86 0 0 1 6 1.8v9.68Zm9-1.44h-1a12.87 12.87 0 0 0-6 1.48V5.67a10.86 10.86 0 0 1 6-1.8c.333-.02.667-.02 1 0v10.04Zm1.17 4.15a13.098 13.098 0 0 0-2.17-.19 12.94 12.94 0 0 0-7 2.05 12.94 12.94 0 0 0-7-2.05c-.727.003-1.453.066-2.17.19A1 1 0 0 0 2 19.21a1 1 0 0 0 1.17.79 10.9 10.9 0 0 1 8.25 1.91 1 1 0 0 0 1.16 0A10.9 10.9 0 0 1 20.83 20a1 1 0 0 0 1.17-.79 1 1 0 0 0-.83-1.15Z"/></svg></div><div class="astro-weqivxqx">대회 이해</div></a></li><li class="astro-weqivxqx"><a href="/axis/03-axis-network/" class="astro-weqivxqx"><div class="starlight-sidebar-topics-icon astro-weqivxqx"><svg aria-hidden="true" class="astro-weqivxqx astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 22H5a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3h1a4 4 0 0 1 7.3-2.18c.448.64.692 1.4.7 2.18h3a1 1 0 0 1 1 1v3a4 4 0 0 1 2.18 7.3A3.86 3.86 0 0 1 18 18v3a1 1 0 0 1-1 1ZM5 8a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11v-3.18a1 1 0 0 1 1.33-.95 1.77 1.77 0 0 0 1.74-.23 2 2 0 0 0 .93-1.37 2 2 0 0 0-.48-1.59 1.89 1.89 0 0 0-2.17-.55 1 1 0 0 1-1.33-.95V8h-3.2a1 1 0 0 1-1-1.33 1.77 1.77 0 0 0-.23-1.74 1.939 1.939 0 0 0-3-.43A2 2 0 0 0 8 6c.002.23.046.456.13.67A1 1 0 0 1 7.18 8H5Z"/></svg></div><div class="astro-weqivxqx">과제 축</div></a></li><li class="astro-weqivxqx"><a href="/drill/09-drills/" class="astro-weqivxqx"><div class="starlight-sidebar-topics-icon astro-weqivxqx"><svg aria-hidden="true" class="astro-weqivxqx astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path fill-rule="evenodd" d="M1.44 8.855v-.001l3.527-3.516c.34-.344.802-.541 1.285-.548h6.649l.947-.947c3.07-3.07 6.207-3.072 7.62-2.868a1.821 1.821 0 0 1 1.557 1.557c.204 1.413.203 4.55-2.868 7.62l-.946.946v6.649a1.845 1.845 0 0 1-.549 1.286l-3.516 3.528a1.844 1.844 0 0 1-3.11-.944l-.858-4.275-4.52-4.52-2.31-.463-1.964-.394A1.847 1.847 0 0 1 .98 10.693a1.843 1.843 0 0 1 .46-1.838Zm5.379 2.017-3.873-.776L6.32 6.733h4.638l-4.14 4.14Zm8.403-5.655c2.459-2.46 4.856-2.463 5.89-2.33.134 1.035.13 3.432-2.329 5.891l-6.71 6.71-3.561-3.56 6.71-6.711Zm-1.318 15.837-.776-3.873 4.14-4.14v4.639l-3.364 3.374Z" clip-rule="evenodd"/><path d="M9.318 18.345a.972.972 0 0 0-1.86-.561c-.482 1.435-1.687 2.204-2.934 2.619a8.22 8.22 0 0 1-1.23.302c.062-.365.157-.79.303-1.229.415-1.247 1.184-2.452 2.62-2.935a.971.971 0 1 0-.62-1.842c-.12.04-.236.084-.35.13-2.02.828-3.012 2.588-3.493 4.033a10.383 10.383 0 0 0-.51 2.845l-.001.016v.063c0 .536.434.972.97.972H2.24a7.21 7.21 0 0 0 .878-.065c.527-.063 1.248-.19 2.02-.447 1.445-.48 3.205-1.472 4.033-3.494a5.828 5.828 0 0 0 .147-.407Z"/></svg></div><div class="astro-weqivxqx">훈련</div></a></li></ul><sl-sidebar-state-persist data-hash="15ozldw" class="astro-f5yvicm7"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><ul class="top-level astro-ojxuodky"><li class="astro-ojxuodky"><details open class="astro-ojxuodky"><summary class="astro-ojxuodky"><span class="group-label astro-ojxuodky"><span class="large astro-ojxuodky">대회 이해</span></span><svg aria-hidden="true" class="caret astro-ojxuodky astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-ojxuodky"><li class="astro-ojxuodky"><a href="/exam/00-competition-map/" aria-current="page" class="astro-ojxuodky"><span class="astro-ojxuodky">지방대회 지형도</span></a></li><li class="astro-ojxuodky"><a href="/exam/01-past-exams/" class="astro-ojxuodky"><span class="astro-ojxuodky">기출 분해 — 2023·2024·2025·2026 지방</span></a></li><li class="astro-ojxuodky"><a href="/exam/02-scoring/" class="astro-ojxuodky"><span class="astro-ojxuodky">채점 해부 — 스크립트가 실제로 보는 것</span></a></li></ul></details></li></ul><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-b5gddk54"><div class="social-icons astro-b5gddk54"><a href="https://github.com/rladnwls122/skills-guide-regional" rel="me" class="sl-flex astro-cg55etiy"><span class="sr-only astro-cg55etiy">GitHub</span><svg aria-hidden="true" class="astro-cg55etiy astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-r2p65idu"><span class="sr-only astro-r2p65idu">테마 선택</span><svg aria-hidden="true" class="icon label-icon astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-r2p65idu"><option value="dark" class="astro-r2p65idu">어두운 테마</option><option value="light" class="astro-r2p65idu">밝은 테마</option><option value="auto" selected class="astro-r2p65idu">자동</option></select><svg aria-hidden="true" class="icon caret astro-r2p65idu astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></div></div></nav><div class="main-frame astro-gqpr5s5a"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-abfeecmu"><aside class="right-sidebar-container print:hidden astro-abfeecmu"><div class="right-sidebar astro-abfeecmu"><div class="lg:sl-hidden astro-q5mffni3"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-5ulgm6bh"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-5ulgm6bh"><details id="starlight__mobile-toc" class="astro-5ulgm6bh"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-5ulgm6bh"><span class="toggle sl-flex astro-5ulgm6bh">목차<svg aria-hidden="true" class="caret astro-5ulgm6bh astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-5ulgm6bh"></span></summary><div class="dropdown astro-5ulgm6bh"><ul class="isMobile astro-cxyftcne" style="--depth: 0;"><li style="--depth: 0;" class="astro-cxyftcne"><a href="#_top" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">개요</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#1-형식" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">1. 형식</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#2-두-번의-전환점" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">2. 두 번의 전환점</span></a><ul class="isMobile astro-cxyftcne" style="--depth: 1;"><li style="--depth: 1;" class="astro-cxyftcne"><a href="#2-1-2025--2과제가-파이프라인에서-독립-4문제로-바뀌었다" style="--depth: 1;" class="astro-cxyftcne"><span style="--depth: 1;" class="astro-cxyftcne">2-1. 2025 — 2과제가 파이프라인에서 독립 4문제로 바뀌었다</span></a></li><li style="--depth: 1;" class="astro-cxyftcne"><a href="#2-2-2026--2과제-채점이-bastion을-떠나-cloudshell로-갔다" style="--depth: 1;" class="astro-cxyftcne"><span style="--depth: 1;" class="astro-cxyftcne">2-2. 2026 — 2과제 채점이 Bastion을 떠나 CloudShell로 갔다</span></a></li></ul></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#3-채점-흐름" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">3. 채점 흐름</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#4-등장-서비스-누적표" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">4. 등장 서비스 누적표</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#5-지방과-전국의-차이" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">5. 지방과 전국의 차이</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.BcSo_yiZ.js"></script><sl-quiz-progress-badge data-badge-label="Quiz" data-answered-label="answered" hidden="true" class="sl-quiz-progress-badge"><span class="sl-quiz-progress-badge-label">Quiz:</span><span class="sl-quiz-progress-answered">0</span><span class="sl-quiz-progress-badge-sep" aria-hidden="true">/</span><span class="sl-quiz-progress-total">0</span></sl-quiz-progress-badge><script type="module" src="/_astro/QuizProgressBadge.astro_astro_type_script_index_0_lang.DX0GWihi.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-q5mffni3"><div class="sl-container astro-q5mffni3"><sl-quiz-progress data-confirm-label="Reset every answer on this page? This cannot be undone." hidden="true" class="sl-quiz-progress sl-quiz-progress--toc"><h2 class="sl-quiz-progress-heading">퀴즈 진행 상황</h2><p class="sl-quiz-progress-stats"><span class="sl-quiz-progress-label">answered</span>: <span class="sl-quiz-progress-answered">0</span> / <span class="sl-quiz-progress-total">0</span> <span class="sl-quiz-progress-percent">(<span class="sl-quiz-progress-percentage">0%</span>)</span></p><div class="sl-quiz-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="퀴즈 진행 상황"><span class="sl-quiz-progress-bar-incorrect"></span><span class="sl-quiz-progress-bar-correct"></span></div><div class="sl-quiz-progress-footer"><p class="sl-quiz-progress-stats"><span class="sl-quiz-progress-label">정답</span>: <span class="sl-quiz-progress-correct">0</span> / <span class="sl-quiz-progress-total">0</span> <span class="sl-quiz-progress-percent">(<span class="sl-quiz-progress-score">0%</span>)</span></p><button type="button" class="sl-quiz-progress-reset">초기화</button></div></sl-quiz-progress><script type="module" src="/_astro/QuizProgress.astro_astro_type_script_index_0_lang.jWeZZBJf.js"></script><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">목차</h2><ul class="astro-cxyftcne" style="--depth: 0;"><li style="--depth: 0;" class="astro-cxyftcne"><a href="#_top" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">개요</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#1-형식" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">1. 형식</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#2-두-번의-전환점" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">2. 두 번의 전환점</span></a><ul class="astro-cxyftcne" style="--depth: 1;"><li style="--depth: 1;" class="astro-cxyftcne"><a href="#2-1-2025--2과제가-파이프라인에서-독립-4문제로-바뀌었다" style="--depth: 1;" class="astro-cxyftcne"><span style="--depth: 1;" class="astro-cxyftcne">2-1. 2025 — 2과제가 파이프라인에서 독립 4문제로 바뀌었다</span></a></li><li style="--depth: 1;" class="astro-cxyftcne"><a href="#2-2-2026--2과제-채점이-bastion을-떠나-cloudshell로-갔다" style="--depth: 1;" class="astro-cxyftcne"><span style="--depth: 1;" class="astro-cxyftcne">2-2. 2026 — 2과제 채점이 Bastion을 떠나 CloudShell로 갔다</span></a></li></ul></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#3-채점-흐름" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">3. 채점 흐름</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#4-등장-서비스-누적표" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">4. 등장 서비스 누적표</span></a></li><li style="--depth: 0;" class="astro-cxyftcne"><a href="#5-지방과-전국의-차이" style="--depth: 0;" class="astro-cxyftcne"><span style="--depth: 0;" class="astro-cxyftcne">5. 지방과 전국의 차이</span></a></li></ul></nav></starlight-toc><script type="module" src="/_astro/TableOfContents.astro_astro_type_script_index_0_lang.Csloo1VZ.js"></script></div></div></div></aside><div class="main-pane astro-abfeecmu"><main data-pagefind-body class="astro-vdxcvpsm" lang="ko" dir="ltr"><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><h1 id="_top" class="astro-2sm4b3ln">지방대회 지형도</h1></div></div><div class="content-panel astro-oil7k7jf"><div class="sl-container astro-oil7k7jf"><div class="sl-markdown-content"><blockquote>
+<p>문서 유형: 개요</p>
+</blockquote>
+<p>지방기능경기대회 클라우드컴퓨팅이 4년간 어떻게 생겨 먹었는지를 한 장에 담는다. 개별 과제 내용은 <a href="/exam/01-past-exams/">기출 분해</a>에 있다.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="1-형식">1. 형식</h2><a class="sl-anchor-link" href="#1-형식"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">섹션 제목: “1. 형식”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>항목</th><th>2023</th><th>2024</th><th>2025</th><th>2026</th></tr></thead><tbody><tr><td>과제 수</td><td>2</td><td>2</td><td>2</td><td>2</td></tr><tr><td>과제당 시간</td><td>4시간</td><td>4시간</td><td>4시간</td><td>4시간</td></tr><tr><td>1과제 배점</td><td>60</td><td>60</td><td>50</td><td>50</td></tr><tr><td>2과제 배점</td><td>40(추정)</td><td>40</td><td>50</td><td>50</td></tr><tr><td>1과제 이름</td><td>Web Service Provisioning</td><td>Web Service Provisioning</td><td>Solution Architecture</td><td>Solution architecture</td></tr><tr><td>2과제 이름</td><td>Automation</td><td>Automation</td><td>Small Challenge</td><td>Small challenge</td></tr></tbody></table>
+<p><strong>2023 2과제 배점 40은 추정이다.</strong> 2023 자료 중 확보된 채점기준은 1과제분(60점)뿐이다. 2024가 60/40이고 2과제 항목 수가 비슷해 같은 배분으로 본다.</p>
+<p>전국대회는 3과제 체제이지만 지방은 4년 내내 2과제다. 그래서 훈련 단위도 “4시간 안에 과제 하나를 끝낸다”가 된다.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="2-두-번의-전환점">2. 두 번의 전환점</h2><a class="sl-anchor-link" href="#2-두-번의-전환점"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">섹션 제목: “2. 두 번의 전환점”</span></a></div>
+<div class="sl-heading-wrapper level-h3"><h3 id="2-1-2025--2과제가-파이프라인에서-독립-4문제로-바뀌었다">2-1. 2025 — 2과제가 파이프라인에서 독립 4문제로 바뀌었다</h3><a class="sl-anchor-link" href="#2-1-2025--2과제가-파이프라인에서-독립-4문제로-바뀌었다"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">섹션 제목: “2-1. 2025 — 2과제가 파이프라인에서 독립 4문제로 바뀌었다”</span></a></div>
+<p>2023·2024의 2과제는 <strong>하나의 파이프라인</strong>이었다. 2023은 API Gateway → Kinesis → S3 → Glue 로 이어지는 ETL 한 줄기, 2024는 CodeCommit → CodeBuild → CodeDeploy → CodePipeline 로 이어지는 CI/CD 한 줄기다. 앞 단계가 막히면 뒤가 통째로 죽는다.</p>
+<p>2025부터는 <strong>서로 독립된 소문제 4개</strong>가 되었고 각 12.5점으로 균등 배분된다. 2025는 Client VPN / KEDA / Terraform / EC2 자동화, 2026은 EFS / Athena / IAM / Lambda 다. 네 문제 사이에 의존이 없다.</p>
+<p>전략이 완전히 달라진다.</p>
+<ul>
+<li>파이프라인형(2023·2024): 앞부터 순서대로. 중간에 막히면 그 뒤는 포기하고 다른 축으로 넘어간다.</li>
+<li>독립형(2025·2026): <strong>12.5점씩 네 덩어리라 가장 자신 있는 것부터 집는다.</strong> 한 문제에 1시간을 넘기면 손을 뗀다. 4시간 ÷ 4문제 = 문제당 60분이 기준선이다.</li>
+</ul>
+<div class="sl-heading-wrapper level-h3"><h3 id="2-2-2026--2과제-채점이-bastion을-떠나-cloudshell로-갔다">2-2. 2026 — 2과제 채점이 Bastion을 떠나 CloudShell로 갔다</h3><a class="sl-anchor-link" href="#2-2-2026--2과제-채점이-bastion을-떠나-cloudshell로-갔다"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">섹션 제목: “2-2. 2026 — 2과제 채점이 Bastion을 떠나 CloudShell로 갔다”</span></a></div>
+<p>2023~2025는 1·2과제 모두 선수가 만든 Bastion EC2에 SSH로 붙어 채점했다. 2026 2과제 채점기준은 다르다.</p>
+<blockquote>
+<p>채점시 cloud shell을 이용해 진행합니다. 브라우저를 통해 접근하며 권한 및 접속 문제가 없도록 주의합니다. — 2026 2과제 과제지 유의사항 10)</p>
+</blockquote>
+<p>2026 2과제에는 Bastion 요구 자체가 없다. 1과제는 여전히 <code dir="auto">worldpay-bastion</code> 을 요구하고 SSH·SSM 접근을 전제한다.</p>
+<p>의미는 둘이다. 첫째, 2과제에서 Bastion 만드는 시간을 아낀다. 둘째, <strong>CloudShell 은 리전마다 새로 열린다</strong> — 2026 2과제는 문제마다 리전이 달라(EFS는 도쿄, 나머지는 서울) 채점자가 리전을 옮겨 다니며 채점한다. 리전을 잘못 쓰면 리소스가 있어도 안 보인다.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="3-채점-흐름">3. 채점 흐름</h2><a class="sl-anchor-link" href="#3-채점-흐름"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">섹션 제목: “3. 채점 흐름”</span></a></div>
+<p>4년 내내 같은 골격이다.</p>
+<div class="expressive-code"><link rel="stylesheet" href="/_astro/ec.heuha.css"/><script type="module" src="/_astro/ec.0vx5m.js"></script><figure class="frame not-content"><figcaption class="header"></figcaption><pre data-language="plaintext"><code><div class="ec-line"><div class="code"><span style="--0:#dbd7caee;--1:#393a34">1) 채점자가 선수 Bastion(또는 CloudShell)에 접속</span></div></div><div class="ec-line"><div class="code"><span style="--0:#dbd7caee;--1:#393a34">2) aws sts get-caller-identity 로 선수 계정인지 확인   ← 다른 계정이면 부정행위 의심</span></div></div><div class="ec-line"><div class="code"><span style="--0:#dbd7caee;--1:#393a34">3) ~/.aws/config 에 region=ap-northeast-2, output=json 설정</span></div></div><div class="ec-line"><div class="code"><span style="--0:#dbd7caee;--1:#393a34">4) 채점기준표의 항목 번호 순서대로 aws CLI 명령 실행</span></div></div><div class="ec-line"><div class="code"><span style="--0:#dbd7caee;--1:#393a34">5) 출력이 기대값과 같으면 득점</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="클립보드로 복사" data-copied="복사 완료!" data-code="1) 채점자가 선수 Bastion(또는 CloudShell)에 접속2) aws sts get-caller-identity 로 선수 계정인지 확인   ← 다른 계정이면 부정행위 의심3) ~/.aws/config 에 region=ap-northeast-2, output=json 설정4) 채점기준표의 항목 번호 순서대로 aws CLI 명령 실행5) 출력이 기대값과 같으면 득점"><div></div></button></div></figure></div>
+<p>핵심은 4)다. <strong>채점은 사람이 콘솔을 눈으로 보는 게 아니라 정해진 CLI 명령의 출력 문자열을 대조하는 것이다.</strong> 2024·2026은 아예 그 명령을 그대로 담은 <code dir="auto">mark.sh</code> 를 채점자에게 배포한다.</p>
+<p>여기서 나오는 규칙이 이 문서 전체를 관통한다 — <a href="/exam/02-scoring/">채점 해부</a>에서 항목별로 다룬다.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="4-등장-서비스-누적표">4. 등장 서비스 누적표</h2><a class="sl-anchor-link" href="#4-등장-서비스-누적표"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">섹션 제목: “4. 등장 서비스 누적표”</span></a></div>
+<p>4년간 문제지에 명시된 Software Stack 이다. 빈칸은 그해 안 나왔다는 뜻이다.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>서비스</th><th style="text-align:center">2023</th><th style="text-align:center">2024</th><th style="text-align:center">2025</th><th style="text-align:center">2026</th></tr></thead><tbody><tr><td>VPC</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td></tr><tr><td>EC2</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td></tr><tr><td>ELB/ALB</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td></tr><tr><td>ECR</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center"></td></tr><tr><td>ECS</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center"></td></tr><tr><td>EKS</td><td style="text-align:center"></td><td style="text-align:center">●</td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td></tr><tr><td>Fargate</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td>CloudFront</td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td>DocumentDB</td><td style="text-align:center"></td><td style="text-align:center">●</td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td>ElastiCache</td><td style="text-align:center"></td><td style="text-align:center">●</td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td>DynamoDB</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●</td><td style="text-align:center">●(2과제)</td></tr><tr><td>RDS</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●</td></tr><tr><td>Secrets Manager</td><td style="text-align:center"></td><td style="text-align:center">●</td><td style="text-align:center"></td><td style="text-align:center">●</td></tr><tr><td>KMS</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●</td></tr><tr><td>CloudWatch</td><td style="text-align:center"></td><td style="text-align:center">●</td><td style="text-align:center">●</td><td style="text-align:center">●</td></tr><tr><td>CloudMap</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●</td><td style="text-align:center"></td></tr><tr><td>Kinesis</td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td>Glue</td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td></tr><tr><td>Athena</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td></tr><tr><td>S3</td><td style="text-align:center">●(2과제)</td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td></tr><tr><td>API Gateway</td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td>CodeCommit/Build/Deploy/Pipeline</td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td><td style="text-align:center"></td></tr><tr><td>Client VPN</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td></tr><tr><td>Terraform</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td></tr><tr><td>EFS</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td></tr><tr><td>Lambda</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td></tr><tr><td>IAM (문제로 명시)</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td></tr><tr><td>ASG</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●</td></tr><tr><td>SQS</td><td style="text-align:center"></td><td style="text-align:center"></td><td style="text-align:center">●(2과제)</td><td style="text-align:center"></td></tr></tbody></table>
+<p><strong>개발 언어</strong>: 2023 Python/Flask, 2024 Golang(1과제)·Java Spring(2과제), 2025 Golang, 2026 Python/FastAPI + MySQL.</p>
+<p>읽는 법: ●이 3개 이상인 줄이 매년 축이다. VPC·EC2·ALB 셋은 4년 연속이고, 컨테이너 계열(ECR·ECS·EKS·Fargate)은 이름만 바뀌며 4년 연속이다. 나머지는 그해의 색깔이다.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="5-지방과-전국의-차이">5. 지방과 전국의 차이</h2><a class="sl-anchor-link" href="#5-지방과-전국의-차이"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore="true">섹션 제목: “5. 지방과 전국의 차이”</span></a></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th></th><th>지방</th><th>전국</th></tr></thead><tbody><tr><td>과제 수</td><td>2</td><td>3</td></tr><tr><td>과제당 시간</td><td>4시간</td><td>4시간+</td></tr><tr><td>한 과제의 서비스 수</td><td>많음 (8~11개 주요항목)</td><td>적고 깊음</td></tr><tr><td>요구 깊이</td><td>서비스 기본 옵션 수준</td><td>Suricata 룰 직접 작성, ArgoCD Rollouts 등</td></tr><tr><td>IaC</td><td>2025 2과제에서 Terraform 1회</td><td>상시</td></tr><tr><td>채점</td><td>CLI 출력 대조</td><td>동일</td></tr></tbody></table>
+<p>지방 훈련에서 시간을 잘못 쓰는 대표적 방식이 <strong>전국 수준의 깊이를 지방 축에 쏟는 것</strong>이다. 지방은 “DocumentDB의 감사 로그를 켠다”까지지 “감사 로그를 파싱해 이상 탐지를 만든다”가 아니다. 옵션 하나하나를 빠르게 켜는 손이 점수다.</p></div><sl-quiz-progress data-confirm-label="Reset every answer on this page? This cannot be undone." hidden="true" class="sl-quiz-progress sl-quiz-progress--mobile lg:sl-hidden"><p class="sl-quiz-progress-stats"><span class="sl-quiz-progress-label">answered</span>: <span class="sl-quiz-progress-answered">0</span> / <span class="sl-quiz-progress-total">0</span> <span class="sl-quiz-progress-percent">(<span class="sl-quiz-progress-percentage">0%</span>)</span></p><div class="sl-quiz-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-label="퀴즈 진행 상황"><span class="sl-quiz-progress-bar-incorrect"></span><span class="sl-quiz-progress-bar-correct"></span></div><div class="sl-quiz-progress-footer"><p class="sl-quiz-progress-stats"><span class="sl-quiz-progress-label">정답</span>: <span class="sl-quiz-progress-correct">0</span> / <span class="sl-quiz-progress-total">0</span> <span class="sl-quiz-progress-percent">(<span class="sl-quiz-progress-score">0%</span>)</span></p><button type="button" class="sl-quiz-progress-reset">초기화</button></div></sl-quiz-progress><footer class="sl-flex astro-xhxjzfa7"><div class="meta sl-flex astro-xhxjzfa7"></div><div class="pagination-links print:hidden astro-jgq3vlii" dir="ltr"><a href="/exam/01-past-exams/" rel="next" class="astro-jgq3vlii"><svg aria-hidden="true" class="astro-jgq3vlii astro-n5k4ipy7" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-jgq3vlii">다음 페이지<br class="astro-jgq3vlii"><span class="link-title astro-jgq3vlii">기출 분해 — 2023·2024·2025·2026 지방</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>

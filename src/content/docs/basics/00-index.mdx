@@ -1,0 +1,88 @@
+---
+title: 사전 지식 — 어디부터 채울까
+description: 지방대회에 실제로 쓰이는 것만 남긴 선수 학습 15편. 자가진단 표로 부족한 것만 골라 본다.
+sidebar:
+  order: 0
+---
+
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+> 문서 유형: 개요
+
+[skills-guide](https://skills-learn.zenru.net/)(전국판)의 선수 학습을 **지방대회 기출에 맞춰 다시 짰다.** 전국판이 18편으로 개념을 넓게 깐다면 이쪽은 4년치 기출에 실제로 나온 것만 남기고, 지방에만 나온 것(EFS·Athena)을 새로 넣었다.
+
+각 문서는 **앞 문서를 전제하지 않는다.** 필요한 것만 골라 봐도 된다.
+
+## 전국판에서 무엇을 바꿨나
+
+| 처리 | 문서 | 이유 |
+| --- | --- | --- |
+| 새로 씀 | [EFS](/basics/12-efs/), [Athena·Glue](/basics/13-athena-glue/) | 2026 2과제 ①②. 전국판에 없다 |
+| 지방 기출 예제로 교체 | VPC · IAM · ALB · DynamoDB · KMS | 예제가 전국 과제(set-02 등) 기준이었다 |
+| 범위를 줄임 | K8s·EKS | 지방은 클러스터를 띄우고 Deployment 를 올리는 선까지다 |
+| 새로 씀 | [셸과 AWS CLI](/basics/01-shell-awscli/) | 채점이 CLI 출력 대조라 **JMESPath 를 읽는 것 자체가 실력**이다 |
+| 뺌 | Go 앱, EventBridge, Step Functions, WAF, CloudFront 심화 | 4년간 지방 기출에 없거나 한 번뿐이다 |
+
+## 자가진단
+
+"설명할 수 있다"에 걸리는 줄만 보충한다. 전부 볼 필요 없다.
+
+| # | 질문 | 부족하면 |
+| --- | --- | --- |
+| 1 | `--query "Vpcs[].CidrBlock"` 이 무엇을 뽑는지 읽을 수 있다 | [01 셸과 AWS CLI](/basics/01-shell-awscli/) |
+| 2 | 서브넷이 public 이 되는 조건을 라우팅 기준으로 말할 수 있다 | [02 VPC](/basics/02-vpc/) |
+| 3 | 역할(role)·정책·신뢰 정책이 각각 무엇인지 안다 | [03 IAM](/basics/03-iam/) |
+| 4 | Launch Template 과 ASG 의 관계, user data 가 언제 도는지 안다 | [04 EC2·ASG](/basics/04-ec2-asg/) |
+| 5 | 리스너·규칙·타깃 그룹·헬스 체크를 구분한다 | [05 로드밸런서](/basics/05-loadbalancer/) |
+| 6 | 이미지·레지스트리·태스크 정의·서비스를 구분한다 | [06 컨테이너·ECS](/basics/06-container-ecs/) |
+| 7 | Pod·Deployment·Service 차이를 설명할 수 있다 | [07 쿠버네티스·EKS](/basics/07-k8s-eks/) |
+| 8 | 클러스터·인스턴스·서브넷 그룹·파라미터 그룹을 구분한다 | [08 RDS·MySQL](/basics/08-rds-mysql/) |
+| 9 | 파티션 키와 정렬 키, 온디맨드 모드를 안다 | [09 DynamoDB](/basics/09-dynamodb/) |
+| 10 | CMK 를 쓸 때 키 정책과 IAM 정책이 왜 둘 다 필요한지 안다 | [10 KMS·Secrets Manager](/basics/10-kms-secrets/) |
+| 11 | 지표·차원·통계·경보 상태를 구분한다 | [11 CloudWatch](/basics/11-cloudwatch/) |
+| 12 | NFS 마운트가 무엇이고 왜 보안 그룹 2049 가 필요한지 안다 | [12 EFS](/basics/12-efs/) |
+| 13 | S3 위의 CSV 를 SQL 로 읽는 구조(Glue 카탈로그 + Athena)를 안다 | [13 Athena·Glue](/basics/13-athena-glue/) |
+| 14 | Lambda 의 실행 역할·레이어·VPC 연결을 구분한다 | [14 Lambda](/basics/14-lambda/) |
+| 15 | `terraform init`·`plan`·`apply`·`destroy` 가 각각 무엇을 하는지 안다 | [15 Terraform](/basics/15-terraform/) |
+
+## 어느 해에 무엇이 필요했나
+
+| 문서 | 2023 | 2024 | 2025 | 2026 |
+| --- | :-: | :-: | :-: | :-: |
+| 01 셸·AWS CLI | ● | ● | ● | ● |
+| 02 VPC | ● | ● | ● | ● |
+| 03 IAM | ● | ● | ● | ● |
+| 04 EC2·ASG | ● | ● | ● | ● |
+| 05 로드밸런서 | ● | ● | ● | ● |
+| 06 컨테이너·ECS | ● | ● | ● | |
+| 07 쿠버네티스·EKS | | ● | ● | |
+| 08 RDS·MySQL | | | | ● |
+| 09 DynamoDB | | | ● | ● |
+| 10 KMS·Secrets | | ● | ● | ● |
+| 11 CloudWatch | | ● | ● | ● |
+| 12 EFS | | | | ● |
+| 13 Athena·Glue | ●(Glue) | | | ● |
+| 14 Lambda | | | | ● |
+| 15 Terraform | | | ● | |
+
+**01~05 는 4년 내내 필요했다.** 시간이 없으면 이 다섯부터 채운다.
+
+## 문서
+
+<CardGrid>
+  <LinkCard title="01 셸과 AWS CLI" href="/basics/01-shell-awscli/" description="채점 스크립트를 읽는 힘. JMESPath 와 출력 형식." />
+  <LinkCard title="02 VPC" href="/basics/02-vpc/" description="서브넷·라우팅·IGW·NAT·NACL·엔드포인트." />
+  <LinkCard title="03 IAM" href="/basics/03-iam/" description="역할·정책·신뢰 정책, 조건 키." />
+  <LinkCard title="04 EC2·ASG" href="/basics/04-ec2-asg/" description="AMI·user data·Launch Template·오토스케일링." />
+  <LinkCard title="05 로드밸런서" href="/basics/05-loadbalancer/" description="리스너·규칙·타깃 그룹·헬스 체크." />
+  <LinkCard title="06 컨테이너·ECS" href="/basics/06-container-ecs/" description="이미지·ECR·태스크 정의·서비스." />
+  <LinkCard title="07 쿠버네티스·EKS" href="/basics/07-k8s-eks/" description="Pod·Deployment·Service·노드그룹." />
+  <LinkCard title="08 RDS·MySQL" href="/basics/08-rds-mysql/" description="클러스터·서브넷 그룹·포트·사용자 권한." />
+  <LinkCard title="09 DynamoDB" href="/basics/09-dynamodb/" description="키 설계·용량 모드·백업·암호화." />
+  <LinkCard title="10 KMS·Secrets Manager" href="/basics/10-kms-secrets/" description="CMK 와 키 정책, 시크릿 조회 권한." />
+  <LinkCard title="11 CloudWatch" href="/basics/11-cloudwatch/" description="지표·차원·통계·경보·로그." />
+  <LinkCard title="12 EFS" href="/basics/12-efs/" description="NFS 공유 스토리지, 마운트 타깃, 수명 주기." />
+  <LinkCard title="13 Athena·Glue" href="/basics/13-athena-glue/" description="S3 위의 SQL, 카탈로그와 헤더 처리." />
+  <LinkCard title="14 Lambda" href="/basics/14-lambda/" description="핸들러·레이어·VPC 연결·환경 변수." />
+  <LinkCard title="15 Terraform" href="/basics/15-terraform/" description="HCL 최소 문법과 상태 파일." />
+</CardGrid>

@@ -1,0 +1,81 @@
+/* 도식 아래 붙는 접이식 동작 설명 (`<details class="diagram-note">`).
+ *
+ * mermaid 는 브라우저에서 그린다. 접힌 <details> 안에 도식을 넣으면 렌더 시점의
+ * 폭이 0 이라 viewBox 가 깨지므로, 접는 것은 설명 문장 쪽이고 도식은 늘 펼쳐 둔다.
+ *
+ * mermaid-fullscreen.js 의 decorate() 가 도식 바로 뒤의 이 요소를 .mfs-frame 안으로
+ * 옮긴다. 스크립트가 없거나 아직 안 돌았을 때도 읽히도록, 프레임 밖에 있을 때의
+ * 모양도 함께 정의한다. */
+
+.diagram-note {
+	margin: -0.75rem 0 1.5rem;
+	border: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	border-radius: 0 0 0.75rem 0.75rem;
+	border-top: 0;
+	background: var(--sl-color-bg-sidebar, var(--sl-color-gray-6));
+	font-size: var(--sl-text-sm);
+}
+
+/* 프레임 안으로 옮겨진 뒤에는 프레임이 테두리를 맡는다. */
+.mfs-frame .diagram-note {
+	margin: 0;
+	border: 0;
+	border-top: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	border-radius: 0;
+	background: transparent;
+}
+
+.diagram-note > summary {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.5rem 0.9rem;
+	color: var(--sl-color-gray-2);
+	cursor: pointer;
+	list-style: none;
+	user-select: none;
+}
+
+.diagram-note > summary::-webkit-details-marker {
+	display: none;
+}
+
+/* 삼각형은 직접 그린다 — 기본 마커는 브라우저마다 위치가 다르다. */
+.diagram-note > summary::before {
+	content: '';
+	width: 0;
+	height: 0;
+	border-left: 0.35rem solid currentColor;
+	border-top: 0.28rem solid transparent;
+	border-bottom: 0.28rem solid transparent;
+	transition: transform 0.15s ease;
+}
+
+.diagram-note[open] > summary::before {
+	transform: rotate(90deg);
+}
+
+.diagram-note > summary:hover {
+	color: var(--sl-color-white);
+}
+
+.diagram-note > :not(summary) {
+	margin: 0 0 0.75rem;
+	padding: 0 0.9rem;
+	color: var(--sl-color-gray-2);
+	line-height: 1.7;
+}
+
+.diagram-note > :not(summary):first-of-type {
+	margin-top: 0.15rem;
+}
+
+@media (max-width: 50rem) {
+	.diagram-note > summary {
+		padding: 0.5rem 0.7rem;
+	}
+
+	.diagram-note > :not(summary) {
+		padding: 0 0.7rem;
+	}
+}

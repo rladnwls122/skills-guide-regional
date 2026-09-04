@@ -1,0 +1,213 @@
+---
+title: 09 DynamoDB (선수 학습, 약 90분)
+description: 키 설계·용량 모드·백업·암호화. 2025 1과제와 2026 2과제 ③ 이 여기서 나온다.
+sidebar:
+  order: 9
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 9/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+DynamoDB 도 데이터베이스인데 성격이 다르다. MySQL 이 엑셀 표라면 **DynamoDB 는 이름표가 붙은 서랍장**에 가깝다. 서랍 이름(키)을 알면 순식간에 꺼내지만, "연봉이 7만 이상인 사람" 같은 조건 검색은 잘 못한다.
+
+대신 아무리 데이터가 많아져도 속도가 유지되고, 서버를 신경 쓸 필요가 없다.
+
+2025 1과제 Database 10점 전부와 2026 2과제 ③ 의 절반이 여기다.
+
+## ① 학습 목표
+
+- [ ] 파티션 키와 정렬 키를 구분한다
+- [ ] `PAY_PER_REQUEST` 와 프로비저닝 모드의 차이를 안다
+- [ ] 온디맨드 백업과 PITR 이 서로 다른 기능임을 안다
+- [ ] SSE 키 세 종류(AWS 소유·AWS 관리형·고객 관리형)를 구분한다
+- [ ] 항목의 속성 이름이 IAM 조건으로 제한될 수 있음을 안다
+
+## ② 핵심 개념
+
+### 키
+
+| 종류 | 뜻 |
+| --- | --- |
+| 파티션 키 (PK) | 항목이 어느 파티션에 저장될지 결정. **필수** |
+| 정렬 키 (SK) | 같은 PK 안에서 정렬·범위 조회에 쓰인다. 선택 |
+
+기본 테이블의 키는 **최대 둘**이다. 세 필드로 조회하려면 GSI(글로벌 보조 인덱스)를 따로 만든다.
+
+2025 문제지는 "uuid, name, owner 를 테이블의 키로 사용" 이라고 적었지만 기본 테이블에 셋을 넣을 수는 없다. **채점은 `TableStatus` 만 보므로 실제 리스크는 낮다** — PK `uuid` 로 만들고 필요하면 GSI 를 붙인다.
+
+### 항목 표기
+
+DynamoDB CLI 는 타입을 함께 적는다.
+
+```bash
+aws dynamodb put-item --table-name catalog \
+  --item '{"name": {"S": "apple"}, "type": {"S": "fruit"}}'
+```
+
+| 표기 | 타입 |
+| --- | --- |
+| `S` | 문자열 |
+| `N` | 숫자 (**따옴표 안에 넣는다** — `{"N": "1"}`) |
+| `BOOL` | 참·거짓 |
+| `L` / `M` | 리스트 / 맵 |
+
+### 용량 모드
+
+| 모드 | 언제 |
+| --- | --- |
+| `PAY_PER_REQUEST` (온디맨드) | 트래픽을 모를 때. **대회는 이것** |
+| `PROVISIONED` | 읽기·쓰기 용량을 미리 정할 때 |
+
+```bash
+aws dynamodb describe-table --table-name product \
+  --query "Table.BillingModeSummary.BillingMode" --output text
+# → PAY_PER_REQUEST
+```
+
+### 백업 두 종류는 별개다
+
+| 기능 | 무엇 | 확인 명령 |
+| --- | --- | --- |
+| 온디맨드 백업 | 그 시점의 스냅샷. 사람이 만든다 | `aws dynamodb list-backups` |
+| PITR | 최근 35일 중 아무 시점으로 복원 | `describe-continuous-backups` |
+
+**PITR 만 켜면 `list-backups` 는 비어 있다.** 2025 채점 3-4 가 `list-backups` 결과가 비면 오답으로 간주하므로 온디맨드 백업을 하나 만들어 둔다.
+
+```bash
+aws dynamodb create-backup --table-name product --backup-name manual-1
+aws dynamodb update-continuous-backups --table-name product \
+  --point-in-time-recovery-specification PointInTimeRecoveryEnabled=true
+```
+
+### 암호화 키 세 종류
+
+| 종류 | `SSEDescription` 이 나오나 | KMS ARN 이 나오나 |
+| --- | --- | --- |
+| AWS 소유 키 (기본) | 안 나온다 | 안 나온다 |
+| AWS 관리형 (`aws/dynamodb`) | 나온다 | 나온다 (AWS 계정 키) |
+| **고객 관리형 (CMK)** | 나온다 | **선수 계정의 키 ARN** |
+
+2025 채점 3-5 는 "SSE 에 사용한 KMS ARN 이 출력되며 **해당 KMS 가 선수의 계정에 있는 것인지**" 까지 본다 → **CMK 를 직접 만들어 쓴다.**
+
+2026 2과제 3-3 은 `SSEDescription.Status` 가 `ENABLED` 이기만 하면 된다.
+
+## ③ 대회에서 어떻게 쓰이나
+
+| 해 | 요구 |
+| --- | --- |
+| 2025 | `product`, PAY_PER_REQUEST, CMK SSE, 백업 + PITR, 삭제 방지, 앱이 실제로 읽고 쓴다 |
+| 2026 2과제 ③ | `catalog`·`secret`, 삭제 방지, KMS 암호화, **IAM 정책으로 속성 이름 제한** |
+
+## ④ 미니 실습 (30분)
+
+<Steps>
+
+1. CMK 를 하나 만든다.
+
+2. 테이블 `연습-product` 를 만든다 — PK `uuid`(S), 온디맨드, SSE 를 그 CMK 로, 삭제 방지 켜기.
+
+3. 확인한다.
+
+   ```bash
+   aws dynamodb describe-table --table-name 연습-product \
+     --query 'Table.[BillingModeSummary.BillingMode,DeletionProtectionEnabled,SSEDescription.KMSMasterKeyArn]' --output text
+   ```
+
+4. 백업을 하나 만들고 PITR 을 켠다. `list-backups` 가 비지 않는지 본다.
+
+5. 항목을 넣고 읽는다.
+
+   ```bash
+   aws dynamodb put-item --table-name 연습-product --item '{"uuid":{"S":"a1"},"name":{"S":"mug"}}'
+   aws dynamodb get-item  --table-name 연습-product --key  '{"uuid":{"S":"a1"}}' --query Item.name.S --output text
+   ```
+
+6. 삭제 방지가 켜진 상태로 테이블을 지워 본다. **거부되는 것**을 확인하고, 껐다 지운다.
+
+</Steps>
+
+## ⑤ 심화 개념
+
+### 속성 이름을 IAM 으로 제한한다 (2026 2과제 ③)
+
+```json
+"Condition": {
+  "ForAllValues:StringEquals": { "dynamodb:Attributes": ["name", "type"] }
+}
+```
+
+`dynamodb:Attributes` 는 요청에 등장한 속성 이름의 집합이다. `ForAllValues:` 는 그 전부가 허용 목록 안에 있어야 참이다. → [03 IAM](/basics/03-iam/)
+
+**`dynamodb:Select` 조건은 넣지 않는다.** AWS 문서는 권하지만 채점의 `get-item` 이 `--projection-expression` 없이 호출되어 오히려 거부된다.
+
+### 삭제 방지와 채점
+
+```bash
+aws dynamodb describe-table --table-name catalog \
+  --query Table.DeletionProtectionEnabled --output text   # → True
+```
+
+켜 두면 테이블을 못 지운다. **연습 후 정리할 때 먼저 끄는 것을 잊지 않는다.**
+
+### 계정 전체를 훑는 채점
+
+```bash
+aws dynamodb list-tables --query TableNames --output text
+# → catalog  secret  만 나와야 한다
+```
+
+연습 테이블을 남기면 조건이 깨진다. → [종료 전 체크리스트](/drill/10-checklist/)
+
+### 왜 스캔이 아니라 조회인가
+
+`scan` 은 테이블 전체를 읽는다. 항목이 많아지면 느리고 비싸다. 키로 찾는 `get-item`·`query` 를 쓰는 것이 DynamoDB 를 쓰는 이유다. 대회 규모에서는 차이가 안 보이지만 키 설계를 왜 먼저 하는지의 근거다.
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="백업 두 종류">
+PITR 만 켠 상태에서 2025 채점 3-4(`list-backups`)를 돌리면?
+
+- [x] 결과가 비어 오답으로 간주된다 — 온디맨드 백업을 따로 만들어야 한다
+- [ ] PITR 이 백업 목록에 나온다
+  > PITR 은 연속 백업이라 `describe-continuous-backups` 에 나오고 `list-backups` 와 별개다.
+- [ ] 하루 뒤 자동으로 나타난다
+  > 자동 생성되지 않는다.
+- [ ] 명령이 오류를 낸다
+  > 빈 목록을 정상 반환한다. 그래서 더 놓치기 쉽다.
+
+**둘은 별개 기능이다.** 문제지가 "백업과 PITR" 을 함께 적었다면 둘 다 한다.
+</Quiz>
+
+<Quiz title="암호화 키 선택">
+2025 채점이 "SSE 에 쓴 KMS 가 선수 계정의 것인지" 확인한다. 어떤 키를 써야 하나?
+
+- [x] 고객 관리형 키(CMK)를 직접 만들어 지정한다
+- [ ] 기본값(AWS 소유 키)으로 둔다
+  > `SSEDescription` 자체가 나오지 않는다.
+- [ ] AWS 관리형 `aws/dynamodb` 를 쓴다
+  > ARN 은 나오지만 문제지가 "CMK 를 활용해" 라고 명시했고 채점도 계정 소유를 따진다.
+- [ ] 암호화를 끄고 테이블 수준 권한으로 막는다
+  > 요구가 암호화다.
+
+**CMK 를 만드는 데 1분도 안 걸린다.** 아끼지 않는다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+<LinkButton href="/basics/10-kms-secrets/" icon="right-arrow">다음 — 10 KMS·Secrets Manager</LinkButton>
+<LinkButton href="/axis/06-axis-data/" variant="minimal">축 4 — 데이터 저장소</LinkButton>
+
+## 공식 문서
+
+- [DynamoDB 핵심 개념](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html) — 키와 항목
+- [백업과 PITR](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BackupRestore.html)
+- [저장 시 암호화](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html) — 키 종류 비교표
+- [세분화된 액세스 제어](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html)

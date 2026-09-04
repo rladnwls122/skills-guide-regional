@@ -1,0 +1,137 @@
+---
+title: 공식 문서 링크 맵
+description: 축별로 어느 문서의 어느 절을 읽어야 하는지.
+sidebar:
+  order: 11
+---
+
+> 문서 유형: reference
+
+축별로 **어느 문서의 어느 절을 읽어야 하는지**를 적었다. 문서 전체를 읽으라는 뜻이 아니다 — 대회 준비에 필요한 절만 골랐다.
+
+읽는 기준 하나 — **"왜 그렇게 동작하는지"가 궁금하면 문서를 읽고, "인자가 뭐였지"가 궁금하면 `aws <service> <command> help` 를 친다.**
+
+## 1. 네트워크 → [축 1](/axis/03-axis-network/)
+
+| 문서 | 읽을 절 | 왜 |
+| --- | --- | --- |
+| [VPC 서브넷 구성](https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html) | "Subnet routing" | 서브넷이 public 이 되는 조건이 라우팅뿐임을 확인 |
+| [라우팅 테이블](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Route_Tables.html) | "Route priority" | 가장 구체적인 경로가 이긴다 |
+| [NAT Gateway](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html) | "NAT gateway basics", "Pricing" | AZ별 배치 이유 |
+| [네트워크 ACL](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html) | "Ephemeral ports", "Rules" | stateless 라 응답 포트를 열어야 하는 이유 |
+| [보안 그룹](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html) | "Security group rules" | NACL 과의 차이 |
+| [VPC Peering](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html) | "Update route tables" | Peering 이 길을 만들지 않는다 |
+| [Peering DNS 옵션](https://docs.aws.amazon.com/vpc/latest/peering/modify-peering-connections.html) | 전체 (짧다) | 2026 1-7 항목의 근거 |
+| [PrivateLink 인터페이스 엔드포인트](https://docs.aws.amazon.com/vpc/latest/privatelink/create-interface-endpoint.html) | "Create an interface endpoint" | 보안 그룹이 필요한 이유 |
+| [Gateway 엔드포인트](https://docs.aws.amazon.com/vpc/latest/privatelink/gateway-endpoints.html) | 첫 절 | Interface 와 무엇이 다른지 |
+| [VPC Flow Logs](https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs-cwl.html) | "IAM role for publishing" | CLI 로 만들 때 필요한 role |
+
+## 2. Bastion·IAM → [축 2](/axis/04-axis-bastion/)
+
+| 문서 | 읽을 절 | 왜 |
+| --- | --- | --- |
+| [EC2 인스턴스 프로파일](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html) | 전체 | role 이 인스턴스에 붙는 구조 |
+| [인스턴스 메타데이터](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html) | "IMDSv2" | 자기 인스턴스 ID 를 얻는 법 |
+| [Session Manager 사전 조건](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-prerequisites.html) | 전체 | SSM 이 안 될 때 볼 네 가지 |
+| [SSM VPC 엔드포인트](https://docs.aws.amazon.com/systems-manager/latest/userguide/setup-create-vpc.html) | "Create endpoints" | NAT 없이 SSM |
+| [종료 방지](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_ChangingDisableAPITermination.html) | 전체 (짧다) | 2025 2과제 ④ |
+| [IAM 정책 평가 논리](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html) | "Determining whether a request is allowed or denied" | Deny 가 항상 이긴다 |
+| [IAM 조건 연산자](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition_operators.html) | "Multivalued context keys" | `ForAllValues:` 접두사의 의미 |
+| [CloudShell](https://docs.aws.amazon.com/cloudshell/latest/userguide/working-with-cloudshell.html) | "Persistent storage" | 리전별로 별개다 |
+
+## 3. 컴퓨팅·로드밸런서 → [축 3](/axis/05-axis-compute/)
+
+| 문서 | 읽을 절 | 왜 |
+| --- | --- | --- |
+| [ALB 리스너 규칙](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/listener-update-rules.html) | "Rule action types" | fixed-response 와 기본 동작 |
+| [ALB 상태 확인](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html) | "Health check settings" | unhealthy 원인 목록 |
+| [ALB 지표](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html) | 표 전체 | ELB_4XX vs Target_4XX |
+| [시작 템플릿](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html) | "Tag specifications" | 인스턴스 Name 태그가 붙는 자리 |
+| [ASG 태그](https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-tagging.html) | "PropagateAtLaunch" | 태그 전파 |
+| [ASG 대상 추적](https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html) | "Predefined metrics" | CPU 70% 정책 |
+| [EC2 user data](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html) | "Run commands at launch", "Troubleshoot" | 로그가 `/var/log/cloud-init-output.log` 에 있다 |
+| [ECS 작업 정의](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html) | "logConfiguration" | awslogs 드라이버 |
+| [ECS Service Connect](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-connect.html) | "How it works" | 프록시 컨테이너가 붙는 구조 |
+| [ECS Exec](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-exec.html) | "Prerequisites" | 필요한 IAM 권한 |
+| [ECR 이미지 스캔](https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html) | "Basic scanning" | 스캔 결과 형식 |
+| [ECR 태그 변경 불가](https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-tag-mutability.html) | 전체 (짧다) | immutable 켜는 순서 |
+| [EKS 클러스터 엔드포인트 접근](https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html) | "Private only" | 2024 Private 클러스터 |
+| [EKS Fargate 프로파일](https://docs.aws.amazon.com/eks/latest/userguide/fargate-profile.html) | "Considerations" | DaemonSet 이 안 되는 이유 |
+| [Cluster Autoscaler](https://docs.aws.amazon.com/eks/latest/userguide/autoscaling.html) | "Cluster Autoscaler" | Pod 가 늘면 Node 도 늘게 |
+
+## 4. 데이터 → [축 4](/axis/06-axis-data/)
+
+| 문서 | 읽을 절 | 왜 |
+| --- | --- | --- |
+| [Aurora 클러스터 생성](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CreateInstance.html) | "Creating a DB cluster" | 포트 지정 위치 |
+| [Aurora 암호화](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Overview.Encryption.html) | "Limitations" | 생성 후 못 켠다 |
+| [DB 서브넷 그룹](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html) | "DB subnet group" | 2 AZ 요구 |
+| [DynamoDB 저장 시 암호화](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html) | 키 종류 비교표 | AWS 소유 / AWS 관리형 / 고객 관리형 |
+| [DynamoDB 백업](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BackupRestore.html) | "On-demand backup" | PITR 과 별개다 |
+| [DynamoDB 세분화 액세스 제어](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html) | "dynamodb:Attributes" | 2026 2과제 ③ 의 정답 |
+| [DocumentDB 감사](https://docs.aws.amazon.com/documentdb/latest/developerguide/event-auditing.html) | 전체 | 파라미터 그룹 + 로그 내보내기 두 곳 |
+| [ElastiCache 클러스터 모드](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Replication.Redis-RedisCluster.html) | "Comparison" | 샤딩이 무엇을 바꾸나 |
+| [ElastiCache 전송 중 암호화](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/in-transit-encryption.html) | "Conditions" | 켜면 클라이언트가 TLS 로 붙어야 한다 |
+| [EFS 자동 마운트](https://docs.aws.amazon.com/efs/latest/ug/mount-fs-auto-mount-onreboot.html) | "Using fstab" | user data 에 넣을 내용 |
+| [EFS 수명 주기](https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html) | "Transition to IA" | AFTER_30_DAYS |
+| [EFS 마운트 대상 보안](https://docs.aws.amazon.com/efs/latest/ug/network-access.html) | "NFS port 2049" | 마운트가 멈추는 원인 1위 |
+| [Glue 분류자](https://docs.aws.amazon.com/glue/latest/dg/custom-classifier.html) | "CSV classifier" | 헤더 처리 |
+| [Athena CREATE TABLE](https://docs.aws.amazon.com/athena/latest/ug/create-table.html) | "TBLPROPERTIES" | `skip.header.line.count` |
+| [Athena 워크그룹 제어](https://docs.aws.amazon.com/athena/latest/ug/workgroups-setting-control-limits-cloudwatch.html) | "Per query data limit" | 1GB = 1073741824 |
+| [Secrets Manager 암호화](https://docs.aws.amazon.com/secretsmanager/latest/userguide/security-encryption.html) | "Permissions for the KMS key" | 읽는 쪽에 kms:Decrypt 가 필요한 이유 |
+
+## 5. 관측 → [축 5](/axis/07-axis-observability/)
+
+| 문서 | 읽을 절 | 왜 |
+| --- | --- | --- |
+| [CloudWatch Agent 설치](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-EC2-Instance.html) | "IAM role" | CloudWatchAgentServerPolicy |
+| [Agent 설정 파일](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html) | "logs" 절만 | collect_list 형식 |
+| [로그 그룹 보존](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html) | "Change log retention" | |
+| [대시보드 본문 구조](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html) | "Metric widget" | metrics 배열 형식 |
+| [알람 누락 데이터](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data) | 전체 | notBreaching 이 필요한 이유 |
+| [Container Insights (ECS)](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/deploy-container-insights-ECS.html) | "Enabling" | 기존 Task 에 소급 안 됨 |
+
+## 6. 2과제 유형별 → [카탈로그](/axis/08-task2-catalog/)
+
+| 유형 | 문서 |
+| --- | --- |
+| Client VPN | [상호 인증](https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/authentication-authrization.html#mutual), [시작하기](https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/cvpn-getting-started.html), [규칙과 제한](https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/limits.html) |
+| KEDA | [배포](https://keda.sh/docs/latest/deploy/), [SQS 스케일러](https://keda.sh/docs/latest/scalers/aws-sqs/), [ScaledObject 스펙](https://keda.sh/docs/latest/reference/scaledobject-spec/) |
+| EKS IRSA | [서비스 계정 IAM 역할](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html) |
+| Terraform | [AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs), [default_tags](https://registry.terraform.io/providers/hashicorp/aws/latest/docs#default_tags), [aws_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/instance) |
+| Lambda | [레이어](https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html), [VPC 연결](https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html), [코드 암호화](https://docs.aws.amazon.com/lambda/latest/dg/encrypt-zip-package.html) |
+| API Gateway → Kinesis | [AWS 서비스 통합](https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html) |
+| Firehose | [S3 접두사](https://docs.aws.amazon.com/firehose/latest/dev/s3-prefixes.html) |
+| Glue | [크롤러](https://docs.aws.amazon.com/glue/latest/dg/add-crawler.html), [Studio 조인](https://docs.aws.amazon.com/glue/latest/ug/transforms-join.html), [워크플로](https://docs.aws.amazon.com/glue/latest/dg/workflows_overview.html) |
+| CodeDeploy Blue/Green | [ECS 배포 유형](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-bluegreen.html), [AppSpec](https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html) |
+| CloudFront 캐시 | [캐시 정책](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/controlling-the-cache-key.html), [무효화](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Invalidation.html) |
+
+## 7. CLI 참조
+
+문서보다 빠른 경우가 많다.
+
+```bash
+aws ec2 describe-vpcs help              # 인자와 필터 목록
+aws ec2 wait vpc-available help         # wait 하위 명령 목록
+aws configure set region ap-northeast-2
+```
+
+`--query` 는 JMESPath 다. 채점 스크립트가 전부 이걸로 쓰여 있으니 읽을 줄 알아야 한다.
+
+- [JMESPath 튜토리얼](https://jmespath.org/tutorial.html) — 필터 표현식 `[?Key=='Name']` 절까지만
+- [AWS CLI 출력 필터링](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html)
+
+자주 쓰는 형태:
+
+```bash
+--query "Vpcs[].CidrBlock"                       # 리스트에서 필드 뽑기
+--query "Subnets[0].CidrBlock"                   # 첫 번째만
+--query "Tags[?Key=='Name'].Value"               # 조건 필터
+--query "Entries[?(!(Egress) && RuleAction=='allow')].CidrBlock"   # 부정 + AND
+--output text                                    # 따옴표 없는 평문
+```
+
+## 8. 대회 자료
+
+- [한국산업인력공단 기능경기대회](https://meister.hrdkorea.or.kr/) — 시행 공고와 과제 배포
+- 과제지·채점기준은 대회 전후로 공개되는 해와 아닌 해가 있다. **이 문서의 근거 자료 목록은 [README](/)에 있다.**

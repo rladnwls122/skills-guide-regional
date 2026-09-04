@@ -5,11 +5,19 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "icons:aws": "node scripts/build-aws-icons.mjs",
+    "icons:k8s": "node scripts/build-k8s-icons.mjs",
+    "check:icons": "node scripts/check-mermaid-icons.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.3",
     "@astrojs/starlight": "^0.41.4",
+    "@astrojs/starlight-tailwind": "^5.0.0",
+    "@astrojs/svelte": "^9.0.1",
+    "@astrojs/vercel": "^11.0.10",
+    "@mermaid-js/layout-elk": "^0.2.0",
+    "@tailwindcss/vite": "^4.3.3",
     "astro": "^7.1.3",
     "astro-mermaid": "^2.1.0",
     "mermaid": "^11.0.0",
@@ -19,8 +27,12 @@
     "starlight-codeblock-fullscreen": "^1.0.0",
     "starlight-heading-badges": "^0.8.0",
     "starlight-links-validator": "^0.25.2",
+    "starlight-quiz": "^1.0.0",
     "starlight-scroll-to-top": "^1.0.1",
-    "starlight-theme-exquisitus": "^1.2.0"
+    "starlight-sidebar-topics": "^0.8.0",
+    "starlight-theme-exquisitus": "^1.2.0",
+    "svelte": "^5.56.8",
+    "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",

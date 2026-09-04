@@ -1,0 +1,267 @@
+---
+title: 14 Lambda (선수 학습, 약 90분)
+description: 서버 없이 코드만 올려 돌리는 방법. 핸들러·레이어·VPC 연결을 처음 보는 사람 기준으로.
+sidebar:
+  order: 14
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 14/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+지금까지는 코드를 돌리려면 서버(EC2)를 만들고, 리눅스에 패키지를 깔고, 프로세스를 띄우고, 죽으면 다시 살렸다.
+
+Lambda 는 그 과정을 전부 건너뛴다. **함수 하나만 올려 두면 부를 때마다 AWS 가 알아서 실행**한다. 서버가 없다고 해서 서버리스(serverless)라고 부른다.
+
+<Aside type="tip" title="비유">
+EC2 가 "가게를 하나 빌려 24시간 열어 두는 것" 이라면, Lambda 는 "손님이 올 때만 잠깐 문을 여는 것" 이다. 안 부르면 돈이 안 나간다.
+</Aside>
+
+## ① 학습 목표
+
+- [ ] 핸들러(handler)가 무엇인지 안다
+- [ ] `event` 와 `context` 가 무엇인지 안다
+- [ ] 레이어(layer)를 왜 쓰는지 안다
+- [ ] Lambda 를 VPC 에 넣으면 무엇이 바뀌는지 안다
+- [ ] 실행 역할이 무엇인지 안다
+
+## ② 핵심 개념
+
+### 핸들러
+
+Lambda 가 호출할 **함수 하나**를 정해 준다. 파이썬이면 보통 이렇게 생겼다.
+
+```python
+def lambda_handler(event, context):
+    return {"ok": True}
+```
+
+| 인자 | 무엇 |
+| --- | --- |
+| `event` | **호출할 때 넘어온 데이터.** 파이썬 딕셔너리로 들어온다 |
+| `context` | 실행 환경 정보(남은 시간, 요청 ID 등). 대회에서는 거의 안 쓴다 |
+
+설정에서 "핸들러" 를 `lambda_function.lambda_handler` 로 지정하면 **`lambda_function.py` 파일의 `lambda_handler` 함수**를 부른다는 뜻이다. 파일 이름과 함수 이름을 점으로 이은 것이다.
+
+### 호출해 보기
+
+```bash
+payload=$(echo '{"op": "GET", "product_id": "101"}' | base64)
+aws lambda invoke --function-name store-manager --payload $payload /tmp/out.txt
+cat /tmp/out.txt
+```
+
+`--payload` 로 넘긴 JSON 이 함수 안에서 `event` 가 된다. 반환한 값은 `/tmp/out.txt` 에 저장된다.
+
+<Aside type="note" title="왜 base64 인가">
+AWS CLI v2 는 payload 를 base64 로 받는 것이 기본이다. 2026 채점 스크립트가 `| base64` 를 붙이는 이유다. 파일로 넘길 수도 있다 — `--payload file://event.json`.
+</Aside>
+
+### 레이어
+
+파이썬에서 `pymysql` 같은 외부 라이브러리를 쓰려면 그 코드도 함께 올려야 한다. 그런데 함수 코드에 매번 넣으면 무겁다.
+
+**레이어는 라이브러리만 따로 담은 묶음**이다. 여러 함수가 같은 레이어를 공유할 수 있다.
+
+```bash
+mkdir -p python
+pip install pymysql -t python/
+zip -r store-mysql.zip python
+aws lambda publish-layer-version --layer-name store-mysql \
+  --zip-file fileb://store-mysql.zip --compatible-runtimes python3.12
+```
+
+<Aside type="caution" title="폴더 이름이 python 이어야 한다">
+파이썬 레이어는 압축 안에 `python/` 폴더가 있어야 Lambda 가 import 경로에 넣어 준다. 이름을 바꾸면 `ModuleNotFoundError` 가 난다.
+</Aside>
+
+**`pymysql` 을 권장하는 이유**는 순수 파이썬으로 쓰였기 때문이다. `mysqlclient` 나 `psycopg2` 는 C 로 컴파일된 부분이 있어서 리눅스 x86 환경에서 빌드해야 한다. 윈도우나 맥에서 만든 압축을 올리면 안 돈다.
+
+### VPC 에 넣으면 무엇이 바뀌나
+
+기본 Lambda 는 **VPC 밖**에 있다. 인터넷은 되지만 프라이빗 RDS 에는 못 붙는다.
+
+VPC 에 넣으면 반대가 된다.
+
+| | VPC 밖 (기본) | VPC 안 |
+| --- | --- | --- |
+| 인터넷 | 된다 | **NAT 이 없으면 안 된다** |
+| 프라이빗 RDS | 못 붙는다 | 붙는다 |
+| AWS API (S3·Secrets Manager …) | 된다 | NAT 이나 VPC 엔드포인트가 필요하다 |
+
+2026 2과제 ④ 는 "RDS 가 인터넷에 노출되지 않도록" 이라 VPC 안에 넣는다. **이 함수는 RDS 에만 붙으면 되므로 NAT 은 필요 없다.**
+
+### 실행 역할
+
+Lambda 가 AWS 를 부를 때 쓰는 IAM 역할이다. EC2 의 인스턴스 프로파일과 같은 자리다. → [03 IAM](/basics/03-iam/)
+
+| 상황 | 필요한 권한 |
+| --- | --- |
+| 기본 | `AWSLambdaBasicExecutionRole` (로그를 CloudWatch 로) |
+| VPC 안에 넣을 때 | `AWSLambdaVPCAccessExecutionRole` (ENI 를 만들 수 있어야 한다) |
+| 코드를 CMK 로 암호화했을 때 | `kms:Decrypt` |
+
+<Aside type="danger" title="VPC 권한을 빠뜨리면">
+함수 생성은 되는데 호출하면 ENI 를 못 만들어 실패한다. 오류 메시지가 네트워크 문제처럼 보여서 헤매기 쉽다.
+</Aside>
+
+## ③ 대회에서 어떻게 쓰이나
+
+2026 2과제 ④, 서울 리전, 12.5점.
+
+| 채점 | 내용 |
+| --- | --- |
+| 4-1 | 함수 `store-manager` 존재 |
+| 4-2 | `Code.SourceKMSKeyArn` — **코드가 CMK 로 암호화** |
+| 4-3·4-4 | 레이어 `store-mysql` 존재, 함수가 그 레이어를 씀 |
+| 4-5 | 함수가 VPC 안에 있음 |
+| 4-6~4-8 | RDS `store-rds`, 암호화, 퍼블릭 액세스 off |
+| 4-9·4-10 | **실제로 호출해 데이터 저장·조회** |
+
+4-1 부터 4-8 까지 **9.5점은 코드가 안 돌아도** 받는다. 동작 항목 두 개(3점)를 못 해도 나머지는 챙긴다. → [2과제 카탈로그 C절](/axis/08-task2-catalog/)
+
+### 지급된 뼈대 코드 주의
+
+2026 이 준 `lambda_function.py` 에는 문제가 둘 있다.
+
+1. **모듈 최상단에서 DB 에 접속하고 실패하면 `sys.exit()`** — 초기화 단계에서 함수가 죽는다
+2. **마지막 줄에 문법 오류** — `result = select_data(event)` 뒤에 따옴표가 하나 더 붙어 있다
+
+문제지도 "주어진 코드를 활용하지 않아도 무방하다" 고 적었다. **참고만 하고 새로 쓴다.**
+
+```python
+import os, pymysql
+
+def _conn():
+    return pymysql.connect(
+        host=os.environ["DB_HOST"], user=os.environ["DB_USER"],
+        passwd=os.environ["DB_PASS"], db="store", connect_timeout=3)
+
+def lambda_handler(event, context):
+    op = event["op"].lower()
+    with _conn() as c, c.cursor() as cur:
+        if op == "post":
+            cur.execute("INSERT INTO product VALUES (%s, %s)",
+                        (event["product_id"], event["name"]))
+            c.commit()
+            return {"product_id": event["product_id"]}
+        cur.execute("SELECT product_id, name FROM product WHERE product_id = %s",
+                    (event["product_id"],))
+        pid, name = cur.fetchone()
+        return {"product_id": pid, "name": name}
+```
+
+접속을 **함수 안에서** 하는 것이 요점이다. 최상단에서 하면 DB 가 잠깐 느릴 때 함수 전체가 죽는다.
+
+## ④ 미니 실습 (40분)
+
+<Steps>
+
+1. 아주 단순한 함수를 하나 만든다.
+
+   ```python
+   def lambda_handler(event, context):
+       return {"echo": event}
+   ```
+
+2. 호출해 본다.
+
+   ```bash
+   payload=$(echo '{"hello":"world"}' | base64)
+   aws lambda invoke --function-name 연습-fn --payload $payload /tmp/out.txt
+   cat /tmp/out.txt
+   ```
+
+3. 레이어를 만들어 붙인다.
+
+   ```bash
+   mkdir -p python && pip install requests -t python/
+   zip -r layer.zip python
+   aws lambda publish-layer-version --layer-name 연습-layer \
+     --zip-file fileb://layer.zip --compatible-runtimes python3.12
+   ```
+
+4. 함수 코드에서 `import requests` 를 해 보고 오류가 안 나는지 확인한다.
+
+5. 함수를 VPC 에 넣는다. **이제 인터넷이 안 되는지** 확인한다 — `requests.get("https://example.com")` 이 타임아웃되면 정상이다.
+
+6. CloudWatch 로그에서 실행 기록을 본다.
+
+   ```bash
+   aws logs tail /aws/lambda/연습-fn --since 10m
+   ```
+
+</Steps>
+
+5번이 이 실습의 핵심이다. **VPC 에 넣는 순간 인터넷이 끊긴다**는 것을 몸으로 확인해 둔다.
+
+## ⑤ 심화 개념
+
+### 콜드 스타트
+
+한동안 안 부르면 실행 환경이 사라지고, 다음 호출에서 다시 만든다. 그때 몇백 밀리초가 더 걸린다. VPC 에 넣으면 ENI 준비 때문에 더 느릴 수 있다. **대회 채점에서는 문제가 안 되지만 첫 호출이 느려도 놀라지 않는다.**
+
+### 타임아웃과 메모리
+
+기본 타임아웃은 3초다. DB 접속이 느리면 여기 걸린다. 문제 상황이면 10~30초로 늘린다. 메모리를 올리면 CPU 도 함께 올라간다.
+
+### 환경 변수
+
+DB 접속 정보를 코드에 박지 않고 환경 변수로 넣는다. 더 나아가면 Secrets Manager 를 쓰지만, **VPC 안 Lambda 가 Secrets Manager 를 부르려면 엔드포인트가 필요하다.** 2026 ④ 는 환경 변수로 충분하다.
+
+### 코드 암호화
+
+```bash
+aws lambda get-function --function-name store-manager --query Code.SourceKMSKeyArn --output text
+```
+
+함수 코드 묶음 자체를 CMK 로 암호화하는 기능이다. 실행 역할에 `kms:Decrypt` 가 있어야 함수가 뜬다. → [10 KMS](/basics/10-kms-secrets/)
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="VPC 에 넣으면">
+Lambda 를 VPC 안에 넣었다. 무엇이 달라지나? **모두** 고르시오.
+
+- [x] 프라이빗 서브넷의 RDS 에 붙을 수 있게 된다
+- [x] NAT 이 없으면 인터넷으로 못 나간다
+- [ ] 실행 속도가 항상 빨라진다
+  > ENI 준비 때문에 콜드 스타트가 오히려 느려질 수 있다.
+- [ ] 실행 역할이 필요 없어진다
+  > 오히려 `AWSLambdaVPCAccessExecutionRole` 이 더 필요하다.
+
+**"VPC 안" 은 곧 "인터넷 밖" 이다.** RDS 만 부르면 되는 함수라면 NAT 없이도 충분하다.
+</Quiz>
+
+<Quiz title="레이어 압축 구조">
+`pymysql` 을 레이어로 만들려고 한다. 압축 파일 안의 구조로 옳은 것은?
+
+- [x] `python/pymysql/...`
+- [ ] `pymysql/...` (최상단에 바로)
+  > Lambda 가 import 경로에 넣는 것은 `python/` 폴더 안이다.
+- [ ] `lib/pymysql/...`
+  > 파이썬 런타임은 `python/` 또는 `python/lib/python3.x/site-packages/` 를 본다.
+- [ ] `layer/pymysql/...`
+  > 인식되지 않는다.
+
+**`pip install -t python/` 로 설치하고 그 폴더째 압축한다.** 이름이 틀리면 `ModuleNotFoundError` 가 난다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+<LinkButton href="/basics/15-terraform/" icon="right-arrow">다음 — 15 Terraform</LinkButton>
+<LinkButton href="/axis/08-task2-catalog/" variant="minimal">2과제 카탈로그 — MySQL with Lambda</LinkButton>
+
+## 공식 문서
+
+- [Lambda 시작하기](https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html)
+- [파이썬 핸들러](https://docs.aws.amazon.com/lambda/latest/dg/python-handler.html) — `event` 와 `context`
+- [레이어](https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html) — 압축 구조 절
+- [VPC 의 Lambda](https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html) — 인터넷 접근 절
+- [배포 패키지 암호화](https://docs.aws.amazon.com/lambda/latest/dg/encrypt-zip-package.html)

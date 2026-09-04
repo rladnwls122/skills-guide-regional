@@ -1,0 +1,213 @@
+---
+title: 04 EC2와 Auto Scaling (선수 학습, 약 2시간)
+description: AMI·user data·Launch Template·ASG. 2026 1과제가 컨테이너 없이 이 조합만으로 돌아간다.
+sidebar:
+  order: 4
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 4/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+EC2 는 AWS 에서 빌리는 **가상 컴퓨터 한 대**다. 전원을 켜면 리눅스가 뜨고, 거기에 프로그램을 올려 돌린다.
+
+그런데 컴퓨터 한 대는 언젠가 고장 난다. 그래서 **"항상 두 대가 켜져 있게 해 줘"** 라고 맡기는 장치가 Auto Scaling 그룹(ASG)이다. 한 대가 죽으면 자동으로 새로 띄운다.
+
+2026 1과제는 컨테이너 없이 이 조합만으로 앱을 돌린다. 지방에서 손이 가장 많이 가는 부분이라 순서를 익혀 두면 크게 이득이다.
+
+## ① 학습 목표
+
+- [ ] AMI·인스턴스 타입·EBS·EIP 가 각각 무엇인지 안다
+- [ ] user data 가 **언제 몇 번** 실행되는지 안다
+- [ ] Launch Template 과 ASG 의 역할 분담을 설명할 수 있다
+- [ ] 인스턴스 Name 태그가 어디서 붙는지 안다
+- [ ] 대상 추적(target tracking) 스케일 정책이 무엇을 보는지 안다
+
+## ② 핵심 개념
+
+### 용어표
+
+| 용어 | 한 줄 정의 |
+| --- | --- |
+| AMI | 인스턴스를 띄울 때 쓰는 디스크 이미지. `Amazon Linux 2` 와 `2023` 은 패키지 관리자가 다르다(`yum` / `dnf`) |
+| 인스턴스 타입 | CPU·메모리 규격. `t3.micro`(x86) 와 `t4g.micro`(ARM) 는 **아키텍처가 다르다** |
+| EBS | 인스턴스에 붙는 블록 디스크. 암호화는 보통 생성 시 정한다 |
+| EIP | 고정 퍼블릭 IP. 재시작해도 안 바뀐다 |
+| user data | 첫 부팅 때 실행되는 스크립트 |
+| Launch Template | "인스턴스를 어떻게 만들까"의 설계도 |
+| Auto Scaling group | 설계도로 인스턴스를 **몇 대 유지할까**를 담당 |
+
+### user data 는 첫 부팅에 한 번 돈다
+
+`#!/bin/bash` 로 시작하고 **root 권한**으로 실행된다. 기본값은 **최초 부팅 1회**다 — 재부팅해도 다시 안 돈다.
+
+```bash
+#!/bin/bash
+dnf install -y jq
+echo "hello" > /var/log/mytest.log
+```
+
+로그는 여기 남는다.
+
+```bash
+cat /var/log/cloud-init-output.log
+```
+
+**user data 가 실패해도 인스턴스는 running 이다.** 앱이 안 뜨는데 인스턴스 상태가 정상인 대부분의 경우가 이것이다.
+
+### Launch Template 과 ASG 의 분담
+
+```
+Launch Template            ASG
+ ├ AMI                      ├ 이 템플릿을 쓴다
+ ├ 인스턴스 타입             ├ 서브넷 여러 개(= AZ 분산)
+ ├ IAM 인스턴스 프로파일     ├ Min / Desired / Max
+ ├ 보안 그룹                 ├ 타깃 그룹 연결
+ ├ user data                └ 스케일 정책
+ └ 태그 스펙
+```
+
+**Name 태그가 인스턴스에 붙는 자리는 두 곳뿐이다.**
+
+1. Launch Template 의 태그 스펙에서 리소스 타입 `instance`
+2. ASG 태그에 `PropagateAtLaunch = true`
+
+ASG 이름은 인스턴스 태그가 아니다. 2026 채점 2-3 이 `Reservations[].Instances[].Tags` 를 보므로 여기서 1.5점이 갈린다.
+
+### 대상 추적 스케일 정책
+
+"이 지표를 이 값 근처로 유지해 줘" 라고 목표만 준다. 나머지는 AWS 가 계산한다.
+
+```bash
+aws autoscaling put-scaling-policy \
+  --auto-scaling-group-name worldpay-asg \
+  --policy-name cpu70 --policy-type TargetTrackingScaling \
+  --target-tracking-configuration '{
+    "PredefinedMetricSpecification": {"PredefinedMetricType": "ASGAverageCPUUtilization"},
+    "TargetValue": 70.0 }'
+```
+
+2026 요구 "CPU 사용량이 70% 를 넘으면 새 인스턴스를 생성" 이 이것이다. 채점은 정책이 **존재하는지만** 본다.
+
+## ③ 대회에서 어떻게 쓰이나
+
+| 해 | 요구 |
+| --- | --- |
+| 2023 | Bastion t3.small + EIP |
+| 2024 | Bastion t4g.large(ARM) + EIP + SSH 포트 변경 |
+| 2025 | Bastion 3대(문제마다), 도쿄에서 인스턴스 4대 만들고 태그로 골라 삭제 |
+| 2026 1과제 | ASG `worldpay-asg` min 2, 인스턴스 태그 `worldpay-app`, CPU 70% 정책 |
+| 2026 2과제 ① | ASG `sharing-asg` min 2, 새 인스턴스가 EFS 자동 마운트 |
+
+## ④ 미니 실습 (40분)
+
+<Steps>
+
+1. Launch Template 을 만든다 — Amazon Linux 2023, t3.micro, 보안 그룹(80 인바운드), IAM 인스턴스 프로파일(SSM 권한), 태그 스펙에 `Name=연습-app`.
+
+2. user data 를 넣는다.
+
+   ```bash
+   #!/bin/bash
+   dnf install -y nginx
+   echo "<h1>$(hostname -f)</h1>" > /usr/share/nginx/html/index.html
+   systemctl enable --now nginx
+   ```
+
+3. ASG 를 만든다 — 서브넷 2개(2a·2c), Min 2 / Desired 2 / Max 4.
+
+4. 인스턴스 목록에서 **Name 태그가 붙었는지** 확인한다.
+
+   ```bash
+   aws ec2 describe-instances --filters Name=instance-state-name,Values=running \
+     --query "Reservations[].Instances[].[InstanceId,Tags[?Key=='Name']|[0].Value]" --output text
+   ```
+
+5. 인스턴스 하나를 terminate 하고 ASG 가 새로 띄우는지 본다. **새 인스턴스에도 user data 가 도는지** 확인한다.
+
+</Steps>
+
+5번이 2026 2과제 ① 채점(1-8)의 방식 그대로다.
+
+## ⑤ 심화 개념
+
+### 아키텍처를 틀리면 바이너리가 안 돈다
+
+2024 는 `user` 가 ARM64, `token` 이 x86_64 로 빌드됐다고 명시했다. `t4g.*` 는 Graviton(ARM), `t3.*` 는 x86 이다. **엉뚱한 타입에 올리면 `Exec format error` 가 난다.**
+
+### EBS 암호화는 대개 생성 시점 결정이다
+
+Launch Template 의 블록 디바이스 매핑에서 켠다. 2025 2과제 ③ 의 Terraform 은 이렇게 쓴다.
+
+```hcl
+root_block_device { encrypted = true }
+```
+
+### SSM 으로 붙으려면 네 가지
+
+1. `AmazonSSMManagedInstanceCore` 를 가진 역할
+2. SSM Agent (AL2/AL2023 기본 포함)
+3. SSM 엔드포인트로 나가는 길 — NAT 또는 VPC 엔드포인트 3종
+4. 아웃바운드 443
+
+```bash
+aws ssm describe-instance-information \
+  --filters Key=InstanceIds,Values=[i-xxxx] --query InstanceInformationList[].PingStatus
+# → Online (등록에 1~2분 걸린다)
+```
+
+### 종료 방지
+
+```bash
+aws ec2 modify-instance-attribute --instance-id i-xxxx --disable-api-termination
+```
+
+2025 2과제 ④ 요구다. 다만 **삭제 스크립트에서 자기 자신을 명시적으로 제외**하지 않으면 API 오류로 스크립트가 죽어 뒤 항목이 실패한다. → [축 2 6절](/axis/04-axis-bastion/)
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="user data 가 도는 시점">
+ASG 가 스케일 아웃으로 새 인스턴스를 띄웠다. user data 는?
+
+- [x] 새 인스턴스의 첫 부팅에서 실행된다 — 그래서 자동 마운트·앱 기동을 여기 넣는다
+- [ ] 실행되지 않는다 — 최초 1대에만 적용된다
+  > Launch Template 의 user data 는 그 템플릿으로 뜨는 모든 인스턴스에서 돈다.
+- [ ] 매 부팅마다 실행된다
+  > 기본값은 최초 부팅 1회다. 매번 돌게 하려면 cloud-init 설정을 따로 바꾼다.
+- [ ] ASG 가 아니라 사람이 실행해야 한다
+  > 자동이다.
+
+**손으로 마운트한 것은 소용없다.** 2026 2과제 ① 채점이 인스턴스를 전부 지우고 새로 뜬 것에서 확인하는 이유다.
+</Quiz>
+
+<Quiz title="인스턴스 Name 태그">
+채점 명령이 `worldpay-app` 을 못 찾는다. 확인할 곳을 **모두** 고르시오.
+
+- [x] Launch Template 태그 스펙의 리소스 타입이 `instance` 인지
+- [x] ASG 태그의 `PropagateAtLaunch` 가 `true` 인지
+- [ ] ASG 이름이 `worldpay-app` 인지
+  > ASG 이름은 `worldpay-asg` 여야 한다. 별개 항목이다.
+- [ ] 보안 그룹 이름
+  > 무관하다.
+
+**태그를 붙인 뒤 뜬 인스턴스에만 적용된다.** 이미 떠 있는 인스턴스는 태그를 직접 붙이거나 인스턴스 새로고침을 한다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+<LinkButton href="/basics/05-loadbalancer/" icon="right-arrow">다음 — 05 로드밸런서</LinkButton>
+<LinkButton href="/axis/05-axis-compute/" variant="minimal">축 3 — 앱 배포와 ALB</LinkButton>
+
+## 공식 문서
+
+- [EC2 user data](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html) — 실행 시점과 문제 해결
+- [시작 템플릿](https://docs.aws.amazon.com/autoscaling/ec2/userguide/create-launch-template.html) — 태그 스펙 절
+- [ASG 태그](https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-tagging.html) — `PropagateAtLaunch`
+- [대상 추적 조정 정책](https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scaling-target-tracking.html)

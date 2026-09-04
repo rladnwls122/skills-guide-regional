@@ -1,0 +1,234 @@
+---
+title: 11 CloudWatch (선수 학습, 약 90분)
+description: 지표·차원·통계·경보·로그를 처음 보는 사람 기준으로. 배점 대비 가장 싸게 얻는 축이다.
+sidebar:
+  order: 11
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 11/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+서버를 만들어 놓으면 그다음 궁금한 것은 하나다. **"지금 잘 돌아가고 있나?"**
+
+CloudWatch 는 그 질문에 답하는 도구다. AWS 안의 모든 서비스가 자기 상태를 CloudWatch 로 보내고, 우리는 그걸 그래프로 보거나 "이상하면 알려 줘" 라고 설정한다.
+
+대회에서는 2024·2025·2026 세 해 연속 나왔고, **손이 가장 적게 가는데 점수는 잘 주는 축**이다. 로그 그룹 하나 만드는 데 30초인데 1.5점이다.
+
+## ① 학습 목표
+
+- [ ] 지표(metric)·차원(dimension)·통계(statistic)가 각각 무엇인지 말할 수 있다
+- [ ] 로그 그룹과 로그 스트림의 관계를 안다
+- [ ] 경보(alarm)의 세 가지 상태를 안다
+- [ ] 통계를 Sum 으로 둬야 하는 경우와 Average 로 둬야 하는 경우를 구분한다
+
+## ② 핵심 개념
+
+### 먼저 낯선 말 네 개
+
+| 말 | 쉽게 말하면 | 예 |
+| --- | --- | --- |
+| 지표 (metric) | **시간에 따라 변하는 숫자 하나** | CPU 사용률, 요청 수 |
+| 네임스페이스 (namespace) | 지표가 사는 폴더 이름 | `AWS/EC2`, `AWS/ApplicationELB` |
+| 차원 (dimension) | **"어느 것의" 숫자인지 알려 주는 꼬리표** | `InstanceId=i-123`, `AutoScalingGroupName=worldpay-asg` |
+| 통계 (statistic) | 여러 값을 하나로 줄이는 방법 | 평균(Average), 합(Sum), 최댓값(Maximum) |
+
+이 넷을 합치면 하나의 그래프가 된다.
+
+```
+AWS/EC2  ·  CPUUtilization  ·  AutoScalingGroupName=worldpay-asg  ·  Average
+네임스페이스   지표 이름            차원                                통계
+```
+
+<Aside type="tip" title="왜 차원이 필요할까">
+"CPU 사용률" 이라고만 하면 어느 서버의 CPU 인지 알 수 없다. 차원이 그 "어느 것" 을 정해 준다. 반대로 차원을 `AutoScalingGroupName` 으로 주면 그 그룹에 속한 **모든 인스턴스를 묶은** 평균이 된다.
+</Aside>
+
+### 로그 그룹과 로그 스트림
+
+| 말 | 쉽게 말하면 |
+| --- | --- |
+| 로그 그룹 | 로그를 담는 **폴더**. 이름과 보관 기간을 여기에 정한다 |
+| 로그 스트림 | 그 폴더 안의 **파일 한 개**. 보통 인스턴스나 컨테이너 하나당 하나 |
+
+앱이 여러 대여도 로그 그룹은 하나고, 그 안에 스트림이 여러 개 생긴다. 검색은 그룹 전체에서 한다.
+
+```bash
+aws logs create-log-group --log-group-name worldpay-log-group
+aws logs put-retention-policy --log-group-name worldpay-log-group --retention-in-days 30
+aws logs tail worldpay-log-group --since 10m
+```
+
+<Aside type="caution" title="보관 기간을 안 정하면">
+기본값은 "만료 없음" 이다. 로그가 영원히 쌓이고 계속 과금된다. 대회에서도 2026 이 30일을 요구했다 — 실무에서 가장 흔한 낭비라 문제로 나온 것이다.
+</Aside>
+
+### 경보의 상태 세 가지
+
+| 상태 | 뜻 |
+| --- | --- |
+| `OK` | 지금 정상이다 |
+| `ALARM` | 조건을 넘었다 |
+| `INSUFFICIENT_DATA` | **판단할 데이터가 없다** |
+
+세 번째가 함정이다. 아무 일도 안 일어나면 지표에 값이 아예 안 들어오고, 그러면 경보가 `OK` 가 아니라 `INSUFFICIENT_DATA` 로 앉아 있다.
+
+2025 채점은 "경보가 정상(OK) 상태였다가 요청 후 바뀌는지" 를 본다. 그래서 **누락 데이터 처리를 `notBreaching`(데이터 없으면 정상으로 친다)로 바꿔 둔다.**
+
+### Sum 과 Average
+
+여기서 실수가 가장 많이 난다.
+
+> 5분 안에 4xx 에러가 10개 이상 발생하면 알람 — 2025 문제지
+
+| 통계 | 5분 동안 20번 요청하면 |
+| --- | --- |
+| **Sum (합)** | 20 → 임계값 10 을 넘는다 ✅ |
+| Average (평균) | 1 근처 → 절대 10 을 못 넘는다 ❌ |
+
+"몇 번 일어났나" 를 세는 지표는 **Sum**, "얼마나 높나" 를 보는 지표(CPU 사용률 등)는 **Average** 다.
+
+## ③ 대회에서 어떻게 쓰이나
+
+| 해 | 요구 |
+| --- | --- |
+| 2024 | 로그 그룹 `/aws/app/user`, `/aws/app/token` |
+| 2025 | 대시보드 `ProductService`, **4xx 경보**, Container Insights, 로그 그룹 2개 |
+| 2026 | 로그 그룹 `worldpay-log-group` + 보관 30일, 대시보드 `worldpay-dashboard` |
+
+## ④ 미니 실습 (30분)
+
+<Steps>
+
+1. 로그 그룹을 만들고 보관 기간을 30일로 둔다.
+
+   ```bash
+   aws logs create-log-group --log-group-name 연습-log
+   aws logs put-retention-policy --log-group-name 연습-log --retention-in-days 30
+   ```
+
+2. 로그를 한 줄 직접 넣어 본다.
+
+   ```bash
+   aws logs create-log-stream --log-group-name 연습-log --log-stream-name test
+   aws logs put-log-events --log-group-name 연습-log --log-stream-name test \
+     --log-events timestamp=$(($(date +%s)*1000)),message="hello marking-user"
+   aws logs tail 연습-log --since 10m | grep marking-user
+   ```
+
+3. 콘솔에서 대시보드를 만들고 EC2 의 `CPUUtilization` 위젯을 추가한다. **검색해서 고르면 네임스페이스·차원이 자동으로 맞는다.**
+
+4. 만든 대시보드의 JSON 을 들여다본다.
+
+   ```bash
+   aws cloudwatch get-dashboard --dashboard-name 연습-dash \
+     --query DashboardBody --output text | jq '.widgets[].properties.metrics'
+   ```
+
+5. 경보를 하나 만들고 상태를 확인한다.
+
+   ```bash
+   aws cloudwatch describe-alarms --query "MetricAlarms[].[AlarmName,StateValue]" --output text
+   ```
+
+</Steps>
+
+3번에서 **JSON 을 손으로 쓰지 말고 콘솔에서 고르는 것**이 요령이다. 차원 키 이름을 틀리기 쉽다(`AutoScalingGroupName` 이지 `AutoScalingGroup` 이 아니다).
+
+## ⑤ 심화 개념
+
+### 로그가 CloudWatch 까지 가는 길
+
+로그는 저절로 가지 않는다. 누군가 보내 줘야 한다.
+
+| 앱이 어디서 도나 | 누가 보내나 |
+| --- | --- |
+| ECS 컨테이너 | 태스크 정의의 `awslogs` 드라이버 |
+| EKS Pod | Fluent Bit 같은 수집기 |
+| **EC2 (2026)** | **CloudWatch Agent 를 직접 설치하고 설정** |
+
+2026 은 컨테이너가 없어서 세 번째다.
+
+```bash
+dnf install -y amazon-cloudwatch-agent
+```
+
+그리고 설정 파일에 "어느 파일을 어느 로그 그룹으로" 를 적는다.
+
+```json
+{"logs":{"logs_collected":{"files":{"collect_list":[
+  {"file_path":"/var/log/worldpay/app.log",
+   "log_group_name":"worldpay-log-group",
+   "log_stream_name":"{instance_id}"}
+]}}}}
+```
+
+<Aside type="danger" title="조용히 실패하는 지점">
+인스턴스 역할에 `CloudWatchAgentServerPolicy` 가 없으면 **에이전트는 잘 돌고 로그만 안 간다.** 화면에 오류가 안 뜬다. 의심되면 에이전트 자기 로그를 본다.
+
+```bash
+tail /opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log
+```
+</Aside>
+
+### 4xx 가 두 종류인 이유
+
+| 지표 | 누가 만든 응답인가 |
+| --- | --- |
+| `HTTPCode_ELB_4XX_Count` | 로드밸런서가 직접 돌려준 것 (규칙에 안 걸림 등) |
+| `HTTPCode_Target_4XX_Count` | 뒤에 있는 앱이 돌려준 것 |
+
+없는 주소로 요청했을 때 어느 쪽이 올라갈지는 설정에 따라 다르다. **대시보드에 둘 다 넣어 두면 안전하다.**
+
+### 대시보드는 미리 만든다
+
+그래프는 지나간 데이터를 보여 준다. 마지막 10분에 만들면 **텅 빈 그래프**가 되고, 채점자가 "확인할 수 없다" 고 판단할 수 있다. 앱이 뜨자마자 만들어 두고 데이터가 쌓이게 둔다.
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="통계 고르기">
+"5분 안에 4xx 가 10개 이상이면 경보" 를 만들려고 한다. 통계는?
+
+- [x] Sum — 5분 동안 일어난 횟수를 모두 더한다
+- [ ] Average — 평균이 안정적이다
+  > 개수를 세는 지표의 평균은 1 근처에 머문다. 20번 요청해도 임계값 10 을 절대 못 넘는다.
+- [ ] Maximum — 가장 큰 값을 본다
+  > 1분마다 들어오는 값 중 최댓값이라 역시 10 을 넘기 어렵다.
+- [ ] SampleCount — 표본 수를 센다
+  > 지표가 보고된 횟수이지 에러 개수가 아니다.
+
+**"몇 번" 을 묻는 조건은 Sum 이다.** CPU 사용률처럼 "얼마나 높나" 를 묻는 지표는 Average 다.
+</Quiz>
+
+<Quiz title="경보가 INSUFFICIENT_DATA 다">
+만들어 둔 경보가 계속 `INSUFFICIENT_DATA` 다. 채점은 시작 시점에 `OK` 이길 요구한다. 어떻게 하나?
+
+- [x] 누락 데이터 처리를 `notBreaching` 으로 바꾼다
+- [ ] 임계값을 낮춘다
+  > 데이터 자체가 없어서 생기는 상태라 임계값과 무관하다.
+- [ ] 평가 기간을 늘린다
+  > 데이터가 없는 기간이 길어질 뿐이다.
+- [ ] 경보를 지웠다 다시 만든다
+  > 같은 상태로 돌아온다.
+
+**아무 일도 안 일어나면 지표에 값이 안 들어온다.** "값이 없으면 정상으로 친다" 고 알려 줘야 `OK` 로 앉는다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+<LinkButton href="/basics/12-efs/" icon="right-arrow">다음 — 12 EFS</LinkButton>
+<LinkButton href="/axis/07-axis-observability/" variant="minimal">축 5 — 관측</LinkButton>
+
+## 공식 문서
+
+- [CloudWatch 개념](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html) — 지표·차원·통계 원문
+- [로그 그룹 보존 기간](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html)
+- [경보와 누락 데이터](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html#alarms-and-missing-data)
+- [CloudWatch Agent 설치](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/install-CloudWatch-Agent-on-EC2-Instance.html) — IAM 요구 사항 절

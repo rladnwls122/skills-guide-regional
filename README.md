@@ -4,7 +4,9 @@
 
 전국판이 "한 달에 걸쳐 개념부터 쌓는다"라면 이 문서는 **네 해 기출을 축으로 분해해 반복 출제 지점을 훈련한다**에 가깝다. 지방대회는 4시간 × 2과제이고, 과제 하나가 다루는 서비스 수는 많지만 각 항목의 깊이는 전국보다 얕다. 그래서 훈련 전략이 다르다 — 깊이보다 **속도와 누락 없음**이다.
 
-- 콘텐츠: `src/content/docs/` (랜딩 + `guide/00`~`11`)
+**AWS 를 처음 만지는 사람(고1 기준)을 독자로 쓴다.** 서버·네트워크가 뭔지부터 궁금하면 `basics/` 15편을 먼저 본다.
+
+- 콘텐츠: `src/content/docs/` — `basics/`(사전 지식 15) · `exam/`(대회 이해 3) · `axis/`(과제 축 6) · `drill/`(훈련 3)
 - 디자인: [starlight-theme-exquisitus](https://github.com/anaxite/starlight-theme-exquisitus) — 팔레트·서체는 테마가 전담
 - 한글 서체: 제목·본문 조선일보명조 · UI Pretendard · 코드 Elice Digital Coding — `src/styles/korean-fonts.css`
 
@@ -23,20 +25,29 @@
 
 ## 문서
 
+사이드바는 네 주제로 갈린다.
+
+| 주제 | 문서 | 무엇 |
+| --- | --- | --- |
+| 사전 지식 | `basics/00`~`15` | AWS 가 처음이면 여기부터. 지방 기출에 나온 것만 남기고 EFS·Athena 를 새로 넣었다 |
+| 대회 이해 | `exam/00`~`02` | 지형도 · 기출 분해 · 채점 해부 |
+| 과제 축 | `axis/03`~`08` | 매년 나오는 다섯 축 + 2과제 유형 카탈로그 |
+| 훈련 | `drill/09`~`11` | 훈련 계획 · 종료 전 체크리스트 · 공식 문서 링크 맵 |
+
 | 순서 | 문서 | 무엇을 얻나 |
 | --- | --- | --- |
-| 1 | [지방대회 지형도](src/content/docs/guide/00-competition-map.md) | 형식·시간·배점·채점 흐름이 4년간 어떻게 바뀌었나 |
-| 2 | [기출 분해](src/content/docs/guide/01-past-exams.md) | 2023~2026 과제 전문 요약과 축 대조표 |
-| 3 | [채점 해부](src/content/docs/guide/02-scoring.md) | 채점 스크립트가 실제로 보는 것과 감점 지뢰 |
-| 4 | [축 1 — 네트워크](src/content/docs/guide/03-axis-network.md) | 매년 나오고 배점이 가장 큰 축 |
-| 5 | [축 2 — Bastion·IAM](src/content/docs/guide/04-axis-bastion.md) | 틀리면 나머지 전부가 0이 되는 축 |
-| 6 | [축 3 — 앱 배포와 ALB](src/content/docs/guide/05-axis-compute.md) | 형태만 바뀌고 매년 나오는 축 |
-| 7 | [축 4 — 데이터 저장소](src/content/docs/guide/06-axis-data.md) | 서비스는 바뀌어도 요구는 같은 축 |
-| 8 | [축 5 — 관측](src/content/docs/guide/07-axis-observability.md) | 배점 대비 가장 싸게 얻는 축 |
-| 9 | [2과제 유형 카탈로그](src/content/docs/guide/08-task2-catalog.md) | 4년치 2과제 16개 유형 전부 |
-| 10 | [훈련 계획과 드릴](src/content/docs/guide/09-drills.md) | 무엇을 며칠에 어떤 순서로 |
-| 11 | [종료 전 체크리스트](src/content/docs/guide/10-checklist.md) | 마지막 30분에 볼 것 |
-| 12 | [공식 문서 링크 맵](src/content/docs/guide/11-links.md) | 축별로 어느 문서의 어느 절을 읽나 |
+| 1 | [지방대회 지형도](src/content/docs/exam/00-competition-map.mdx) | 형식·시간·배점·채점 흐름이 4년간 어떻게 바뀌었나 |
+| 2 | [기출 분해](src/content/docs/exam/01-past-exams.mdx) | 2023~2026 과제 전문 요약과 축 대조표 |
+| 3 | [채점 해부](src/content/docs/exam/02-scoring.mdx) | 채점 스크립트가 실제로 보는 것과 감점 지뢰 |
+| 4 | [축 1 — 네트워크](src/content/docs/axis/03-axis-network.mdx) | 매년 나오고 배점이 가장 큰 축 |
+| 5 | [축 2 — Bastion·IAM](src/content/docs/axis/04-axis-bastion.mdx) | 틀리면 나머지 전부가 0이 되는 축 |
+| 6 | [축 3 — 앱 배포와 ALB](src/content/docs/axis/05-axis-compute.mdx) | 형태만 바뀌고 매년 나오는 축 |
+| 7 | [축 4 — 데이터 저장소](src/content/docs/axis/06-axis-data.mdx) | 서비스는 바뀌어도 요구는 같은 축 |
+| 8 | [축 5 — 관측](src/content/docs/axis/07-axis-observability.mdx) | 배점 대비 가장 싸게 얻는 축 |
+| 9 | [2과제 유형 카탈로그](src/content/docs/axis/08-task2-catalog.mdx) | 4년치 2과제 16개 유형 전부 |
+| 10 | [훈련 계획과 드릴](src/content/docs/drill/09-drills.mdx) | 무엇을 며칠에 어떤 순서로 |
+| 11 | [종료 전 체크리스트](src/content/docs/drill/10-checklist.mdx) | 마지막 30분에 볼 것 |
+| 12 | [공식 문서 링크 맵](src/content/docs/drill/11-links.mdx) | 축별로 어느 문서의 어느 절을 읽나 |
 
 시간이 없으면 채점 해부 → 축 1 → 축 2 셋만 본다. 이 셋이 2026 1과제 배점의 절반 가까이(VPC 15.5 + 채점 전제인 Bastion)를 차지한다.
 

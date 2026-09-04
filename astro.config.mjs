@@ -2,6 +2,9 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import mdx from '@astrojs/mdx';
+import svelte from '@astrojs/svelte';
+import vercel from '@astrojs/vercel';
+import tailwindcss from '@tailwindcss/vite';
 import mermaid from 'astro-mermaid';
 import remarkGfm from 'remark-gfm';
 import rehypeExternalLinks from 'rehype-external-links';
@@ -10,10 +13,19 @@ import starlightHeadingBadges from 'starlight-heading-badges';
 import starlightScrollToTop from 'starlight-scroll-to-top';
 import starlightCodeblockFullscreen from 'starlight-codeblock-fullscreen';
 import starlightLinksValidator from 'starlight-links-validator';
+import starlightQuiz from 'starlight-quiz';
+import starlightSidebarTopics from 'starlight-sidebar-topics';
+import { iconifyUrl } from './src/mermaid-icons.mjs';
+/* Iconify 에 없는 AWS 서비스·리소스용 자체 팩. scripts/build-aws-icons.mjs 가
+   AWS 공식 아이콘 패키지에서 뽑아 만든다. */
+import awsIcons from './src/icons/aws.json';
+/* kubernetes 공식 리소스 아이콘. scripts/build-k8s-icons.mjs 가 만든다. */
+import k8sIcons from './src/icons/k8s.json';
 
 export default defineConfig({
-  /* 정적 빌드다. API 라우트가 없으므로 어댑터를 두지 않는다 — `npm run build` 가
-     평범한 파일을 내고 어느 정적 호스팅에나 그대로 올라간다. */
+  /* 문서는 전부 정적으로 굽는다. 어댑터는 나중에 `/api/*` 같은 함수 경로를 붙일
+     자리를 열어 두기 위한 것이고, 지금은 페이지가 전부 프리렌더된다. */
+  adapter: vercel(),
 
   /* GFM 기본값은 홑물결(~)도 취소선 구분자로 먹는다 — `3~4h` 같은 범위 표기가
      문단 안에서 짝 지어져 그 사이가 통째로 취소선이 된다. 내장 gfm 을 끄고
@@ -31,16 +43,46 @@ export default defineConfig({
   },
 
   integrations: [
-    /* autoTheme 를 끈다 — mermaid 는 항상 default 테마로 한 번만 그리고 다크/라이트
-       차이는 CSS 값 재계산으로 끝난다. 켜면 테마를 누를 때마다 모든 도식이 빈 칸이
-       됐다 돌아온다. */
-    mermaid({ autoTheme: false, mermaidConfig: { themeVariables: { fontSize: '18px' } } }),
+    /* autoTheme 를 끈다 — mermaid 는 항상 default 테마로 한 번만 그리고, 다크/라이트
+       차이는 src/styles/mermaid-theme.css 가 Starlight 의 --sl-color-* 로 낸다.
+       켜면 data-theme 가 바뀔 때마다 모든 도식의 data-processed 를 떼고 mermaid 를
+       통째로 다시 돌린다 — 테마를 누를 때마다 도식이 빈 칸이 됐다 돌아온다. */
+    mermaid({
+      autoTheme: false,
+      mermaidConfig: { themeVariables: { fontSize: '18px' } },
+      iconPacks: [
+        { name: 'logos', url: iconifyUrl('logos', 'json') },
+        { name: 'mdi', url: iconifyUrl('mdi', 'json') },
+        { name: 'simple-icons', url: iconifyUrl('simple-icons', 'json') },
+        /* IconifyJSON 전체를 넘긴다 — 안쪽 icons 맵만 주면 크기만 잡히고 body 가
+           비어 아이콘이 빈 사각형으로 그려진다. 빌드는 통과하므로 브라우저로
+           봐야 드러난다. */
+        { name: 'aws', icons: awsIcons },
+        { name: 'k8s', icons: k8sIcons },
+      ],
+    }),
     starlight({
       title: 'skills-guide-regional',
       description: '지방기능경기대회 클라우드컴퓨팅 훈련 문서 — 2023~2026 기출 분석',
       defaultLocale: 'root',
       locales: { root: { label: '한국어', lang: 'ko' } },
-      customCss: ['./src/styles/korean-fonts.css'],
+      customCss: [
+        /* 레이어 순서를 먼저 선언해야 한다 — 뒤에 오는 파일들이 그 순서를 전제한다. */
+        './src/styles/tailwind.css',
+        './src/styles/korean-fonts.css',
+        './src/styles/mermaid.css',
+        './src/styles/mermaid-theme.css',
+        './src/styles/mermaid-aws-icons.css',
+        './src/styles/mermaid-k8s-icons.css',
+        './src/styles/diagram-note.css',
+      ],
+      /* subgraph 라벨의 <span class='icon--logos--*'> 를 정의하는 CSS. 아이콘이
+         데이터 URI 로 들어 있어 아이콘 개수와 무관하게 요청은 팩당 1건이다.
+         mdi 는 단색이라 색을 박아야 한다 — 양쪽 테마에서 읽히는 중간톤으로 고정. */
+      head: [
+        { tag: 'link', attrs: { rel: 'stylesheet', href: iconifyUrl('logos', 'css') } },
+        { tag: 'link', attrs: { rel: 'stylesheet', href: iconifyUrl('mdi', 'css', '&color=%238ab') } },
+      ],
       social: [
         {
           icon: 'github',
@@ -48,17 +90,45 @@ export default defineConfig({
           href: 'https://github.com/rladnwls122/skills-guide-regional',
         },
       ],
-      sidebar: [{ label: '가이드', items: [{ autogenerate: { directory: 'guide' } }] }],
       plugins: [
         starlightThemeExquisitus(),
+        starlightQuiz(),
         starlightHeadingBadges(),
         starlightScrollToTop(),
         starlightCodeblockFullscreen(),
-        /* 죽은 사이트 내부 링크가 있으면 빌드가 깨진다 — 예전에 쓰던 셸 링크
-           검사 스크립트를 대체한다. */
+        starlightSidebarTopics([
+          {
+            label: '사전 지식',
+            link: '/basics/00-index/',
+            icon: 'seti:notebook',
+            items: [{ label: '사전 지식', items: [{ autogenerate: { directory: 'basics' } }] }],
+          },
+          {
+            label: '대회 이해',
+            link: '/exam/00-competition-map/',
+            icon: 'open-book',
+            items: [{ label: '대회 이해', items: [{ autogenerate: { directory: 'exam' } }] }],
+          },
+          {
+            label: '과제 축',
+            link: '/axis/03-axis-network/',
+            icon: 'puzzle',
+            items: [{ label: '과제 축', items: [{ autogenerate: { directory: 'axis' } }] }],
+          },
+          {
+            label: '훈련',
+            link: '/drill/09-drills/',
+            icon: 'rocket',
+            items: [{ label: '훈련', items: [{ autogenerate: { directory: 'drill' } }] }],
+          },
+        ]),
+        /* 죽은 사이트 내부 링크가 있으면 빌드가 깨진다. */
         starlightLinksValidator({ errorOnRelativeLinks: false }),
       ],
     }),
     mdx(),
+    svelte(),
   ],
+
+  vite: { plugins: [tailwindcss()] },
 });

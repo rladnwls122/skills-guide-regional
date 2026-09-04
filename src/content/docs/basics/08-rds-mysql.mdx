@@ -1,0 +1,190 @@
+---
+title: 08 RDS와 MySQL (선수 학습, 약 90분)
+description: 클러스터·서브넷 그룹·포트·사용자 권한. 2026 1과제와 2과제 ④ 가 여기 걸린다.
+sidebar:
+  order: 8
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 8/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+앱이 다루는 데이터를 어딘가에 저장해야 한다. 서버 안에 파일로 두면 서버가 죽을 때 같이 사라진다.
+
+**RDS 는 AWS 가 대신 관리해 주는 데이터베이스**다. 백업·복구·장애 대응을 알아서 해 준다. Aurora 는 그중에서도 AWS 가 성능을 손본 버전이고, MySQL 과 같은 방식으로 쓴다.
+
+2026 에 처음 나왔지만 1과제 7점 + 2과제 ④ 의 절반을 차지한다. **한번 만들면 못 바꾸는 설정이 많아서** 순서를 아는 것이 곧 시간이다.
+
+## ① 학습 목표
+
+- [ ] 클러스터·인스턴스·서브넷 그룹·파라미터 그룹을 구분한다
+- [ ] 생성 시점에만 정할 수 있는 옵션이 무엇인지 안다
+- [ ] 엔드포인트 두 종류(writer / reader)를 구분한다
+- [ ] 앱 전용 MySQL 사용자를 만들 줄 안다
+- [ ] `CREATE TABLE` 을 어디서 실행해야 하는지 안다
+
+## ② 핵심 개념
+
+### 용어표
+
+| 용어 | 한 줄 정의 |
+| --- | --- |
+| DB 클러스터 | Aurora 의 논리 단위. 엔드포인트·포트·암호화·스토리지가 여기 붙는다 |
+| DB 인스턴스 | 클러스터 안에서 실제로 쿼리를 처리하는 서버. writer 1대 + reader n대 |
+| DB 서브넷 그룹 | 클러스터를 어느 서브넷들에 놓을지. **2개 이상 AZ 필수** |
+| 파라미터 그룹 | MySQL 설정값 묶음. 로그·타임아웃 등을 바꿀 때 |
+| writer 엔드포인트 | 쓰기 가능한 인스턴스로 보내는 주소 |
+| reader 엔드포인트 | 읽기 전용 인스턴스들로 분산하는 주소 |
+
+앱은 보통 writer 엔드포인트 하나만 쓴다. 2026 secret 의 `host` 가 그것이다.
+
+### 생성 시점에만 정할 수 있는 것
+
+| 옵션 | 나중에 바꿀 수 있나 |
+| --- | --- |
+| 스토리지 암호화 | **못 바꾼다.** 스냅샷 → 암호화 복원으로만 |
+| 포트 | 바꿀 수 있지만 수정 + 재부팅이 필요해 시간이 든다 |
+| 엔진·버전 | 업그레이드는 가능하나 다운그레이드 불가 |
+| DB 서브넷 그룹 | 바꾸기 번거롭다 |
+| 마스터 사용자 이름 | **못 바꾼다** |
+
+**마스터 사용자 이름을 못 바꾼다는 점이 2026 에서 함정이다.** 채점 4-3 은 secret 의 `username` 이 `admin` 이 아닌지 본다. 마스터를 `admin` 으로 만들어 두고 그걸 secret 에 넣으면 실패한다.
+
+### 앱 전용 사용자
+
+마스터를 앱에 그대로 주지 않는 것이 정석이고, 2026 문제지도 "애플리케이션이 과도한 권한을 갖지 않도록" 이라고 적었다.
+
+```sql
+CREATE DATABASE worldpay;
+CREATE TABLE `worldpay`.`users` (
+  uid INT AUTO_INCREMENT, name VARCHAR(255), age INT, PRIMARY KEY (uid)
+);
+CREATE USER 'app'@'%' IDENTIFIED BY '<암호>';
+GRANT SELECT, INSERT ON worldpay.users TO 'app'@'%';
+FLUSH PRIVILEGES;
+```
+
+`'app'@'%'` 의 `%` 는 "어느 호스트에서 접속하든" 이다. VPC 안에서만 닿으므로 이 정도로 둔다.
+
+### 테이블은 선수가 만든다
+
+앱은 테이블을 만들지 않는다. **Bastion 에서 MySQL 클라이언트로 붙어 직접 실행한다.**
+
+```bash
+dnf install -y mariadb105        # Amazon Linux 2023
+mysql -h <writer 엔드포인트> -P 3307 -u <마스터> -p
+```
+
+2026 은 Bastion 이 app VPC 에, RDS 가 db VPC 에 있다. **Peering 경로와 DB 보안 그룹이 Bastion 을 허용해야** 이 명령이 붙는다. → [축 1](/axis/03-axis-network/)
+
+## ③ 대회에서 어떻게 쓰이나
+
+| 해 | 요구 |
+| --- | --- |
+| 2026 1과제 | `worldpay-rds` aurora-mysql 8.0, db.t3.medium, **포트 3307**, KMS 암호화, public access off |
+| 2026 2과제 ④ | `store-rds`, 스토리지 암호화, public access off, Lambda 가 VPC 안에서 접속 |
+
+채점 명령이 **계정 전체**를 훑는다는 점을 잊지 않는다.
+
+```bash
+aws rds describe-db-instances --query DBInstances[].DBInstanceClass --output text
+aws rds describe-db-instances --query DBInstances[].PubliclyAccessible --output text
+```
+
+연습용 RDS 를 남겨 두면 "모두 db.t3.medium", "모두 False" 조건이 깨진다.
+
+## ④ 미니 실습 (40분 + 생성 대기)
+
+<Steps>
+
+1. DB 서브넷 그룹을 만든다(프라이빗 서브넷 2개, 서로 다른 AZ).
+
+2. Aurora MySQL 클러스터를 만든다 — **포트 3307**, 암호화 켜기, 퍼블릭 액세스 끄기, 마스터 사용자 이름은 `admin` 이 아닌 것으로.
+
+   생성에 10~15분 걸린다. 그 사이에 보안 그룹과 Bastion 을 준비한다.
+
+3. DB 보안 그룹에 Bastion 보안 그룹으로부터 3307 인바운드를 넣는다.
+
+4. Bastion 에서 접속해 위 SQL 을 실행한다.
+
+5. 확인한다.
+
+   ```bash
+   aws rds describe-db-clusters --db-cluster-identifier 연습-rds \
+     --query 'DBClusters[].[Port,StorageEncrypted]' --output text
+   ```
+
+6. **끝나면 지운다.** Aurora 는 시간당 과금이 크다.
+
+</Steps>
+
+## ⑤ 심화 개념
+
+### 포트를 바꾸면 네 곳이 함께 바뀐다
+
+1. DB 보안 그룹 인바운드
+2. 앱의 접속 설정
+3. Secrets Manager 의 `host`·`port`
+4. NACL 이 있다면 그 포트도
+
+**포트 하나 때문에 앱이 안 뜨는 경우가 많다.** 1.5점짜리 항목이 4.5점 연쇄를 죽인다.
+
+### 퍼블릭 액세스를 끄면 어디서 붙나
+
+VPC 안에서만 붙는다. CloudShell 은 VPC 밖이라 **직접 못 붙는다** — 2026 2과제 ④ 채점이 Lambda invoke 로 확인하는 이유다.
+
+### 삭제 방지와 최종 스냅샷
+
+클러스터 삭제 방지를 켜 두면 실수로 지우는 것을 막는다. 대회에서 요구되지는 않았지만 연습 계정에서 실수를 줄인다.
+
+### Aurora 와 RDS for MySQL 은 다르다
+
+`aws rds describe-db-clusters` 는 Aurora 에서 의미가 있다. RDS for MySQL 은 클러스터가 없고 인스턴스만 있다. **2026 은 `aurora-mysql` 을 명시했으므로 클러스터를 만든다** — 일반 RDS 로 만들면 `describe-db-clusters` 가 빈 결과라 3-1 이 0점이다.
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="생성 후 못 바꾸는 것">
+Aurora 클러스터를 만들었는데 스토리지 암호화를 깜빡했다. 어떻게 하나?
+
+- [x] 스냅샷을 뜨고 암호화 옵션으로 복원한다 — 시간이 오래 걸린다
+- [ ] 클러스터를 수정해 암호화를 켠다
+  > 생성 후에는 못 켠다. 수정 화면에 항목 자체가 없다.
+- [ ] 파라미터 그룹에서 켠다
+  > 파라미터 그룹은 MySQL 설정이지 스토리지 암호화가 아니다.
+- [ ] 자동으로 켜져 있다
+  > 기본값은 꺼짐이다(콘솔 마법사는 켜 주는 경우가 있으나 CLI 는 아니다).
+
+**처음부터 켜고 만든다.** 포트도 같은 이유로 처음에 3307 로 만든다.
+</Quiz>
+
+<Quiz title="secret 의 username">
+2026 채점 4-3 을 통과하는 구성을 **모두** 고르시오.
+
+- [x] 마스터를 `wpadmin` 으로 만들고 앱 전용 사용자 `app` 을 따로 만들어 secret 에 넣는다
+- [x] 마스터를 `root` 로 만들고 secret 에는 `app` 을 넣는다
+- [ ] 마스터를 `admin` 으로 만들고 secret 에 그대로 넣는다
+  > 채점이 secret 의 username 이 `admin` 인지 직접 본다.
+- [ ] secret 의 username 만 `app` 으로 적고 실제로는 마스터 암호를 넣는다
+  > 채점은 통과할 수 있으나 앱이 접속에 실패한다. 6-1~6-3 과 7-3 이 함께 죽는다.
+
+**채점을 통과하는 것과 앱이 도는 것을 동시에 만족해야 한다.** 실제로 붙는 사용자를 secret 에 넣는다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+<LinkButton href="/basics/09-dynamodb/" icon="right-arrow">다음 — 09 DynamoDB</LinkButton>
+<LinkButton href="/axis/06-axis-data/" variant="minimal">축 4 — 데이터 저장소</LinkButton>
+
+## 공식 문서
+
+- [Aurora 클러스터 생성](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CreateInstance.html)
+- [Aurora 암호화](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Overview.Encryption.html) — 생성 후 변경 불가 절
+- [DB 서브넷 그룹](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_VPC.WorkingWithRDSInstanceinaVPC.html)
+- [Aurora 엔드포인트](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Overview.Endpoints.html) — writer 와 reader

@@ -1,0 +1,221 @@
+---
+title: 01 셸과 AWS CLI (선수 학습, 약 2시간)
+description: 채점이 CLI 출력 대조라서, JMESPath 를 읽는 것 자체가 실력이다. 채점 스크립트를 해독하는 데 필요한 만큼만.
+sidebar:
+  order: 1
+---
+
+import { Quiz, QuizResults } from 'starlight-quiz/components';
+import { Steps, LinkButton, Aside } from '@astrojs/starlight/components';
+
+> 문서 유형: explanation
+
+**선수 학습 1/15.** 앞선 문서를 전제하지 않는다. 처음 보는 사람 기준으로 씁니다.
+
+## 이 문서를 왜 읽나
+
+대회 채점은 사람이 콘솔 화면을 눈으로 보는 게 아니다. **정해진 명령어를 터미널에 치고, 화면에 찍힌 글자가 정답과 같은지 비교**한다.
+
+그래서 채점기준표에 적힌 명령어를 읽을 줄 아는 것이 그 자체로 점수다. 명령어를 보고 "아, 이건 서브넷의 CIDR 을 뽑는 거구나" 하고 알면, 무엇을 만들어야 하는지가 바로 보인다.
+
+이 문서는 그 명령어를 해독하는 데 필요한 만큼만 다룬다. 리눅스를 처음 만져도 따라올 수 있다.
+
+## ① 학습 목표
+
+- [ ] `--query` 의 JMESPath 표현식을 소리 내어 읽을 수 있다
+- [ ] `--output text` 와 `json` 의 차이가 왜 채점에 중요한지 안다
+- [ ] `--filter` 와 `--query` 가 서로 다른 층에서 동작한다는 것을 안다
+- [ ] 채점기준표의 명령을 그대로 옮겨 자가 채점 스크립트를 만들 수 있다
+
+## ② 핵심 개념
+
+### `--filter` 와 `--query` 는 층이 다르다
+
+```bash
+aws ec2 describe-vpcs \
+  --filter Name=tag:Name,Values=worldpay-app-vpc \
+  --query "Vpcs[].CidrBlock" \
+  --output text
+```
+
+| 조각 | 어디서 도나 | 무엇을 하나 |
+| --- | --- | --- |
+| `--filter` | **AWS 서버** | 서버가 조건에 맞는 것만 골라 보낸다 |
+| `--query` | **내 컴퓨터** | 받은 JSON 에서 필요한 필드만 뽑는다 |
+| `--output` | 내 컴퓨터 | 뽑은 값을 어떤 모양으로 찍을지 |
+
+`--filter` 는 서비스마다 지원하는 키가 다르다. `describe-vpcs` 는 `tag:Name` 을 받지만 `describe-db-clusters` 는 아예 없다 — 그래서 RDS 채점은 `--db-cluster-identifier` 를 쓴다.
+
+### JMESPath 읽는 법
+
+`--query` 는 [JMESPath](https://jmespath.org/tutorial.html) 다. 채점기준표에 나오는 형태는 다섯 가지뿐이다.
+
+| 표현식 | 뜻 |
+| --- | --- |
+| `Vpcs[].CidrBlock` | Vpcs 배열의 각 원소에서 `CidrBlock` 만 뽑아 새 배열 |
+| `Subnets[0].CidrBlock` | **첫 번째 원소만** — 같은 이름표가 둘이면 하나만 본다 |
+| `Tags[?Key=='Name'].Value` | Key 가 `Name` 인 원소만 남기고 그 `Value` |
+| `logGroups[?logGroupName=='worldpay-log-group'].retentionInDays` | 이름이 정확히 일치하는 것의 보관 기간 |
+| `Entries[?(!(Egress) && RuleAction=='allow')].CidrBlock` | Egress 가 거짓이고(=inbound) allow 인 규칙의 CIDR |
+
+마지막 줄이 2026 NACL 채점이다. 풀어 읽으면 **"인바운드 허용 규칙들의 CIDR 목록"** 이고, 채점은 그 목록에 `0.0.0.0/0` 이 없기를 요구한다.
+
+```bash
+# 2026 1-9
+aws ec2 describe-network-acls --filter Name=tag:Name,Values=worldpay-db-nacl \
+  --query "NetworkAcls[].Entries[?(!(Egress) && RuleAction=='allow')].CidrBlock" --output text
+```
+
+**`[]` 는 "펼쳐서 이어 붙이기"다.** `NetworkAcls[].Entries[?...]` 는 NACL 이 여럿이어도 규칙을 하나의 평평한 목록으로 만든다.
+
+### `--output text` 가 중요한 이유
+
+```bash
+$ aws ec2 describe-vpcs --query "Vpcs[].CidrBlock"
+[
+    "10.0.0.0/16"
+]
+$ aws ec2 describe-vpcs --query "Vpcs[].CidrBlock" --output text
+10.0.0.0/16
+```
+
+채점기준표가 "출력되는 결과가 `10.0.0.0/16` 인지 확인" 이라고 적을 때 그 모양은 `text` 다. 따옴표와 대괄호가 없다.
+
+그리고 **`text` 는 결과를 탭으로 이어 붙인다.** 값이 여럿이면 한 줄에 나란히 나오거나 줄바꿈된다 — 2026 Athena 채점이 `| wc -l` 로 줄 수를 세는 것이 이 성질을 쓴 것이다.
+
+### 셸에서 쓰는 것 다섯
+
+| 도구 | 대회에서 쓰는 자리 |
+| --- | --- |
+| `$(...)` 명령 치환 | ALB DNS·ARN·계정 ID 를 변수에 담는다 |
+| `grep` / `grep -o` | 응답에서 `"uid":3` 만 뽑는다 |
+| `jq` | 대시보드 JSON, secret JSON 파싱 |
+| heredoc `<<'EOF'` | user data·정책 JSON 을 파일로 쓴다. **따옴표를 붙이면 `$` 가 그대로 남는다** |
+| `for` 루프 | 부하 주입(2025 KEDA·CloudWatch 알람 검증) |
+
+```bash
+ALB=$(aws elbv2 describe-load-balancers --names worldpay-alb \
+        --query LoadBalancers[].DNSName --output text)
+out=$(curl -s http://$ALB/v1/users -H "Content-type: application/json" \
+        -d '{"name":"selfcheck","age":1}')
+uid=$(echo $out | grep -o '"uid":[0-9]*' | grep -o '[0-9]*')
+curl -s "http://$ALB/v1/users?uid=$uid"
+```
+
+이 네 줄이 2026 채점 6-1·6-2 의 전부다.
+
+## ③ 대회에서 어떻게 쓰이나
+
+- **자가 채점.** 채점기준표의 명령을 그대로 옮겨 `mark.sh` 를 만든다. 만드는 과정에서 "이 항목이 뭘 보는지"가 손에 남는다. → [채점 해부 9절](/exam/02-scoring/)
+- **빈 출력 진단.** 출력이 비면 리소스가 없거나, 이름표가 틀렸거나, 리전이 다르다. 셋을 이 순서로 확인한다.
+- **리전 고정.** 채점 스크립트는 첫 줄에서 `aws configure set region ...` 을 한다. 자기 셸에서도 같은 값을 박아 둔다.
+
+## ④ 미니 실습 (30분)
+
+<Steps>
+
+1. 임의의 VPC 하나를 만들고 Name 태그를 붙인다.
+
+2. 아래를 순서대로 돌려 출력이 어떻게 달라지는지 본다.
+
+   ```bash
+   aws ec2 describe-vpcs
+   aws ec2 describe-vpcs --query "Vpcs[].VpcId"
+   aws ec2 describe-vpcs --query "Vpcs[].VpcId" --output text
+   aws ec2 describe-vpcs --filter Name=tag:Name,Values=없는이름 \
+     --query "Vpcs[].VpcId" --output text
+   ```
+
+3. 마지막 명령이 **아무것도 출력하지 않는 것**을 확인한다. 이것이 채점에서 0점인 상태다.
+
+4. 태그를 뽑아 본다.
+
+   ```bash
+   aws ec2 describe-vpcs --query "Vpcs[].[VpcId,CidrBlock,Tags[?Key=='Name']|[0].Value]" --output text
+   ```
+
+</Steps>
+
+`|[0]` 는 파이프 뒤 첫 원소를 고르는 표현이다. 태그가 없으면 `None` 이 찍힌다.
+
+## ⑤ 심화 개념
+
+### `Subnets[0]` 함정
+
+```bash
+aws ec2 describe-subnets --filter Name=tag:Name,Values=worldpay-app-subnet-a \
+  --query "Subnets[0].CidrBlock" --output text
+```
+
+같은 Name 태그를 가진 서브넷이 둘이면 **어느 쪽이 `[0]` 인지 보장되지 않는다.** 이름표를 재사용하지 않는 이유가 이것이다.
+
+### 계정 전체를 훑는 명령
+
+`--filter` 가 없는 명령은 연습 잔해까지 본다.
+
+```bash
+aws rds describe-db-instances --query DBInstances[].DBInstanceClass --output text
+# → db.t3.medium  db.t3.micro   ← 연습용 하나가 남아 "모두 db.t3.medium" 조건이 깨진다
+```
+
+→ [종료 전 체크리스트 2절](/drill/10-checklist/)
+
+### AWS CLI v2 의 페이저
+
+v2 는 출력이 길면 페이저를 띄운다. 스크립트에서는 멈춘 것처럼 보인다.
+
+```bash
+aws configure set cli_pager ""      # 또는 명령마다 --no-cli-pager
+```
+
+### 자격 증명이 어디서 오는가
+
+우선순위는 환경 변수 → `~/.aws/credentials` → 인스턴스 프로파일 순이다. **Bastion 에서는 인스턴스 프로파일만 쓰고 나머지를 비워 둔다** — 다른 계정 자격 증명이 남아 있으면 채점에서 부정행위로 의심받는다. → [축 2](/axis/04-axis-bastion/)
+
+```bash
+aws sts get-caller-identity
+# Arn 이 assumed-role/... 이어야 한다
+```
+
+## ⑥ 자기 점검 퀴즈
+
+<Quiz title="JMESPath 읽기">
+`--query "Entries[?(@.Egress && RuleAction=='allow')].CidrBlock"` 이 뽑는 것은?
+
+- [x] 아웃바운드 방향의 허용 규칙들이 가진 CIDR 목록
+- [ ] 인바운드 방향의 허용 규칙들이 가진 CIDR 목록
+  > `@.Egress` 가 참인 것을 고르므로 아웃바운드다. 인바운드는 `!(Egress)` 로 부정한다.
+- [ ] 모든 규칙의 CIDR 목록
+  > `[?...]` 는 필터다. 조건에 맞는 것만 남는다.
+- [ ] 거부 규칙의 CIDR 목록
+  > `RuleAction=='allow'` 이므로 허용 규칙이다.
+
+**`Egress` 가 참이면 아웃바운드.** 2026 채점 1-10 이 이것이고, 결과에 `0.0.0.0/0` 이 없어야 득점한다.
+</Quiz>
+
+<Quiz title="filter 와 query">
+`--filter` 와 `--query` 에 대한 설명으로 옳은 것을 **모두** 고르시오.
+
+- [x] `--filter` 는 AWS 서버에서, `--query` 는 로컬에서 처리된다
+- [x] 서비스마다 `--filter` 가 지원하는 키가 다르다
+- [ ] `--query` 로 거른 것은 API 호출량을 줄인다
+  > 이미 받아 온 JSON 을 로컬에서 자르는 것이라 전송량은 그대로다.
+- [ ] 둘 다 JMESPath 문법이다
+  > `--query` 만 JMESPath 다. `--filter` 는 `Name=...,Values=...` 형식이다.
+
+**두 층을 구분해야 "왜 이 서비스는 tag 로 못 거르나"가 설명된다.** RDS·ECS 채점이 이름·식별자를 쓰는 이유다.
+</Quiz>
+
+<QuizResults />
+
+## ⑦ 다음 단계
+
+<LinkButton href="/basics/02-vpc/" icon="right-arrow">다음 — 02 VPC</LinkButton>
+<LinkButton href="/exam/02-scoring/" variant="minimal">채점 해부로 바로 가기</LinkButton>
+
+## 공식 문서
+
+- [AWS CLI 출력 필터링](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-filter.html) — `--query` 원문
+- [JMESPath 튜토리얼](https://jmespath.org/tutorial.html) — 필터 표현식 `[?Key=='Name']` 절까지만
+- [AWS CLI 출력 형식](https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-output-format.html) — `text` 가 탭으로 이어 붙이는 규칙
+- [자격 증명 우선순위](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-authentication.html)

@@ -1,0 +1,1046 @@
+{
+  "version": 1,
+  "quizzes": [
+    {
+      "id": "quiz-1t2852f",
+      "page": "/axis/03-axis-network/",
+      "title": "서브넷이 public 이 되는 조건",
+      "type": "single",
+      "question": "어떤 서브넷을 “public” 으로 만드는 것은 무엇인가?",
+      "answers": [
+        {
+          "text": "그 서브넷이 연결된 라우팅 테이블에 0.0.0.0/0 → IGW 경로가 있는 것",
+          "correct": true
+        },
+        {
+          "text": "서브넷 생성 시 public 옵션을 켜는 것",
+          "correct": false,
+          "feedback": "그런 옵션은 없다. 콘솔의 “퍼블릭 IP 자동 할당”은 그 서브넷에 뜨는 인스턴스가 퍼블릭 IP 를 받느냐일 뿐, 나가는 길과는 별개다."
+        },
+        {
+          "text": "서브넷 안 인스턴스가 퍼블릭 IP 를 갖는 것",
+          "correct": false,
+          "feedback": "퍼블릭 IP 가 있어도 라우팅 테이블에 IGW 경로가 없으면 인터넷과 통신할 수 없다."
+        },
+        {
+          "text": "서브넷 CIDR 이 VPC CIDR 의 앞쪽 대역인 것",
+          "correct": false,
+          "feedback": "CIDR 값은 아무 관계가 없다. 관례상 앞 대역을 public 에 쓸 뿐이다."
+        }
+      ],
+      "explanation": "라우팅 테이블 연결이 전부다. 채점도 그렇게 본다 — 2023 채점 1-3 은 wsi-public-rtb 의 Routes[].GatewayId 가 igw- 로 시작하는지만 확인한다."
+    },
+    {
+      "id": "quiz-18ykc5l",
+      "page": "/axis/03-axis-network/",
+      "title": "NACL outbound 임시 포트",
+      "type": "single",
+      "question": "2026 db 서브넷 NACL 에서 app 서브넷의 응답이 돌아가게 하려면 outbound 에 무엇을 넣어야 하나?",
+      "answers": [
+        {
+          "text": "목적지 CIDR 을 app 서브넷(10.0.10.0/24, 10.0.11.0/24)으로 한 1024–65535 allow",
+          "correct": true
+        },
+        {
+          "text": "넣을 필요 없다 — 들어온 연결의 응답은 자동으로 나간다",
+          "correct": false,
+          "feedback": "그건 보안 그룹(stateful)의 동작이다. NACL 은 stateless 라 응답 방향에도 규칙이 있어야 한다."
+        },
+        {
+          "text": "목적지 0.0.0.0/0 인 1024–65535 allow",
+          "correct": false,
+          "feedback": "동작은 하지만 채점 1-10 이 outbound allow 규칙의 CIDR 에 0.0.0.0/0 이 없는지 본다. 그 순간 1.5점을 잃는다."
+        },
+        {
+          "text": "목적지 app 서브넷인 3307 allow",
+          "correct": false,
+          "feedback": "3307 은 요청이 들어오는 포트다. 응답은 클라이언트가 연 임시 포트로 돌아간다."
+        }
+      ],
+      "explanation": "app 서브넷 CIDR 로 좁힌 임시 포트 allow. 동작과 채점을 동시에 만족하는 유일한 답이다."
+    },
+    {
+      "id": "quiz-1rz0zyf",
+      "page": "/axis/05-axis-compute/",
+      "title": "ALB 기본 동작과 규칙",
+      "type": "single",
+      "question": "2026 요구를 만족하는 리스너 구성은?",
+      "answers": [
+        {
+          "text": "기본 동작 = fixed-response 403, 규칙 1 = /v1/users·/health 를 타깃 그룹으로 forward",
+          "correct": true
+        },
+        {
+          "text": "기본 동작 = forward, 규칙 1 = 나머지 경로를 403 fixed-response",
+          "correct": false,
+          "feedback": "채점 5-3 이 Listeners[].DefaultActions[].FixedResponseConfig.StatusCode 를 본다. 기본 동작이 forward 면 이 값이 없어 0점이다."
+        },
+        {
+          "text": "기본 동작 = forward, 앱이 404 대신 403 을 반환하도록 구현",
+          "correct": false,
+          "feedback": "지급 바이너리는 수정할 수 없고, 채점은 ALB 설정을 직접 읽는다."
+        },
+        {
+          "text": "기본 동작 = redirect 403",
+          "correct": false,
+          "feedback": "redirect 는 상태 코드 3xx 다. fixed-response 여야 한다."
+        }
+      ],
+      "explanation": "기본 동작 자체가 403 이어야 한다. 동작이 같아 보여도 채점이 읽는 필드가 다르다."
+    },
+    {
+      "id": "quiz-dvcxtj",
+      "page": "/axis/05-axis-compute/",
+      "title": "ASG 인스턴스 Name 태그",
+      "type": "multiple",
+      "question": "worldpay-app Name 태그가 인스턴스에 붙게 하는 방법을 모두 고르시오.",
+      "answers": [
+        {
+          "text": "Launch Template 의 태그 스펙(instance 리소스 타입)에 넣는다",
+          "correct": true
+        },
+        {
+          "text": "ASG 태그에 PropagateAtLaunch=true 로 넣는다",
+          "correct": true
+        },
+        {
+          "text": "ASG 이름을 worldpay-app 으로 짓는다",
+          "correct": false,
+          "feedback": "ASG 이름은 worldpay-asg 여야 하고(채점 2-1), 인스턴스 태그와 별개다."
+        },
+        {
+          "text": "Launch Template 이름에 넣는다",
+          "correct": false,
+          "feedback": "템플릿 이름은 인스턴스에 전파되지 않는다."
+        }
+      ],
+      "explanation": "채점 2-3 은 Reservations[].Instances[].Tags 를 본다. ASG 이름만 맞고 인스턴스에 태그가 없으면 1.5점을 잃는다."
+    },
+    {
+      "id": "quiz-17zw8es",
+      "page": "/basics/01-shell-awscli/",
+      "title": "JMESPath 읽기",
+      "type": "single",
+      "question": "--query \"Entries[?(@.Egress && RuleAction=='allow')].CidrBlock\" 이 뽑는 것은?",
+      "answers": [
+        {
+          "text": "아웃바운드 방향의 허용 규칙들이 가진 CIDR 목록",
+          "correct": true
+        },
+        {
+          "text": "인바운드 방향의 허용 규칙들이 가진 CIDR 목록",
+          "correct": false,
+          "feedback": "@.Egress 가 참인 것을 고르므로 아웃바운드다. 인바운드는 !(Egress) 로 부정한다."
+        },
+        {
+          "text": "모든 규칙의 CIDR 목록",
+          "correct": false,
+          "feedback": "[?...] 는 필터다. 조건에 맞는 것만 남는다."
+        },
+        {
+          "text": "거부 규칙의 CIDR 목록",
+          "correct": false,
+          "feedback": "RuleAction=='allow' 이므로 허용 규칙이다."
+        }
+      ],
+      "explanation": "Egress 가 참이면 아웃바운드. 2026 채점 1-10 이 이것이고, 결과에 0.0.0.0/0 이 없어야 득점한다."
+    },
+    {
+      "id": "quiz-vr8h4r",
+      "page": "/basics/01-shell-awscli/",
+      "title": "filter 와 query",
+      "type": "multiple",
+      "question": "--filter 와 --query 에 대한 설명으로 옳은 것을 모두 고르시오.",
+      "answers": [
+        {
+          "text": "--filter 는 AWS 서버에서, --query 는 로컬에서 처리된다",
+          "correct": true
+        },
+        {
+          "text": "서비스마다 --filter 가 지원하는 키가 다르다",
+          "correct": true
+        },
+        {
+          "text": "--query 로 거른 것은 API 호출량을 줄인다",
+          "correct": false,
+          "feedback": "이미 받아 온 JSON 을 로컬에서 자르는 것이라 전송량은 그대로다."
+        },
+        {
+          "text": "둘 다 JMESPath 문법이다",
+          "correct": false,
+          "feedback": "--query 만 JMESPath 다. --filter 는 Name=...,Values=... 형식이다."
+        }
+      ],
+      "explanation": "두 층을 구분해야 “왜 이 서비스는 tag 로 못 거르나”가 설명된다. RDS·ECS 채점이 이름·식별자를 쓰는 이유다."
+    },
+    {
+      "id": "quiz-tefa12",
+      "page": "/basics/02-vpc/",
+      "title": "NAT Gateway 배치",
+      "type": "single",
+      "question": "NAT Gateway 는 어디에 두어야 하나?",
+      "answers": [
+        {
+          "text": "퍼블릭 서브넷 — NAT 자신이 IGW 로 나가야 한다",
+          "correct": true
+        },
+        {
+          "text": "트래픽을 내보낼 프라이빗 서브넷 안",
+          "correct": false,
+          "feedback": "NAT 이 프라이빗에 있으면 NAT 자신이 나갈 길이 없다. 라우팅은 라우팅 테이블이 하는 일이라 같은 서브넷일 필요가 전혀 없다."
+        },
+        {
+          "text": "VPC 에 직접 붙인다 — IGW 와 같은 방식",
+          "correct": false,
+          "feedback": "IGW 는 VPC 에 attach 하지만 NAT 은 서브넷에 만든다."
+        },
+        {
+          "text": "어디든 상관없다",
+          "correct": false,
+          "feedback": "퍼블릭이어야 한다."
+        }
+      ],
+      "explanation": "퍼블릭 서브넷. 그리고 AZ 별로 나눠야 AZ 장애가 격리된다."
+    },
+    {
+      "id": "quiz-6v43sj",
+      "page": "/basics/02-vpc/",
+      "title": "stateless 가 뜻하는 것",
+      "type": "single",
+      "question": "DB 서브넷 NACL 에서 인바운드 3307 만 허용하고 아웃바운드를 비워 두었다. 무슨 일이 일어나나?",
+      "answers": [
+        {
+          "text": "요청은 도착하지만 응답이 나가지 못해 연결이 끊긴다",
+          "correct": true
+        },
+        {
+          "text": "정상 동작한다 — 들어온 연결의 응답은 자동 허용된다",
+          "correct": false,
+          "feedback": "그것은 보안 그룹(stateful)의 동작이다. NACL 은 응답 방향에도 규칙이 필요하다."
+        },
+        {
+          "text": "요청 자체가 막힌다",
+          "correct": false,
+          "feedback": "인바운드 3307 은 허용했으므로 요청은 들어온다."
+        },
+        {
+          "text": "아웃바운드가 비면 기본 허용이다",
+          "correct": false,
+          "feedback": "NACL 의 마지막 규칙은 * DENY 다. 명시적으로 허용해야 한다."
+        }
+      ],
+      "explanation": "응답은 클라이언트가 연 임시 포트(1024–65535)로 돌아간다. 그 포트를 app 서브넷 CIDR 로 좁혀 허용한다."
+    },
+    {
+      "id": "quiz-19r9kfd",
+      "page": "/basics/03-iam/",
+      "title": "ForAllValues 와 ForAnyValue",
+      "type": "single",
+      "question": "ForAllValues:StringEquals 로 dynamodb:Attributes 를 [\"name\",\"type\"] 에 묶었다. {\"name\",\"price\"} 요청은?",
+      "answers": [
+        {
+          "text": "거부된다 — price 가 허용 목록에 없어 “모든 값” 조건이 깨진다",
+          "correct": true
+        },
+        {
+          "text": "허용된다 — name 이 목록에 있다",
+          "correct": false,
+          "feedback": "그것은 ForAnyValue: 의 동작이다. ForAllValues: 는 전부 만족해야 한다."
+        },
+        {
+          "text": "허용된다 — 조건은 읽기에만 적용된다",
+          "correct": false,
+          "feedback": "조건은 그 Statement 의 모든 Action 에 적용된다."
+        },
+        {
+          "text": "오류가 난다 — 조건 키를 잘못 썼다",
+          "correct": false,
+          "feedback": "유효한 조건 키다. 정상적으로 평가되어 거부된다."
+        }
+      ],
+      "explanation": "접두사 하나가 정답과 오답을 가른다. 2026 채점 3-9 가 정확히 이 요청을 보내 실패하기를 기대한다."
+    },
+    {
+      "id": "quiz-jsezft",
+      "page": "/basics/03-iam/",
+      "title": "역할에 붙는 두 정책",
+      "type": "single",
+      "question": "employee-role 을 다른 계정 주체가 아니라 내 계정의 모든 user·role 이 assume 할 수 있게 하려면 어디를 고치나?",
+      "answers": [
+        {
+          "text": "역할의 신뢰 정책에서 Principal 을 arn:aws:iam::<계정>:root 로 둔다",
+          "correct": true
+        },
+        {
+          "text": "역할에 붙은 employee-policy 에 sts:AssumeRole 을 추가한다",
+          "correct": false,
+          "feedback": "연결된 정책은 assume 한 뒤 무엇을 할 수 있나를 정한다. 누가 빌릴 수 있나는 신뢰 정책이다."
+        },
+        {
+          "text": "각 사용자에게 employee-role 을 붙인다",
+          "correct": false,
+          "feedback": "역할은 사용자에게 “붙이는” 것이 아니라 빌리는 것이다."
+        },
+        {
+          "text": "역할을 public 으로 설정한다",
+          "correct": false,
+          "feedback": "그런 설정은 없다."
+        }
+      ],
+      "explanation": "신뢰 정책의 root 는 “계정 루트 사용자”가 아니라 “이 계정 전체”를 뜻한다. 자주 오해하는 표기다."
+    },
+    {
+      "id": "quiz-p4u87u",
+      "page": "/basics/04-ec2-asg/",
+      "title": "user data 가 도는 시점",
+      "type": "single",
+      "question": "ASG 가 스케일 아웃으로 새 인스턴스를 띄웠다. user data 는?",
+      "answers": [
+        {
+          "text": "새 인스턴스의 첫 부팅에서 실행된다 — 그래서 자동 마운트·앱 기동을 여기 넣는다",
+          "correct": true
+        },
+        {
+          "text": "실행되지 않는다 — 최초 1대에만 적용된다",
+          "correct": false,
+          "feedback": "Launch Template 의 user data 는 그 템플릿으로 뜨는 모든 인스턴스에서 돈다."
+        },
+        {
+          "text": "매 부팅마다 실행된다",
+          "correct": false,
+          "feedback": "기본값은 최초 부팅 1회다. 매번 돌게 하려면 cloud-init 설정을 따로 바꾼다."
+        },
+        {
+          "text": "ASG 가 아니라 사람이 실행해야 한다",
+          "correct": false,
+          "feedback": "자동이다."
+        }
+      ],
+      "explanation": "손으로 마운트한 것은 소용없다. 2026 2과제 ① 채점이 인스턴스를 전부 지우고 새로 뜬 것에서 확인하는 이유다."
+    },
+    {
+      "id": "quiz-14lf1n8",
+      "page": "/basics/04-ec2-asg/",
+      "title": "인스턴스 Name 태그",
+      "type": "multiple",
+      "question": "채점 명령이 worldpay-app 을 못 찾는다. 확인할 곳을 모두 고르시오.",
+      "answers": [
+        {
+          "text": "Launch Template 태그 스펙의 리소스 타입이 instance 인지",
+          "correct": true
+        },
+        {
+          "text": "ASG 태그의 PropagateAtLaunch 가 true 인지",
+          "correct": true
+        },
+        {
+          "text": "ASG 이름이 worldpay-app 인지",
+          "correct": false,
+          "feedback": "ASG 이름은 worldpay-asg 여야 한다. 별개 항목이다."
+        },
+        {
+          "text": "보안 그룹 이름",
+          "correct": false,
+          "feedback": "무관하다."
+        }
+      ],
+      "explanation": "태그를 붙인 뒤 뜬 인스턴스에만 적용된다. 이미 떠 있는 인스턴스는 태그를 직접 붙이거나 인스턴스 새로고침을 한다."
+    },
+    {
+      "id": "quiz-1aixyzd",
+      "page": "/basics/05-loadbalancer/",
+      "title": "503 이 뜻하는 것",
+      "type": "single",
+      "question": "채점자의 curl 이 503 을 받았다. 가장 먼저 볼 곳은?",
+      "answers": [
+        {
+          "text": "타깃 그룹의 타깃 상태 — 전부 unhealthy 면 ALB 가 503 을 만든다",
+          "correct": true
+        },
+        {
+          "text": "앱 코드의 오류 처리",
+          "correct": false,
+          "feedback": "앱까지 요청이 갔다면 앱의 응답 코드가 온다. 503 은 대개 ALB 가 만든 것이다."
+        },
+        {
+          "text": "보안 그룹의 인바운드 80",
+          "correct": false,
+          "feedback": "80 이 막혔다면 응답 자체가 안 온다(타임아웃)."
+        },
+        {
+          "text": "RDS 연결",
+          "correct": false,
+          "feedback": "DB 문제라면 앱이 500 을 돌려준다. 앱이 아예 타깃에서 빠진 상태가 503 이다."
+        }
+      ],
+      "explanation": "503 = “보낼 타깃이 없다”. 헬스 체크부터 본다."
+    },
+    {
+      "id": "quiz-1cj2xz2",
+      "page": "/basics/05-loadbalancer/",
+      "title": "기본 동작과 규칙",
+      "type": "single",
+      "question": "DefaultActions[].FixedResponseConfig.StatusCode 가 비어 있다. 왜인가?",
+      "answers": [
+        {
+          "text": "기본 동작이 fixed-response 가 아니라 forward 로 설정돼 있다",
+          "correct": true
+        },
+        {
+          "text": "403 규칙을 아직 안 만들었다",
+          "correct": false,
+          "feedback": "규칙으로 만든 403 은 Rules 쪽에 있고 DefaultActions 에는 안 나온다."
+        },
+        {
+          "text": "리스너가 HTTPS 여야 한다",
+          "correct": false,
+          "feedback": "프로토콜과 무관하다."
+        },
+        {
+          "text": "ALB 이름이 틀렸다",
+          "correct": false,
+          "feedback": "이름이 틀리면 명령 자체가 빈 결과를 낸다. 이 경우는 필드만 비어 있다."
+        }
+      ],
+      "explanation": "규칙으로 만든 403 은 이 필드에 안 잡힌다. 기본 동작 자체를 fixed-response 로 바꾼다."
+    },
+    {
+      "id": "quiz-1mcgday",
+      "page": "/basics/06-container-ecs/",
+      "title": "ECR 옵션 순서",
+      "type": "single",
+      "question": "스캔·불변성·암호화를 켜고 이미지를 올리려 한다. 가장 시간을 아끼는 순서는?",
+      "answers": [
+        {
+          "text": "리포지토리 생성 시 암호화·스캔을 켜고 → 이미지 푸시 → 마지막에 불변성",
+          "correct": true
+        },
+        {
+          "text": "셋 다 켜고 → 이미지 푸시",
+          "correct": false,
+          "feedback": "불변성이 켜져 있으면 수정할 때마다 태그를 새로 붙여야 한다. 스캔에서 취약점이 나오면 여러 번 고치게 된다."
+        },
+        {
+          "text": "이미지를 먼저 올리고 → 셋 다 켠다",
+          "correct": false,
+          "feedback": "암호화는 리포지토리 생성 시점 설정이라 나중에 못 켠다."
+        },
+        {
+          "text": "순서는 상관없다",
+          "correct": false,
+          "feedback": "암호화는 생성 시, 불변성은 나중이 유리하다."
+        }
+      ],
+      "explanation": "암호화는 생성 시, 불변성은 마지막. 스캔은 언제 켜도 되지만 미리 켜야 푸시할 때 자동으로 돈다."
+    },
+    {
+      "id": "quiz-1acvfax",
+      "page": "/basics/06-container-ecs/",
+      "title": "awsvpc 네트워크 모드",
+      "type": "single",
+      "question": "2025 채점이 서비스의 networkConfiguration.awsvpcConfiguration.subnets 가 2개 이상인지 본다. 이 필드가 존재하는 이유는?",
+      "answers": [
+        {
+          "text": "awsvpc 모드에서 태스크마다 ENI 를 받으므로 어느 서브넷에 둘지 지정해야 한다",
+          "correct": true
+        },
+        {
+          "text": "ECS 클러스터가 여러 VPC 에 걸쳐 있어서",
+          "correct": false,
+          "feedback": "클러스터는 VPC 하나 안에 있다."
+        },
+        {
+          "text": "ALB 가 서브넷을 2개 요구해서",
+          "correct": false,
+          "feedback": "ALB 서브넷과 태스크 서브넷은 별개 설정이다."
+        },
+        {
+          "text": "EC2 시작 유형에서만 나오는 필드라서",
+          "correct": false,
+          "feedback": "awsvpc 를 쓰는 서비스면 시작 유형과 무관하게 나온다."
+        }
+      ],
+      "explanation": "태스크가 자기 IP 를 갖기 때문이다. 서브넷을 둘 이상 주는 것이 곧 AZ 분산이다."
+    },
+    {
+      "id": "quiz-1vfbstn",
+      "page": "/basics/07-k8s-eks/",
+      "title": "Pod 가 Pending 에 멈춘다",
+      "type": "single",
+      "question": "HPA 로 replicas 를 10 까지 늘렸는데 절반이 Pending 이다. 원인은?",
+      "answers": [
+        {
+          "text": "노드에 남은 자원이 없다 — Node 를 늘리는 장치(Cluster Autoscaler 등)가 없다",
+          "correct": true
+        },
+        {
+          "text": "HPA 설정이 잘못됐다",
+          "correct": false,
+          "feedback": "HPA 는 제 일을 했다. replicas 를 늘린 것까지가 HPA 의 역할이다."
+        },
+        {
+          "text": "이미지 태그가 틀렸다",
+          "correct": false,
+          "feedback": "그러면 Pending 이 아니라 ImagePullBackOff 다."
+        },
+        {
+          "text": "Service 가 없다",
+          "correct": false,
+          "feedback": "Service 는 Pod 스케줄링과 무관하다."
+        }
+      ],
+      "explanation": "Pod 를 늘리는 일과 Node 를 늘리는 일은 별개 장치다. 2024 채점이 둘 다 확인한다."
+    },
+    {
+      "id": "quiz-1op9mr9",
+      "page": "/basics/07-k8s-eks/",
+      "title": "Fargate 프로파일과 DaemonSet",
+      "type": "single",
+      "question": "2024 문제지는 “DaemonSet 은 Fargate 를 제외한 모든 Node 에서 운용” 이라고 적었다. 왜인가?",
+      "answers": [
+        {
+          "text": "Fargate 에는 노드 개념이 없어 DaemonSet 이 스케줄될 대상이 없다",
+          "correct": true
+        },
+        {
+          "text": "DaemonSet 이 Fargate 보다 비싸서",
+          "correct": false,
+          "feedback": "비용 문제가 아니다."
+        },
+        {
+          "text": "Fargate 가 특권 컨테이너를 막아서",
+          "correct": false,
+          "feedback": "특권 제한도 있지만 DaemonSet 이 안 도는 직접적 이유는 노드 단위 배치가 불가능하기 때문이다."
+        },
+        {
+          "text": "문제지의 임의 제약이다",
+          "correct": false,
+          "feedback": "쿠버네티스와 Fargate 의 구조적 제약이다."
+        }
+      ],
+      "explanation": "DaemonSet 은 “노드마다 하나” 를 뜻한다. 노드가 없는 실행 환경에는 성립하지 않는다."
+    },
+    {
+      "id": "quiz-2miuon",
+      "page": "/basics/08-rds-mysql/",
+      "title": "생성 후 못 바꾸는 것",
+      "type": "single",
+      "question": "Aurora 클러스터를 만들었는데 스토리지 암호화를 깜빡했다. 어떻게 하나?",
+      "answers": [
+        {
+          "text": "스냅샷을 뜨고 암호화 옵션으로 복원한다 — 시간이 오래 걸린다",
+          "correct": true
+        },
+        {
+          "text": "클러스터를 수정해 암호화를 켠다",
+          "correct": false,
+          "feedback": "생성 후에는 못 켠다. 수정 화면에 항목 자체가 없다."
+        },
+        {
+          "text": "파라미터 그룹에서 켠다",
+          "correct": false,
+          "feedback": "파라미터 그룹은 MySQL 설정이지 스토리지 암호화가 아니다."
+        },
+        {
+          "text": "자동으로 켜져 있다",
+          "correct": false,
+          "feedback": "기본값은 꺼짐이다(콘솔 마법사는 켜 주는 경우가 있으나 CLI 는 아니다)."
+        }
+      ],
+      "explanation": "처음부터 켜고 만든다. 포트도 같은 이유로 처음에 3307 로 만든다."
+    },
+    {
+      "id": "quiz-14wkddf",
+      "page": "/basics/08-rds-mysql/",
+      "title": "secret 의 username",
+      "type": "multiple",
+      "question": "2026 채점 4-3 을 통과하는 구성을 모두 고르시오.",
+      "answers": [
+        {
+          "text": "마스터를 wpadmin 으로 만들고 앱 전용 사용자 app 을 따로 만들어 secret 에 넣는다",
+          "correct": true
+        },
+        {
+          "text": "마스터를 root 로 만들고 secret 에는 app 을 넣는다",
+          "correct": true
+        },
+        {
+          "text": "마스터를 admin 으로 만들고 secret 에 그대로 넣는다",
+          "correct": false,
+          "feedback": "채점이 secret 의 username 이 admin 인지 직접 본다."
+        },
+        {
+          "text": "secret 의 username 만 app 으로 적고 실제로는 마스터 암호를 넣는다",
+          "correct": false,
+          "feedback": "채점은 통과할 수 있으나 앱이 접속에 실패한다. 6-1~6-3 과 7-3 이 함께 죽는다."
+        }
+      ],
+      "explanation": "채점을 통과하는 것과 앱이 도는 것을 동시에 만족해야 한다. 실제로 붙는 사용자를 secret 에 넣는다."
+    },
+    {
+      "id": "quiz-f5kdvo",
+      "page": "/basics/09-dynamodb/",
+      "title": "백업 두 종류",
+      "type": "single",
+      "question": "PITR 만 켠 상태에서 2025 채점 3-4(list-backups)를 돌리면?",
+      "answers": [
+        {
+          "text": "결과가 비어 오답으로 간주된다 — 온디맨드 백업을 따로 만들어야 한다",
+          "correct": true
+        },
+        {
+          "text": "PITR 이 백업 목록에 나온다",
+          "correct": false,
+          "feedback": "PITR 은 연속 백업이라 describe-continuous-backups 에 나오고 list-backups 와 별개다."
+        },
+        {
+          "text": "하루 뒤 자동으로 나타난다",
+          "correct": false,
+          "feedback": "자동 생성되지 않는다."
+        },
+        {
+          "text": "명령이 오류를 낸다",
+          "correct": false,
+          "feedback": "빈 목록을 정상 반환한다. 그래서 더 놓치기 쉽다."
+        }
+      ],
+      "explanation": "둘은 별개 기능이다. 문제지가 “백업과 PITR” 을 함께 적었다면 둘 다 한다."
+    },
+    {
+      "id": "quiz-7ycnvu",
+      "page": "/basics/09-dynamodb/",
+      "title": "암호화 키 선택",
+      "type": "single",
+      "question": "2025 채점이 “SSE 에 쓴 KMS 가 선수 계정의 것인지” 확인한다. 어떤 키를 써야 하나?",
+      "answers": [
+        {
+          "text": "고객 관리형 키(CMK)를 직접 만들어 지정한다",
+          "correct": true
+        },
+        {
+          "text": "기본값(AWS 소유 키)으로 둔다",
+          "correct": false,
+          "feedback": "SSEDescription 자체가 나오지 않는다."
+        },
+        {
+          "text": "AWS 관리형 aws/dynamodb 를 쓴다",
+          "correct": false,
+          "feedback": "ARN 은 나오지만 문제지가 “CMK 를 활용해” 라고 명시했고 채점도 계정 소유를 따진다."
+        },
+        {
+          "text": "암호화를 끄고 테이블 수준 권한으로 막는다",
+          "correct": false,
+          "feedback": "요구가 암호화다."
+        }
+      ],
+      "explanation": "CMK 를 만드는 데 1분도 안 걸린다. 아끼지 않는다."
+    },
+    {
+      "id": "quiz-1qj8i66",
+      "page": "/basics/10-kms-secrets/",
+      "title": "시크릿 조회가 거부된다",
+      "type": "multiple",
+      "question": "인스턴스 역할에 secretsmanager:GetSecretValue 를 줬는데도 CMK 로 암호화된 시크릿 조회가 거부된다. 확인할 곳을 모두 고르시오.",
+      "answers": [
+        {
+          "text": "역할의 IAM 정책에 kms:Decrypt 가 있는지",
+          "correct": true
+        },
+        {
+          "text": "CMK 의 키 정책에 그 역할이 키 사용자로 들어 있는지",
+          "correct": true
+        },
+        {
+          "text": "시크릿의 리소스 정책",
+          "correct": false,
+          "feedback": "시크릿에도 리소스 정책을 붙일 수 있지만 기본값은 비어 있고 계정 내 접근을 막지 않는다."
+        },
+        {
+          "text": "시크릿 이름의 철자",
+          "correct": false,
+          "feedback": "이름이 틀리면 ResourceNotFoundException 이지 AccessDenied 가 아니다."
+        }
+      ],
+      "explanation": "CMK 는 권한이 두 곳에 필요하다. 한 곳만 있으면 인스턴스는 살아 있고 앱만 안 뜬다."
+    },
+    {
+      "id": "quiz-smvzbk",
+      "page": "/basics/10-kms-secrets/",
+      "title": "봉투 암호화",
+      "type": "single",
+      "question": "KMS 가 시크릿 본문을 직접 암호화하지 않고 데이터 키를 거치는 이유는?",
+      "answers": [
+        {
+          "text": "KMS 는 작은 데이터만 처리하고, 큰 데이터는 데이터 키로 로컬에서 암·복호화하는 편이 빠르고 싸다",
+          "correct": true
+        },
+        {
+          "text": "KMS 가 문자열을 지원하지 않아서",
+          "correct": false,
+          "feedback": "4KB 이하 문자열은 직접 암호화할 수 있다."
+        },
+        {
+          "text": "데이터 키가 없으면 감사 로그가 안 남아서",
+          "correct": false,
+          "feedback": "감사와 무관하다."
+        },
+        {
+          "text": "리전 간 복제를 위해서",
+          "correct": false,
+          "feedback": "다중 리전 키는 별개 기능이다."
+        }
+      ],
+      "explanation": "KMS 호출은 네트워크 왕복이다. 큰 데이터를 매번 보내지 않으려고 키만 주고받는다."
+    },
+    {
+      "id": "quiz-1co3bvc",
+      "page": "/basics/11-cloudwatch/",
+      "title": "통계 고르기",
+      "type": "single",
+      "question": "“5분 안에 4xx 가 10개 이상이면 경보” 를 만들려고 한다. 통계는?",
+      "answers": [
+        {
+          "text": "Sum — 5분 동안 일어난 횟수를 모두 더한다",
+          "correct": true
+        },
+        {
+          "text": "Average — 평균이 안정적이다",
+          "correct": false,
+          "feedback": "개수를 세는 지표의 평균은 1 근처에 머문다. 20번 요청해도 임계값 10 을 절대 못 넘는다."
+        },
+        {
+          "text": "Maximum — 가장 큰 값을 본다",
+          "correct": false,
+          "feedback": "1분마다 들어오는 값 중 최댓값이라 역시 10 을 넘기 어렵다."
+        },
+        {
+          "text": "SampleCount — 표본 수를 센다",
+          "correct": false,
+          "feedback": "지표가 보고된 횟수이지 에러 개수가 아니다."
+        }
+      ],
+      "explanation": "“몇 번” 을 묻는 조건은 Sum 이다. CPU 사용률처럼 “얼마나 높나” 를 묻는 지표는 Average 다."
+    },
+    {
+      "id": "quiz-1rf08zc",
+      "page": "/basics/11-cloudwatch/",
+      "title": "경보가 INSUFFICIENT_DATA 다",
+      "type": "single",
+      "question": "만들어 둔 경보가 계속 INSUFFICIENT_DATA 다. 채점은 시작 시점에 OK 이길 요구한다. 어떻게 하나?",
+      "answers": [
+        {
+          "text": "누락 데이터 처리를 notBreaching 으로 바꾼다",
+          "correct": true
+        },
+        {
+          "text": "임계값을 낮춘다",
+          "correct": false,
+          "feedback": "데이터 자체가 없어서 생기는 상태라 임계값과 무관하다."
+        },
+        {
+          "text": "평가 기간을 늘린다",
+          "correct": false,
+          "feedback": "데이터가 없는 기간이 길어질 뿐이다."
+        },
+        {
+          "text": "경보를 지웠다 다시 만든다",
+          "correct": false,
+          "feedback": "같은 상태로 돌아온다."
+        }
+      ],
+      "explanation": "아무 일도 안 일어나면 지표에 값이 안 들어온다. “값이 없으면 정상으로 친다” 고 알려 줘야 OK 로 앉는다."
+    },
+    {
+      "id": "quiz-k8ri51",
+      "page": "/basics/12-efs/",
+      "title": "마운트가 멈춘다",
+      "type": "single",
+      "question": "mount -a 가 한참 멈췄다가 실패한다. 가장 먼저 볼 곳은?",
+      "answers": [
+        {
+          "text": "마운트 타깃의 보안 그룹에 2049 인바운드가 있는지",
+          "correct": true
+        },
+        {
+          "text": "EFS 의 저장 암호화 설정",
+          "correct": false,
+          "feedback": "암호화는 마운트 가능 여부와 무관하다."
+        },
+        {
+          "text": "/mnt/efs 폴더가 존재하는지",
+          "correct": false,
+          "feedback": "폴더가 없으면 곧바로 오류가 난다. 멈춰 있는 것은 네트워크 문제의 신호다."
+        },
+        {
+          "text": "EFS 의 수명 주기 설정",
+          "correct": false,
+          "feedback": "IA 전환은 요금 문제라 접속과 무관하다."
+        }
+      ],
+      "explanation": "멈춘다 = 네트워크가 안 닿는다. 오류가 빨리 나면 설정 문제, 오래 멈추면 보안 그룹이나 라우팅이다."
+    },
+    {
+      "id": "quiz-bju9vw",
+      "page": "/basics/12-efs/",
+      "title": "채점 1-8 을 통과하려면",
+      "type": "single",
+      "question": "2026 채점은 인스턴스를 전부 종료한 뒤 새로 뜬 인스턴스에서 df | grep /mnt/efs 를 본다. 통과하는 방법은?",
+      "answers": [
+        {
+          "text": "Launch Template 의 user data 에 마운트 스크립트를 넣는다",
+          "correct": true
+        },
+        {
+          "text": "SSM 으로 붙어 손으로 mount 한다",
+          "correct": false,
+          "feedback": "그 인스턴스는 채점 전에 종료된다. 새 인스턴스에는 아무것도 남지 않는다."
+        },
+        {
+          "text": "인스턴스에 접속해 /etc/fstab 만 수정한다",
+          "correct": false,
+          "feedback": "같은 이유로 사라진다. fstab 은 user data 안에서 작성해야 새 인스턴스에도 생긴다."
+        },
+        {
+          "text": "EFS 콘솔에서 자동 마운트 버튼을 누른다",
+          "correct": false,
+          "feedback": "그런 버튼은 없다. 콘솔이 만들어 주는 것은 마운트 명령 예시뿐이다."
+        }
+      ],
+      "explanation": "“새로 뜬 인스턴스에도 자동으로” 가 요구의 핵심이다. 그래서 user data 다."
+    },
+    {
+      "id": "quiz-1n47x57",
+      "page": "/basics/13-athena-glue/",
+      "title": "헤더 처리",
+      "type": "single",
+      "question": "skip.header.line.count 를 빠뜨리면 무슨 일이 생기나?",
+      "answers": [
+        {
+          "text": "name 컬럼에 문자열 \"name\" 이 들어간 행이 하나 생겨 집계 결과가 틀어진다",
+          "correct": true
+        },
+        {
+          "text": "테이블 생성이 실패한다",
+          "correct": false,
+          "feedback": "생성은 잘 된다. 조회할 때 티가 난다."
+        },
+        {
+          "text": "컬럼 이름이 col1, col2 가 된다",
+          "correct": false,
+          "feedback": "컬럼 이름은 CREATE TABLE 에서 내가 정한다."
+        },
+        {
+          "text": "아무 일도 안 생긴다",
+          "correct": false,
+          "feedback": "채점 2-7 이 정확히 이걸 잡는다."
+        }
+      ],
+      "explanation": "첫 줄도 데이터로 읽히는 것이 문제다. 평균을 낼 때 숫자가 아닌 값이 섞여 계산이 어긋난다."
+    },
+    {
+      "id": "quiz-w16fg1",
+      "page": "/basics/13-athena-glue/",
+      "title": "결과 컬럼 이름",
+      "type": "single",
+      "question": "SELECT AVG(response) FROM research.survey; 를 저장된 쿼리로 두었다. 채점을 통과하나?",
+      "answers": [
+        {
+          "text": "통과하지 못한다 — 컬럼 이름이 _col0 이라 “result 하나만” 조건이 깨진다",
+          "correct": true
+        },
+        {
+          "text": "통과한다 — 값만 맞으면 된다",
+          "correct": false,
+          "feedback": "문제지가 “쿼리 결과는 result 라는 column 하나만 존재해야 합니다” 라고 못 박았다."
+        },
+        {
+          "text": "통과한다 — Athena 가 자동으로 result 로 이름 붙인다",
+          "correct": false,
+          "feedback": "별칭이 없으면 _col0 이다."
+        },
+        {
+          "text": "오류가 난다",
+          "correct": false,
+          "feedback": "오류는 안 나고 그냥 이름이 다르게 나온다."
+        }
+      ],
+      "explanation": "AS result 를 붙인다. 컬럼 타입이 문자열이면 CAST(... AS DOUBLE) 도 함께."
+    },
+    {
+      "id": "quiz-zbekih",
+      "page": "/basics/14-lambda/",
+      "title": "VPC 에 넣으면",
+      "type": "multiple",
+      "question": "Lambda 를 VPC 안에 넣었다. 무엇이 달라지나? 모두 고르시오.",
+      "answers": [
+        {
+          "text": "프라이빗 서브넷의 RDS 에 붙을 수 있게 된다",
+          "correct": true
+        },
+        {
+          "text": "NAT 이 없으면 인터넷으로 못 나간다",
+          "correct": true
+        },
+        {
+          "text": "실행 속도가 항상 빨라진다",
+          "correct": false,
+          "feedback": "ENI 준비 때문에 콜드 스타트가 오히려 느려질 수 있다."
+        },
+        {
+          "text": "실행 역할이 필요 없어진다",
+          "correct": false,
+          "feedback": "오히려 AWSLambdaVPCAccessExecutionRole 이 더 필요하다."
+        }
+      ],
+      "explanation": "“VPC 안” 은 곧 “인터넷 밖” 이다. RDS 만 부르면 되는 함수라면 NAT 없이도 충분하다."
+    },
+    {
+      "id": "quiz-n1678p",
+      "page": "/basics/14-lambda/",
+      "title": "레이어 압축 구조",
+      "type": "single",
+      "question": "pymysql 을 레이어로 만들려고 한다. 압축 파일 안의 구조로 옳은 것은?",
+      "answers": [
+        {
+          "text": "python/pymysql/...",
+          "correct": true
+        },
+        {
+          "text": "pymysql/... (최상단에 바로)",
+          "correct": false,
+          "feedback": "Lambda 가 import 경로에 넣는 것은 python/ 폴더 안이다."
+        },
+        {
+          "text": "lib/pymysql/...",
+          "correct": false,
+          "feedback": "파이썬 런타임은 python/ 또는 python/lib/python3.x/site-packages/ 를 본다."
+        },
+        {
+          "text": "layer/pymysql/...",
+          "correct": false,
+          "feedback": "인식되지 않는다."
+        }
+      ],
+      "explanation": "pip install -t python/ 로 설치하고 그 폴더째 압축한다. 이름이 틀리면 ModuleNotFoundError 가 난다."
+    },
+    {
+      "id": "quiz-4eyem8",
+      "page": "/basics/15-terraform/",
+      "title": "destroy 가 안 지우는 것",
+      "type": "single",
+      "question": "terraform destroy 를 돌렸는데 콘솔에 리소스가 남아 있다. 왜인가?",
+      "answers": [
+        {
+          "text": "그 리소스는 Terraform 이 만든 것이 아니라 콘솔에서 손으로 만든 것이다",
+          "correct": true
+        },
+        {
+          "text": "destroy 가 실패했다",
+          "correct": false,
+          "feedback": "실패했다면 오류가 났을 것이다. 조용히 남았다면 상태 파일에 없는 것이다."
+        },
+        {
+          "text": "삭제에 시간이 걸린다",
+          "correct": false,
+          "feedback": "일부는 그렇지만 영구히 남지는 않는다."
+        },
+        {
+          "text": "태그가 없어서 못 찾는다",
+          "correct": false,
+          "feedback": "Terraform 은 태그가 아니라 상태 파일로 찾는다."
+        }
+      ],
+      "explanation": "Terraform 은 상태 파일에 적힌 것만 안다. 2025 채점 전에 코드 밖 리소스를 정리하라는 지시가 이 때문이다."
+    },
+    {
+      "id": "quiz-rrzr25",
+      "page": "/basics/15-terraform/",
+      "title": "참조와 순서",
+      "type": "single",
+      "question": "서브넷 코드에서 vpc_id = aws_vpc.main.id 를 쓰면?",
+      "answers": [
+        {
+          "text": "Terraform 이 VPC 를 먼저 만들고 서브넷을 나중에 만든다",
+          "correct": true
+        },
+        {
+          "text": "순서를 depends_on 으로 따로 적어야 한다",
+          "correct": false,
+          "feedback": "참조가 있으면 자동으로 순서가 정해진다. depends_on 은 참조가 없을 때 쓴다."
+        },
+        {
+          "text": "파일에 적은 순서대로 만들어진다",
+          "correct": false,
+          "feedback": "파일의 위아래 순서는 의미가 없다."
+        },
+        {
+          "text": "동시에 만들어진다",
+          "correct": false,
+          "feedback": "의존이 있으면 순서대로 만든다."
+        }
+      ],
+      "explanation": "참조가 곧 순서다. 그래서 리소스를 파일 어디에 적어도 상관없다."
+    },
+    {
+      "id": "quiz-1nx37xa",
+      "page": "/exam/02-scoring/",
+      "title": "빈 출력이 뜻하는 것",
+      "type": "single",
+      "question": "채점 명령이 아무것도 출력하지 않았다. 가장 먼저 의심할 것은?",
+      "answers": [
+        {
+          "text": "Name 태그 철자 또는 리전 — 리소스는 있는데 필터에 안 걸린 경우",
+          "correct": true
+        },
+        {
+          "text": "리소스를 아직 안 만든 것",
+          "correct": false,
+          "feedback": "그럴 수도 있지만 대회에서는 만들어 놓고 못 찾는 경우가 훨씬 많다. 만든 기억이 있으면 이름과 리전부터 본다."
+        },
+        {
+          "text": "채점 스크립트의 버그",
+          "correct": false,
+          "feedback": "2024·2026 mark.sh 는 실제 배포본이다. 자기 환경을 먼저 의심한다."
+        },
+        {
+          "text": "IAM 권한 부족",
+          "correct": false,
+          "feedback": "권한이 없으면 빈 출력이 아니라 AccessDenied 오류가 난다."
+        }
+      ],
+      "explanation": "빈 출력은 확실한 0점이고 대개 몇 분이면 고친다. 자가 채점에서 빈 출력부터 처리하는 이유다."
+    },
+    {
+      "id": "quiz-1imc0op",
+      "page": "/exam/02-scoring/",
+      "title": "연쇄 항목",
+      "type": "multiple",
+      "question": "2026 1과제에서 앱이 뜨지 않았다. 함께 잃는 항목을 모두 고르시오.",
+      "answers": [
+        {
+          "text": "6-1 User 생성 (curl POST)",
+          "correct": true
+        },
+        {
+          "text": "6-2 User 조회 (curl GET)",
+          "correct": true
+        },
+        {
+          "text": "7-3 Log 전송 — 6-1 이 넣은 marking-user 를 로그에서 찾는다",
+          "correct": true
+        },
+        {
+          "text": "7-1 Log group 생성",
+          "correct": false,
+          "feedback": "로그 그룹은 이름만 맞으면 되는 독립 항목이다. 앱과 무관하게 득점한다."
+        },
+        {
+          "text": "3-3 KMS encryption 활성화",
+          "correct": false,
+          "feedback": "RDS 옵션 확인이라 앱 기동과 무관하다."
+        }
+      ],
+      "explanation": "연쇄는 6-1 → 6-2 → 7-3 으로 4.5점이다. 그래서 앱을 살리는 일이 옵션 켜기보다 먼저다."
+    }
+  ]
+}
