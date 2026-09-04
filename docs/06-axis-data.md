@@ -1,0 +1,229 @@
+# 축 4 — 데이터 저장소
+
+> 문서 유형: explanation
+
+서비스는 매년 바뀌었지만 **요구 목록은 거의 똑같다.** 서비스 이름을 외우는 게 아니라 이 목록을 외운다.
+
+## 1. 매년 반복되는 요구 목록
+
+| 요구 | 2024 DocumentDB | 2024 ElastiCache | 2025 DynamoDB | 2026 RDS | 2026 DynamoDB(2과제) |
+| --- | :-: | :-: | :-: | :-: | :-: |
+| 고가용성(다중 AZ) | ● | ● | (관리형) | ● | (관리형) |
+| 저장 시 암호화 | ● | ● | ● CMK | ● KMS | ● KMS |
+| 전송 중 암호화 | ● | ● | (기본) | | |
+| 로깅 | ● audit·profiler | ● | | | |
+| 백업 | ● | ● | ● + PITR | | |
+| **기본 포트 변경** | ● | ● | | ● 3307 | |
+| 퍼블릭 액세스 차단 | ● | ● | | ● | |
+| 삭제 방지 | | | ● | | ● |
+| 버전 지정 | ● 5.0.0 | ● 7.0 | | ● aurora-mysql 8.0 | |
+| 인스턴스 클래스 지정 | ● db.t4g.medium | ● t4g.small | | ● db.t3.medium | |
+
+**체크리스트로 외운다.** 어떤 DB가 나오든 이 열 줄을 순서대로 훑으면 배점의 대부분이 회수된다.
+
+```
+HA → 저장 암호화 → 전송 암호화 → 로깅 → 백업 → 포트 → 퍼블릭 차단 → 삭제 방지 → 버전 → 클래스
+```
+
+## 2. 왜 이런 요구가 반복되나
+
+이 열 항목은 AWS Well-Architected 의 보안·신뢰성 기둥이 데이터 계층에서 취하는 모양이다. 출제자가 매년 다른 서비스로 같은 질문을 한다 — **"이 서비스를 운영 환경에 안전하게 놓을 줄 아는가."**
+
+각 항목이 막는 사고를 알면 옵션 이름을 못 외워도 콘솔에서 찾을 수 있다.
+
+| 항목 | 막는 사고 |
+| --- | --- |
+| 다중 AZ | AZ 장애 시 DB 소실 |
+| 저장 암호화 | 스냅샷·디스크 유출 |
+| 전송 암호화 | 같은 VPC 안 도청 |
+| 로깅 | 사고 후 추적 불가 |
+| 백업 + PITR | 실수로 지운 데이터 복구 |
+| **기본 포트 변경** | 인터넷 광역 스캔이 3306·6379·27017을 훑는다 |
+| 퍼블릭 차단 | 애초에 인터넷에서 안 보이게 |
+| 삭제 방지 | 손이 미끄러진 삭제 |
+
+## 3. 기본 포트를 바꾸라는 요구
+
+2024(MongoDB·Redis 둘 다)와 2026(RDS 3307)에 나왔다. 배점 1.5점짜리지만 **연쇄로 앱까지 죽인다.**
+
+바꾸면 다음 넷을 같이 고쳐야 한다.
+
+1. 보안 그룹 인바운드 포트
+2. 앱의 접속 설정 또는 환경 변수
+3. Secrets Manager 에 저장한 `host`/`port`
+4. NACL 이 있다면 그 포트도
+
+**2026 RDS의 경우 포트는 클러스터 생성 시점에 정한다.** Aurora 클러스터를 만든 뒤 포트를 바꾸려면 수정 + 재부팅이 필요해 시간이 든다. 처음부터 3307로 만든다.
+
+```bash
+aws rds describe-db-clusters --db-cluster-identifier worldpay-rds \
+  --query DBClusters[].Port --output text    # → 3307
+```
+
+## 4. 서비스별 요점
+
+### 4-1. Aurora MySQL (2026)
+
+- 클러스터 식별자 `worldpay-rds`, 엔진 `aurora-mysql`, 8.0.
+- `describe-db-instances` 로 **계정 전체**의 인스턴스 클래스와 퍼블릭 액세스를 본다 → 연습용 RDS를 남기면 실패한다.
+- 스토리지 암호화는 **생성 시에만 켤 수 있다.** 나중에 못 바꾼다. 끄고 만들었으면 스냅샷 → 암호화 복원이라 시간이 많이 든다.
+- DB 서브넷 그룹에 `worldpay-db-subnet-a`·`-c` 를 넣는다. 서브넷 그룹은 2개 이상 AZ를 요구한다.
+- 테이블 생성은 앱이 아니라 **선수가 직접** 한다. Bastion에서 mysql 클라이언트로 붙어 `CREATE TABLE` 을 실행한다.
+
+  ```bash
+  dnf install -y mariadb105        # AL2023
+  mysql -h <cluster-endpoint> -P 3307 -u app -p
+  ```
+
+  Bastion은 app VPC에 있고 RDS는 db VPC에 있으므로 **Peering 경로와 DB 보안 그룹이 Bastion을 허용해야** 붙는다.
+
+### 4-2. DynamoDB (2025 1과제, 2026 2과제)
+
+- **PAY_PER_REQUEST** (온디맨드). `Table.BillingModeSummary.BillingMode` 로 확인.
+- 키: 2025는 uuid·name·owner를 "테이블의 키로 사용"이라 했지만 DynamoDB 기본 테이블은 파티션 키 + 정렬 키 **둘까지**다. 셋을 키로 쓰려면 GSI를 함께 만든다. 채점은 키 구성을 직접 보지 않고 `TableStatus` 만 보므로 실제 채점 리스크는 낮다.
+- 삭제 방지: `DeletionProtectionEnabled`.
+- **CMK SSE**: 기본은 AWS 소유 키다. `Table.SSEDescription.KMSMasterKeyArn` 이 나오려면 고객 관리 키를 지정해야 한다. **AWS 관리형 `aws/dynamodb` 키로도 SSEDescription 은 나오지만, 2025 채점은 "해당 KMS가 선수의 계정에 있는 것인지 확인"까지 한다** — CMK를 직접 만들어 쓴다.
+- 백업 + PITR: `list-backups` 가 비어 있으면 오답이다. **온디맨드 백업을 한 번 만들어 둔다** — PITR만 켜면 `list-backups` 는 비어 있다.
+
+  ```bash
+  aws dynamodb create-backup --table-name product --backup-name manual-1
+  aws dynamodb update-continuous-backups --table-name product \
+    --point-in-time-recovery-specification PointInTimeRecoveryEnabled=true
+  ```
+
+- 2026 2과제는 `SSEDescription.Status` 가 `ENABLED` 이기만 하면 된다.
+
+### 4-3. DocumentDB (2024)
+
+- 엔진 버전 5.0.0, `db.t4g.medium`.
+- HA = 인스턴스를 2개 이상, 서로 다른 AZ에.
+- 로깅: 클러스터 파라미터 그룹에서 `audit_logs`·`profiler` 를 켜고, 클러스터에서 CloudWatch로 내보낼 로그 종류를 지정한다. **파라미터 그룹만 바꾸면 CloudWatch에 안 간다** — 두 곳 다 해야 한다.
+- 포트는 클러스터 생성 시 지정. 기본 27017.
+
+### 4-4. ElastiCache Redis (2024)
+
+배점 13.5로 그해 최고였다. 요구가 많다.
+
+- 엔진 7.0, `cache.t4g.small`.
+- **샤딩(클러스터 모드) 활성화** — 앱이 클러스터 모드 클라이언트로 붙는다. 켜고 끄는 게 생성 시 결정이다.
+- HA = 자동 장애 조치 + 복제본.
+- at-rest·in-transit 암호화 둘 다. **in-transit을 켜면 앱이 TLS로 붙어야 한다** — 환경 변수만 바꿔서는 안 되고 클라이언트 설정이 필요하다.
+- 슬로우 로그·엔진 로그를 CloudWatch로.
+- 포트 변경, 백업(스냅샷 보존 기간 ≥ 1).
+
+### 4-5. EFS (2026 2과제 ①)
+
+- Name은 태그지만 CLI에서 `FileSystems[].Name` 으로 나온다.
+- KMS 암호화 — **생성 시에만.**
+- Lifecycle `TransitionToIA = AFTER_30_DAYS`.
+- 마운트 타깃을 **AZ마다 하나씩** 만든다. 채점 1-7이 `ap-northeast-1a`, `ap-northeast-1b` 둘 다 나오는지 본다.
+- 마운트 타깃 보안 그룹이 인스턴스로부터 **2049(NFS)** 를 받아야 한다.
+- 자동 마운트: user data에서 `amazon-efs-utils` 설치 후 `/etc/fstab` 에 넣는다.
+
+  ```bash
+  dnf install -y amazon-efs-utils
+  mkdir -p /mnt/efs
+  echo "fs-xxxx:/ /mnt/efs efs _netdev,tls 0 0" >> /etc/fstab
+  mount -a
+  ```
+
+  채점 1-8이 **인스턴스를 전부 종료하고 ASG가 새로 띄운 인스턴스에서** `df | grep /mnt/efs` 를 본다. 손으로 마운트해 둔 것은 소용없다 — Launch Template의 user data에 들어 있어야 한다.
+
+### 4-6. Athena + Glue (2026 2과제 ②)
+
+여기가 2과제에서 가장 함정이 많다.
+
+**헤더 행 처리.** CSV 첫 줄이 `emp_id,name,salary` 다. Glue 테이블에 `skip.header.line.count = 1` 을 주지 않으면 헤더가 데이터 행이 된다. 채점 2-7이 이것을 잡는다.
+
+```bash
+query_id=$(aws athena start-query-execution --work-group research \
+  --query-string "select * from research.employee where name = 'name'" \
+  --query "QueryExecutionId" --output text)
+aws athena get-query-results --query-execution-id $query_id \
+  --query ResultSet.Rows[].Data --output text | wc -l
+# → 3 이어야 한다
+```
+
+`name = 'name'` 은 헤더 행에만 맞는 조건이다. 헤더를 제대로 건너뛰면 데이터 행 0개, 결과에는 컬럼 이름 행(emp_id·name·salary 세 값)만 남아 **3줄**이 나온다. 헤더를 안 건너뛰면 데이터 행이 하나 더 붙어 6줄이 된다. 배점표의 "불필요한 데이터 제거 1.5점"이 이 항목이다.
+
+**워크그룹 설정.**
+
+```bash
+aws athena get-work-group --work-group research \
+  --query WorkGroup.Configuration.BytesScannedCutoffPerQuery --output text
+# → 1073741824  (정확히 1GB. 1000000000 이 아니다)
+```
+
+결과 위치는 `s3://korea-skills-research-result-<비번호>/...`.
+
+**saved query 결과 컬럼은 `result` 하나여야 한다.**
+
+```sql
+-- research-query1
+SELECT AVG(CAST(response AS DOUBLE)) AS result FROM research.survey;
+
+-- research-query2
+SELECT AVG(CAST(s.response AS DOUBLE)) AS result
+FROM research.survey s JOIN research.employee e ON s.emp_id = e.emp_id
+WHERE CAST(e.salary AS BIGINT) >= 70000;
+```
+
+컬럼 타입을 문자열로 크롤링했다면 `CAST` 가 필요하다. 별칭 `AS result` 를 빠뜨리면 컬럼 이름이 `_col0` 이 되어 "result라는 column 하나만" 조건이 깨진다.
+
+**기대값 불일치를 미리 안다.** 채점기준은 3.8·4.5를 기대한다고 적었지만 배포된 CSV로 계산하면 4.05·4.333…이다. → [채점 해부 7절](02-scoring.md)
+
+## 5. Secrets Manager (2024·2026)
+
+DB 축과 붙어 다닌다.
+
+| 해 | 요구 |
+| --- | --- |
+| 2024 | JSON `{"secretValue": "..."}`, user 앱이 JWT 서명에 사용 |
+| 2026 | `worldpay-secret`, CMK 암호화, `{"username","password","host"}`, **username ≠ admin** |
+
+2026 채점 4-3은 secret 값을 직접 꺼내 username을 눈으로 본다.
+
+```bash
+aws secretsmanager get-secret-value --secret-id worldpay-secret --query SecretString --output text
+```
+
+**RDS 마스터 사용자를 그대로 secret에 넣으면 안 된다.** 마스터가 `admin` 이면 실패다. RDS 마스터는 다른 이름으로 만들거나, 앱 전용 사용자를 MySQL에 따로 만든다.
+
+```sql
+CREATE USER 'app'@'%' IDENTIFIED BY '...';
+GRANT SELECT, INSERT ON worldpay.users TO 'app'@'%';
+```
+
+이것이 "애플리케이션이 과도한 권한을 갖지 않도록" 요구의 실제 모습이다.
+
+CMK 암호화는 secret 생성 시 KMS 키를 지정하면 된다. **secret을 읽는 주체(EC2 인스턴스 프로파일, Lambda 실행 역할)에 `kms:Decrypt` 를 줘야 한다.** → [축 3, 3-3절](05-axis-compute.md)
+
+## 6. 드릴
+
+### 6-1. 드릴 A — 체크리스트 훑기
+
+임의의 DB 서비스 하나(RDS·DynamoDB·DocumentDB·ElastiCache 중)를 골라 1절 열 항목을 순서대로 켠다. 각 항목을 확인하는 CLI 명령까지 스스로 쓴다. 서비스를 바꿔 4회 반복한다.
+
+목표 시간: 서비스당 25분.
+
+### 6-2. 드릴 B — 포트 변경 연쇄
+
+RDS를 3307로 만들고 Bastion에서 붙기까지를 시간 재며 한다. 보안 그룹·Peering·NACL·secret 넷을 전부 맞춰야 한다.
+
+### 6-3. 드릴 C — Athena 한 판
+
+`employee.csv`·`survey.csv` 를 S3에 올리고 Glue 테이블 두 개를 만들어 두 쿼리를 saved query로 저장한 뒤, 2026 2과제 채점 2-1~2-10을 전부 자기 손으로 돌린다. `skip.header.line.count` 를 뺀 상태와 넣은 상태의 2-7 출력 차이를 직접 본다.
+
+## 7. 참고 문서
+
+- [Aurora MySQL 클러스터 생성](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.CreateInstance.html)
+- [Aurora 암호화](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Overview.Encryption.html) — 생성 후 변경 불가 절
+- [DynamoDB 백업과 PITR](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BackupRestore.html)
+- [DynamoDB 저장 시 암호화](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/EncryptionAtRest.html) — 키 종류 세 가지 비교표
+- [DocumentDB 감사 로그](https://docs.aws.amazon.com/documentdb/latest/developerguide/event-auditing.html)
+- [ElastiCache 클러스터 모드](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Replication.Redis-RedisCluster.html)
+- [EFS 자동 마운트](https://docs.aws.amazon.com/efs/latest/ug/mount-fs-auto-mount-onreboot.html)
+- [EFS 수명 주기 관리](https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html)
+- [Glue CSV 분류자와 헤더](https://docs.aws.amazon.com/glue/latest/dg/custom-classifier.html)
+- [Athena 워크그룹 데이터 사용량 제어](https://docs.aws.amazon.com/athena/latest/ug/workgroups-setting-control-limits-cloudwatch.html)
+- [Secrets Manager 암호화](https://docs.aws.amazon.com/secretsmanager/latest/userguide/security-encryption.html)
