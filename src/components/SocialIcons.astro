@@ -1,0 +1,14 @@
+---
+/* 상단바 오른쪽 묶음. 로그인 단추를 먼저 그리고 그 뒤에 Starlight 의 기본 소셜
+ * 아이콘을 붙인다 — 로그인이 이 묶음에서 유일하게 상태를 가진 항목이라 왼쪽 끝,
+ * 즉 눈이 먼저 닿는 자리에 둔다. GitHub 링크는 언제나 같은 곳으로 가는 고정 링크다.
+ *
+ * Header 자체를 갈아끼우지 않는 이유는 하나다 — Header 에는 검색·테마·언어 배치를
+ * 정하는 grid 계산이 들어 있어서, 복사해 두면 Starlight 가 올라갈 때마다 그 계산이
+ * 뒤처진다. 이 자리는 아이콘만 넣는 곳이라 그럴 일이 없다. */
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+import HeaderAuth from './HeaderAuth.svelte';
+---
+
+<HeaderAuth client:only="svelte" />
+<Default />

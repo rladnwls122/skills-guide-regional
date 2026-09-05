@@ -22,6 +22,19 @@ import awsIcons from './src/icons/aws.json';
 /* kubernetes 공식 리소스 아이콘. scripts/build-k8s-icons.mjs 가 만든다. */
 import k8sIcons from './src/icons/k8s.json';
 
+/* GFM 이 잠가 놓은 체크박스를 살리고 진도를 브라우저에 남긴다. 문서 쪽은 손대지
+   않는다 — 항목을 새로 쓸 때 문법을 따로 외우지 않아도 되게 하려는 것이다.
+   전국판(skills-guide)과 같은 구조다. */
+/** @type {import('astro').AstroIntegration} */
+const progress = {
+  name: 'progress',
+  hooks: {
+    'astro:config:setup': ({ injectScript }) => {
+      injectScript('page', `import '/src/scripts/progress.js';`);
+    },
+  },
+};
+
 export default defineConfig({
   /* Starlight 이 끼워 넣는 sitemap 은 site 가 없으면 통째로 건너뛴다. 배포 주소를
      여기 박아 두면 빌드마다 sitemap-index.xml 이 함께 나온다. */
@@ -47,6 +60,7 @@ export default defineConfig({
   },
 
   integrations: [
+    progress,
     /* autoTheme 를 끈다 — mermaid 는 항상 default 테마로 한 번만 그리고, 다크/라이트
        차이는 src/styles/mermaid-theme.css 가 Starlight 의 --sl-color-* 로 낸다.
        켜면 data-theme 가 바뀔 때마다 모든 도식의 data-processed 를 떼고 mermaid 를
@@ -79,6 +93,7 @@ export default defineConfig({
         './src/styles/mermaid-aws-icons.css',
         './src/styles/mermaid-k8s-icons.css',
         './src/styles/diagram-note.css',
+        './src/styles/progress.css',
       ],
       /* subgraph 라벨의 <span class='icon--logos--*'> 를 정의하는 CSS. 아이콘이
          데이터 URI 로 들어 있어 아이콘 개수와 무관하게 요청은 팩당 1건이다.
@@ -94,6 +109,11 @@ export default defineConfig({
           href: 'https://github.com/rladnwls122/skills-guide-regional',
         },
       ],
+      /* 상단바 오른쪽에 로그인 단추를 붙이려고 감싼 것이다. 안에서 기본 소셜
+         아이콘(GitHub)을 그대로 렌더한다. */
+      components: {
+        SocialIcons: './src/components/SocialIcons.astro',
+      },
       plugins: [
         starlightThemeExquisitus(),
         starlightQuiz(),
@@ -124,6 +144,22 @@ export default defineConfig({
             link: '/drill/09-drills/',
             icon: 'rocket',
             items: [{ label: '훈련', items: [{ autogenerate: { directory: 'drill' } }] }],
+          },
+          /* 문서가 아니라 도구다. 훈련 문서 넷 어디에도 안 들어가므로 주제를 따로 준다.
+             starlight-sidebar-topics 는 주제에 안 속한 페이지가 있으면 빌드를 세운다. */
+          {
+            label: '진도',
+            link: '/progress/',
+            icon: 'approve-check',
+            items: [
+              {
+                label: '진도',
+                items: [
+                  { label: '저장 상태', link: '/progress/' },
+                  { label: '로그인', link: '/login/' },
+                ],
+              },
+            ],
           },
         ]),
         /* 죽은 사이트 내부 링크가 있으면 빌드가 깨진다. */

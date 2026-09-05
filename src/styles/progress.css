@@ -1,0 +1,238 @@
+/* 진도 막대 — 문서 맨 위에 붙는 체크 진행률.
+ *
+ * 체크박스를 살리는 것만으로는 지금 몇 개를 했는지 보이지 않는다. 항목이 스무 개
+ * 넘는 문서가 흔해서 눈으로 세게 두면 안 센다. 그래서 개수를 문서 첫 줄에 둔다.
+ *
+ * 본문 맨 앞에 들어가지만 읽는 흐름을 끊지 않아야 하므로 선 하나 높이로만 만든다 —
+ * 제목과 첫 문단 사이에 얇은 줄이 하나 지나가는 정도다.
+ *
+ * 스크립트가 붙이는 요소라 문서가 없는 페이지에는 나타나지 않는다. 자바스크립트가
+ * 꺼져 있으면 체크박스는 원래대로 잠긴 채 남고 막대는 아예 생기지 않는다. */
+
+.doc-progress {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-block: 0 1.75rem;
+	font-family: var(--__sl-font-mono, ui-monospace, monospace);
+	font-size: var(--sl-text-xs);
+	color: var(--sl-color-gray-3);
+}
+
+.doc-progress__bar {
+	flex: 1;
+	height: 3px;
+	overflow: hidden;
+	border-radius: 999px;
+	background: var(--sl-color-gray-5);
+}
+
+.doc-progress__bar i {
+	display: block;
+	width: 0;
+	height: 100%;
+	background: var(--sl-color-text-accent);
+	transition: width 0.2s ease;
+}
+
+.doc-progress__count {
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+/* 초기화는 되돌릴 수 없으므로 눈에 먼저 띄면 안 된다. 하나라도 체크했을 때만
+   나타나고, 그때도 본문보다 흐린 색으로 둔다. */
+.doc-progress__reset {
+	padding: 0;
+	border: 0;
+	background: none;
+	cursor: pointer;
+	font: inherit;
+	color: var(--sl-color-gray-4);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.doc-progress__reset:hover {
+	color: var(--sl-color-text-accent);
+}
+
+/* 살아난 체크박스는 눌러도 되는 것처럼 보여야 한다. GFM 이 만든 잠긴 체크박스와
+   같은 모양이면 아무도 누르지 않는다. */
+.sl-markdown-content input[type='checkbox']:not([disabled]) {
+	cursor: pointer;
+	accent-color: var(--sl-color-text-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.doc-progress__bar i {
+		transition: none;
+	}
+}
+
+/* 상단바의 로그인 단추. 소셜 아이콘 자리에 들어가므로 아이콘과 같은 높이로 맞춘다.
+   검색창을 밀어내지 않도록 폭을 제한하고, 아이디가 길면 줄인다. */
+
+.header-auth {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	max-width: 10rem;
+	padding: 0.3rem 0.7rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 999px;
+	color: var(--sl-color-gray-2);
+	font-size: var(--sl-text-xs);
+	line-height: 1.4;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.header-auth:hover {
+	border-color: var(--sl-color-text-accent);
+	color: var(--sl-color-white);
+}
+
+/* 로그인했다는 표시. 아이디 앞의 점 하나면 충분하다. */
+.header-auth__dot {
+	width: 0.4rem;
+	height: 0.4rem;
+	border-radius: 50%;
+	background: var(--sl-color-text-accent);
+	flex: none;
+}
+
+.header-auth__id {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* 진도 화면(`/progress/`). `.not-content` 라 Starlight 의 본문 서식이 닿지 않는다 —
+   표와 입력 칸의 모양을 여기서 직접 준다. */
+
+.progress-panel h2 {
+	margin: 2.5rem 0 0.75rem;
+	font-size: var(--sl-text-xl);
+}
+
+.progress-panel h2:first-child {
+	margin-top: 0;
+}
+
+.progress-panel__muted {
+	color: var(--sl-color-gray-3);
+}
+
+.progress-panel__notice {
+	margin: 0.75rem 0 0;
+	padding: 0.6rem 0.85rem;
+	border-left: 3px solid var(--sl-color-text-accent);
+	background: var(--sl-color-gray-6);
+	color: var(--sl-color-white);
+}
+
+.progress-panel form {
+	display: grid;
+	gap: 0.75rem;
+	max-width: 22rem;
+	margin-top: 1rem;
+}
+
+.progress-panel label {
+	display: grid;
+	gap: 0.35rem;
+	font-size: var(--sl-text-sm);
+	color: var(--sl-color-gray-2);
+}
+
+.progress-panel input {
+	padding: 0.5rem 0.65rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.25rem;
+	background: var(--sl-color-black);
+	color: var(--sl-color-white);
+	font: inherit;
+}
+
+.progress-panel input:focus-visible {
+	outline: 2px solid var(--sl-color-text-accent);
+	outline-offset: 1px;
+}
+
+.progress-panel__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: center;
+	margin: 1rem 0 0;
+}
+
+.progress-panel button {
+	padding: 0.45rem 1rem;
+	border: 1px solid var(--sl-color-text-accent);
+	border-radius: 0.25rem;
+	background: var(--sl-color-text-accent);
+	color: var(--sl-color-black);
+	font: inherit;
+	cursor: pointer;
+}
+
+/* 링크지만 단추처럼 보여야 하는 것. 이동만 하므로 button 이 아니라 a 로 둔다 —
+   가운데 클릭으로 새 탭에 열리고 주소가 보이는 쪽이 맞다. */
+.progress-panel__link-button {
+	display: inline-block;
+	padding: 0.45rem 1rem;
+	border: 1px solid var(--sl-color-text-accent);
+	border-radius: 0.25rem;
+	background: var(--sl-color-text-accent);
+	color: var(--sl-color-black);
+	font-size: var(--sl-text-sm);
+	text-decoration: none;
+}
+
+.progress-panel__link-button.ghost {
+	background: none;
+	border-color: var(--sl-color-gray-5);
+	color: var(--sl-color-gray-2);
+}
+
+.progress-panel button.ghost {
+	background: none;
+	border-color: var(--sl-color-gray-5);
+	color: var(--sl-color-gray-2);
+}
+
+.progress-panel button:disabled {
+	opacity: 0.55;
+	cursor: default;
+}
+
+.progress-panel table {
+	width: 100%;
+	margin-top: 0.5rem;
+	border-collapse: collapse;
+	font-size: var(--sl-text-sm);
+}
+
+.progress-panel th,
+.progress-panel td {
+	padding: 0.45rem 0.6rem;
+	border-bottom: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	text-align: left;
+}
+
+.progress-panel th {
+	color: var(--sl-color-gray-3);
+	font-weight: 600;
+}
+
+/* 수치는 자릿수가 흔들리면 비교가 어렵다. */
+.progress-panel td:not(:first-child) {
+	font-variant-numeric: tabular-nums;
+}
+
+/* 문서 목록은 길어질 수 있다 — 가로로 밀리지 않게 자기 안에서 스크롤한다. */
+.progress-panel table {
+	display: block;
+	overflow-x: auto;
+}
