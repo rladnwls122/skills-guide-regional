@@ -1,0 +1,102 @@
+/* 위키피디아식 3단 배치 + 스플릿 뷰.
+ *
+ * 좌우 레일을 좁혀 바깥으로 밀고, 가운데 읽는 칸을 넓힌다. 화면이 넓어져도
+ * 좌우 여백이 같은 폭으로 남는다.
+ *
+ * exquisitus 테마의 shell 토큰만 바꾼다 — band(3단 전체 폭)·shell-inset(바깥
+ * 여백)·헤더 그리드가 전부 이 값들에서 파생된다. 레이아웃 규칙을 직접 덮으면
+ * 헤더 정렬이 본문과 어긋난다.
+ *
+ * 파생 방향을 테마와 반대로 뒤집는다. 테마는 읽는 칸에서 band 를 계산하지만,
+ * 여기서는 band 를 고정하고 읽는 칸을 나머지로 계산한다 — 그래야 레일을 넓힐 때
+ * 바깥 여백이 아니라 읽는 칸이 줄어든다. 스플릿 뷰가 기대하는 동작이다.
+ * (순환 참조 없음: band 가 리터럴이 됐다.)
+ */
+
+@media (min-width: 72rem) {
+  :root {
+    /* 좌: 인덱스 레일. 우: 목차 레일. 인덱스 항목 이름이 길어 목차보다 한 단
+       넓게 잡는다 — 더 좁히면 대부분의 항목이 두 줄로 접힌다. */
+    --sl-sidebar-width: 16.5rem;
+    --sl-exquisitus-toc-width: 15rem;
+    --sl-exquisitus-shell-gutter: 2.5rem;
+    /* 3단 전체 폭. src/scripts/split-view.js 의 BAND 와 같은 값을 쓴다. */
+    --sl-exquisitus-shell-band: 82.5rem;
+    --sl-exquisitus-measure: calc(
+      var(--sl-exquisitus-shell-band) - var(--sl-sidebar-width) -
+        var(--sl-exquisitus-toc-width) - 2 * var(--sl-exquisitus-shell-gutter)
+    );
+    --sl-content-width: var(--sl-exquisitus-measure);
+  }
+
+  /* 목차 패널이 레일 폭이 아니라 고정 레일 전체 폭으로 그려져 오른쪽 여백이
+     왼쪽보다 좁아 보였다. 패널을 레일 컬럼에 맞춘다. */
+  .right-sidebar-panel {
+    width: var(--sl-exquisitus-toc-width);
+    margin-inline-start: auto;
+  }
+
+  /* 목차 접기. 인덱스 쪽 상태(html[data-sidebar])와 같은 모양으로 맞춘다 —
+     폭이 0 이 되면 읽는 칸이 위 calc 로 그만큼 넓어진다. */
+  html[data-toc='closed'] {
+    --sl-exquisitus-toc-width: 0rem;
+  }
+
+  html[data-toc='closed'] .right-sidebar {
+    display: none;
+  }
+
+  /* ─────────────────────────── 스플릿 바 ─────────────────────────── */
+  /* 레일 경계에 겹쳐 두는 조절 손잡이. 평소에는 보이지 않고, 커서가 근처에
+     오거나 드래그 중일 때만 선이 나타난다. 히트 영역은 선보다 넓게 잡는다 —
+     2px 짜리를 정확히 겨냥하게 만들면 못 쓴다. */
+  .split-handle {
+    position: fixed;
+    top: var(--sl-nav-height);
+    bottom: 0;
+    width: 1.25rem;
+    z-index: 5;
+    cursor: col-resize;
+    touch-action: none;
+  }
+
+  .split-handle::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 50%;
+    width: 2px;
+    transform: translateX(-50%);
+    background-color: var(--sl-color-accent);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .split-handle:hover::before,
+  .split-handle[data-dragging]::before {
+    opacity: 1;
+  }
+
+  /* 경계에 걸치지 않고 거터 쪽으로 밀어 둔다. 인덱스 패널의 스크롤바가 패널
+     오른쪽 끝 11px 를 쓰는데, 손잡이를 경계 중앙에 두면 그 위를 통째로 덮어
+     스크롤바를 잡을 수 없다 — 손잡이가 z-index 5 의 fixed 라 포인터를 전부
+     가져간다. 목차 쪽은 스크롤바가 반대편(화면 바깥쪽) 끝이라 겹치지 않는다. */
+  .split-handle--sidebar {
+    inset-inline-start: calc(
+      var(--sl-exquisitus-shell-inset) + var(--sl-sidebar-width) + 0.25rem
+    );
+  }
+
+  .split-handle--toc {
+    inset-inline-end: calc(
+      var(--sl-exquisitus-shell-inset) + var(--sl-exquisitus-toc-width) - 0.625rem
+    );
+  }
+}
+
+/* 좁은 화면에는 3단이 없다 — 손잡이도 없다. */
+@media (max-width: 71.999rem) {
+  .split-handle {
+    display: none;
+  }
+}

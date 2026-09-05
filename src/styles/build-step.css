@@ -1,0 +1,81 @@
+/* 개념 절 끝에 붙는 접이식 실행 블록 (`<details class="build-step">`).
+ *
+ * theory 는 explanation 이라 산문에 절차를 쓰지 않는다. 이 블록만 예외다 —
+ * 기본이 접힘이라 열지 않는 사람에게는 문서가 그대로 설명으로 읽힌다.
+ * 근거는 reference/style.mdx 의 A 절.
+ *
+ * diagram-note 와 구분되는 것: 도식에 붙지 않고 문단 흐름 안에 독립해 서며,
+ * 실행 블록임을 알리는 왼쪽 강조선을 갖는다. */
+
+.build-step {
+	margin: 1rem 0 1.5rem;
+	border: 1px solid var(--sl-color-hairline, var(--sl-color-gray-5));
+	border-left: 3px solid var(--sl-color-accent);
+	border-radius: 0.5rem;
+	background: var(--sl-color-bg-sidebar, var(--sl-color-gray-6));
+	font-size: var(--sl-text-sm);
+}
+
+.build-step > summary {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.6rem 0.9rem;
+	color: var(--sl-color-white);
+	font-weight: 600;
+	cursor: pointer;
+	list-style: none;
+	user-select: none;
+}
+
+.build-step > summary::-webkit-details-marker {
+	display: none;
+}
+
+/* 삼각형은 직접 그린다 — 기본 마커는 브라우저마다 위치가 다르다. */
+.build-step > summary::before {
+	content: '';
+	width: 0;
+	height: 0;
+	border-left: 0.35rem solid currentColor;
+	border-top: 0.28rem solid transparent;
+	border-bottom: 0.28rem solid transparent;
+	transition: transform 0.15s ease;
+}
+
+.build-step[open] > summary::before {
+	transform: rotate(90deg);
+}
+
+.build-step > summary:hover {
+	color: var(--sl-color-accent-high);
+}
+
+.build-step > :not(summary) {
+	margin: 0 0 0.75rem;
+	padding: 0 0.9rem;
+	line-height: 1.7;
+}
+
+.build-step > :not(summary):first-of-type {
+	margin-top: 0.15rem;
+}
+
+/* 탭·코드블록은 자체 여백을 갖는다. 이중 패딩을 막는다. */
+.build-step .expressive-code,
+.build-step starlight-tabs {
+	padding: 0 0.9rem;
+	margin-bottom: 0.75rem;
+}
+
+@media (max-width: 50rem) {
+	.build-step > summary {
+		padding: 0.6rem 0.7rem;
+	}
+
+	.build-step > :not(summary),
+	.build-step .expressive-code,
+	.build-step starlight-tabs {
+		padding: 0 0.7rem;
+	}
+}

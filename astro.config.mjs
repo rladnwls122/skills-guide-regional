@@ -11,6 +11,8 @@ import rehypeExternalLinks from 'rehype-external-links';
 import starlightThemeExquisitus from 'starlight-theme-exquisitus';
 import starlightHeadingBadges from 'starlight-heading-badges';
 import starlightScrollToTop from 'starlight-scroll-to-top';
+import starlightFullViewMode from 'starlight-fullview-mode';
+import starlightLlmActions from 'starlight-llm-actions';
 import starlightCodeblockFullscreen from 'starlight-codeblock-fullscreen';
 import starlightLinksValidator from 'starlight-links-validator';
 import starlightQuiz from 'starlight-quiz';
@@ -21,6 +23,51 @@ import { iconifyUrl } from './src/mermaid-icons.mjs';
 import awsIcons from './src/icons/aws.json';
 /* kubernetes 공식 리소스 아이콘. scripts/build-k8s-icons.mjs 가 만든다. */
 import k8sIcons from './src/icons/k8s.json';
+
+/* 도식에 "크게 보기" 단추를 붙이고 오버레이에서 확대·이동해 볼 수 있게 한다.
+   색은 여기서 내지 않는다 — .mfs-* 규칙은 이미 src/styles/mermaid.css 에 있고,
+   다크/라이트는 mermaid-theme.css 의 --sl-color-* 가 낸다. 전국판과 같은 구조다. */
+/** @type {import('astro').AstroIntegration} */
+const mermaidFullscreen = {
+  name: 'mermaid-fullscreen',
+  hooks: {
+    'astro:config:setup': ({ injectScript }) => {
+      injectScript('page', `import '/src/scripts/mermaid-fullscreen.js';`);
+    },
+  },
+};
+
+/** @type {import('astro').AstroIntegration} */
+const scrollbars = {
+  name: 'scrollbars',
+  hooks: {
+    'astro:config:setup': ({ injectScript }) => {
+      injectScript('page', `import '/src/scripts/scrollbars.js';`);
+    },
+  },
+};
+
+/** @type {import('astro').AstroIntegration} */
+const splitView = {
+  name: 'split-view',
+  hooks: {
+    'astro:config:setup': ({ injectScript }) => {
+      injectScript('page', `import '/src/scripts/split-view.js';`);
+    },
+  },
+};
+
+/* 저장된 레일 폭·접힘 상태를 첫 페인트 전에 되돌린다. head 인라인이 아니면
+   페이지를 넘길 때마다 기본 폭이 한 프레임 보였다가 바뀐다.
+   접혀 있는 레일에는 저장된 폭을 다시 얹지 않는다 — 인라인 커스텀 속성이
+   html[data-*='closed'] 의 0rem 규칙을 이겨서, 패널만 숨고 폭은 그대로 남는다. */
+const splitViewRestore = `(()=>{try{var r=document.documentElement,
+w=JSON.parse(localStorage.getItem('sl-split-steps')||'{}'),
+sc=localStorage.getItem('sl-sidebar-collapsed')==='1',
+tc=localStorage.getItem('sl-toc-collapsed')==='1';
+if(w.sidebar&&!sc)r.style.setProperty('--sl-sidebar-width',w.sidebar+'rem');
+if(w.toc&&!tc)r.style.setProperty('--sl-exquisitus-toc-width',w.toc+'rem');
+if(tc)r.dataset.toc='closed';}catch(e){}})()`;
 
 /* GFM 이 잠가 놓은 체크박스를 살리고 진도를 브라우저에 남긴다. 문서 쪽은 손대지
    않는다 — 항목을 새로 쓸 때 문법을 따로 외우지 않아도 되게 하려는 것이다.
@@ -61,6 +108,9 @@ export default defineConfig({
 
   integrations: [
     progress,
+    mermaidFullscreen,
+    scrollbars,
+    splitView,
     /* autoTheme 를 끈다 — mermaid 는 항상 default 테마로 한 번만 그리고, 다크/라이트
        차이는 src/styles/mermaid-theme.css 가 Starlight 의 --sl-color-* 로 낸다.
        켜면 data-theme 가 바뀔 때마다 모든 도식의 data-processed 를 떼고 mermaid 를
@@ -93,6 +143,12 @@ export default defineConfig({
         './src/styles/mermaid-aws-icons.css',
         './src/styles/mermaid-k8s-icons.css',
         './src/styles/diagram-note.css',
+        './src/styles/build-step.css',
+        './src/styles/mobile.css',
+        './src/styles/sidebar-toggle.css',
+        './src/styles/layout.css',
+        './src/styles/scrollbar.css',
+        './src/styles/codeblock-fullscreen.css',
         './src/styles/progress.css',
       ],
       /* subgraph 라벨의 <span class='icon--logos--*'> 를 정의하는 CSS. 아이콘이
@@ -101,6 +157,7 @@ export default defineConfig({
       head: [
         { tag: 'link', attrs: { rel: 'stylesheet', href: iconifyUrl('logos', 'css') } },
         { tag: 'link', attrs: { rel: 'stylesheet', href: iconifyUrl('mdi', 'css', '&color=%238ab') } },
+        { tag: 'script', content: splitViewRestore },
       ],
       social: [
         {
@@ -111,14 +168,24 @@ export default defineConfig({
       ],
       /* 상단바 오른쪽에 로그인 단추를 붙이려고 감싼 것이다. 안에서 기본 소셜
          아이콘(GitHub)을 그대로 렌더한다. */
+      /* 목차 오버라이드 둘은 starlight-quiz 의 것을 감싼 것이다 — 배지를 목차
+         패널에서만 감춘다(본문 제목에는 그대로 남는다). Starlight 는 한 컴포넌트에
+         오버라이드를 하나만 걸 수 있어서, 감싸지 않으면 먼저 등록한 quiz 가 자리를
+         차지하고 heading-badges 의 배지 복원이 아예 돌지 않는다. */
       components: {
+        /* 인덱스 패널 접기 단추를 헤더 제목 옆에 둔다. */
+        SiteTitle: './src/components/SiteTitle.astro',
         SocialIcons: './src/components/SocialIcons.astro',
+        TableOfContents: './src/components/TableOfContents.astro',
+        MobileTableOfContents: './src/components/MobileTableOfContents.astro',
       },
       plugins: [
         starlightThemeExquisitus(),
         starlightQuiz(),
         starlightHeadingBadges(),
+        starlightFullViewMode(),
         starlightScrollToTop(),
+        starlightLlmActions(),
         starlightCodeblockFullscreen(),
         starlightSidebarTopics([
           {

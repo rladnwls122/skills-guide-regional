@@ -1,0 +1,55 @@
+/* 인덱스 패널 접기 — 사이드바를 통째로 걷어내고 그 폭을 본문에 돌려준다.
+ *
+ * 상태는 html[data-sidebar="closed"] 하나. 폭 계산이 전부 --sl-sidebar-width 에서
+ * 파생되므로(테마의 shell band·content-inline-start·헤더 그리드까지) 토큰만 0 으로
+ * 내리면 나머지는 알아서 따라온다. 여기 선언들은 캐스케이드 레이어 밖이라
+ * @layer 안의 테마 토큰보다 우선한다.
+ *
+ * 토글 버튼은 SiteTitle 오버라이드(src/components/SiteTitle.astro)에서 렌더한다.
+ */
+
+.sidebar-toggle {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 2rem;
+	height: 2rem;
+	margin-inline-end: 0.5rem;
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.5rem;
+	background: transparent;
+	color: var(--sl-color-gray-1);
+	cursor: pointer;
+}
+
+.sidebar-toggle:hover {
+	background-color: var(--sl-color-gray-6);
+	color: var(--sl-color-white);
+}
+
+/* 좁은 화면은 Starlight 의 기존 햄버거 메뉴가 담당한다 — 토글은 데스크톱에서만. */
+@media (min-width: 50rem) {
+	.sidebar-toggle {
+		display: inline-flex;
+	}
+
+	html[data-sidebar="closed"] {
+		/* 비운 폭은 읽는 열이 가져간다 — layout.css 가 band 를 고정하고 읽는 열을
+		   나머지로 계산하므로 여기서 폭을 따로 적을 필요가 없다. */
+		--sl-sidebar-width: 0rem;
+	}
+
+	html[data-sidebar="closed"] .sidebar-pane {
+		display: none;
+	}
+}
+
+/* 테마가 72rem 이상에서 헤더를 "사이드바 폭 + 거터" 트랙으로 잡는다 — 사이드바가
+   0 이 되면 그 트랙이 2.75rem 로 쪼그라들어 사이트 제목이 잘린다. 닫힌 동안만
+   제목 트랙을 내용 폭으로 되돌린다. */
+@media (min-width: 72rem) {
+	html[data-sidebar="closed"] header.header > .header {
+		grid-template-columns: auto minmax(0, var(--sl-exquisitus-measure)) 1fr;
+	}
+}

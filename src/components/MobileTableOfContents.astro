@@ -1,0 +1,9 @@
+---
+/* 모바일 목차도 같은 이유로 배지를 감춘다 — src/components/TableOfContents.astro 참고. */
+import QuizMobileTableOfContents from 'starlight-quiz/overrides/MobileTableOfContents.astro';
+import { stripHeadingBadges } from '../lib/strip-heading-badges.mjs';
+
+stripHeadingBadges(Astro.locals.starlightRoute.toc);
+---
+
+<QuizMobileTableOfContents />
