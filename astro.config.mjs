@@ -131,6 +131,9 @@ export default defineConfig({
     }),
     starlight({
       title: 'skills-guide-regional',
+      /* 안 주면 Starlight 가 /favicon.svg 를 가리키는데 그 파일이 없어 페이지마다
+         404 가 하나씩 났다. 대회 로고에서 구운 180px PNG 를 쓴다. */
+      favicon: '/favicon.png',
       description: '지방기능경기대회 클라우드컴퓨팅 훈련 문서 — 2023~2026 기출 분석',
       defaultLocale: 'root',
       locales: { root: { label: '한국어', lang: 'ko' } },
