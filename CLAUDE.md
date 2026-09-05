@@ -4,7 +4,7 @@
 
 **독자는 고등학교 1학년, AWS 를 처음 만지는 사람이다.** 문서를 고칠 때 이 전제를 유지한다 — 비유를 먼저 주고, 약어를 풀어 쓰고, 겁주는 대신 무엇을 보면 되는지를 준다. 자세한 것은 `.claude/rules/docs-style.md`.
 
-전국대회판인 [`C:\Users\kryuk\skills-guide`](https://skills-learn.zenru.net/) 의 지방대회 버전이다. 문체·문서 유형 규칙은 그쪽 `src/content/docs/reference/style.mdx` 가 원본이고, 이 저장소는 그중 실제로 쓰는 부분만 `.claude/rules/docs-style.md` 로 줄여 두었다.
+전국대회판인 [`C:\Users\kryuk\skills-guide`](https://skills-2026-learn-module.vercel.app/) 의 지방대회 버전이다. 문체·문서 유형 규칙은 그쪽 `src/content/docs/reference/style.mdx` 가 원본이고, 이 저장소는 그중 실제로 쓰는 부분만 `.claude/rules/docs-style.md` 로 줄여 두었다.
 
 ## 콘텐츠 근거
 

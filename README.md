@@ -1,6 +1,6 @@
 # skills-guide-regional
 
-지방기능경기대회 클라우드컴퓨팅 훈련 문서 — Astro Starlight 문서 사이트. [skills-guide](https://skills-learn.zenru.net/)(전국대회판)의 지방대회 버전이다.
+지방기능경기대회 클라우드컴퓨팅 훈련 문서 — Astro Starlight 문서 사이트. [skills-guide](https://skills-2026-learn-module.vercel.app/)(전국대회판)의 지방대회 버전이다.
 
 전국판이 "한 달에 걸쳐 개념부터 쌓는다"라면 이 문서는 **네 해 기출을 축으로 분해해 반복 출제 지점을 훈련한다**에 가깝다. 지방대회는 4시간 × 2과제이고, 과제 하나가 다루는 서비스 수는 많지만 각 항목의 깊이는 전국보다 얕다. 그래서 훈련 전략이 다르다 — 깊이보다 **속도와 누락 없음**이다.
 
