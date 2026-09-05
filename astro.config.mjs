@@ -23,6 +23,10 @@ import awsIcons from './src/icons/aws.json';
 import k8sIcons from './src/icons/k8s.json';
 
 export default defineConfig({
+  /* Starlight 이 끼워 넣는 sitemap 은 site 가 없으면 통째로 건너뛴다. 배포 주소를
+     여기 박아 두면 빌드마다 sitemap-index.xml 이 함께 나온다. */
+  site: 'https://skills-guide-regional.vercel.app',
+
   /* 문서는 전부 정적으로 굽는다. 어댑터는 나중에 `/api/*` 같은 함수 경로를 붙일
      자리를 열어 두기 위한 것이고, 지금은 페이지가 전부 프리렌더된다. */
   adapter: vercel(),
