@@ -132,8 +132,15 @@ export default defineConfig({
     starlight({
       title: 'skills-guide-regional',
       /* 안 주면 Starlight 가 /favicon.svg 를 가리키는데 그 파일이 없어 페이지마다
-         404 가 하나씩 났다. 대회 로고에서 구운 180px PNG 를 쓴다. */
+         404 가 하나씩 났다. 헤더 로고와 같은 나침반에서 구운 180px PNG 를 쓴다. */
       favicon: '/favicon.png',
+      /* 헤더 제목 왼쪽 로고. 전국판은 대회 로고를 쓰고 이쪽은 나침반이다 —
+         "네 해 기출에서 방향을 찾는다"가 이 문서의 축이라서다. replacesTitle 은
+         켜지 않는다: 그림만 남기면 어느 판인지 글자로 확인할 수가 없다. */
+      logo: {
+        src: './src/assets/logo-mark.png',
+        alt: '지방대회 훈련 문서 로고 — 나침반',
+      },
       description: '지방기능경기대회 클라우드컴퓨팅 훈련 문서 — 2023~2026 기출 분석',
       defaultLocale: 'root',
       locales: { root: { label: '한국어', lang: 'ko' } },
