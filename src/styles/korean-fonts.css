@@ -3,7 +3,7 @@
  * Exquisitus 는 "두 가지 일" 구조다: 세리프가 읽는 열(본문)을, 산세리프가
  * 안내 역할(제목·사이드바·TOC·헤더)을 맡는다. 한글도 같은 구조로 짝을 붙인다.
  *
- *   제목·본문          ChosunSm             조선일보명조 — 읽는 열 전체를 이 서체로
+ *   제목·본문          Bookk Myungjo        부크크명조 — 읽는 열 전체를 이 서체로
  *   UI 크롬            Pretendard           Alegreya Sans(산세리프)의 한글 짝, 가변 굵기
  *   코드블록           Elice Digital Coding JetBrains Mono 의 한글 보조(고정폭)
  *
@@ -13,12 +13,20 @@
  * 서브셋 파일은 skills-guide(전국판)에서 가져왔다. 다시 만들려면 그쪽 scripts/subset-font.py 를 쓴다.
  */
 
+/* 굵기가 파일로 갈려 있어 두 벌을 같은 패밀리로 묶는다 — 제목의 700 이 합성 볼드가
+   아니라 진짜 Bold 로 나온다. */
 @font-face {
-	font-family: "Chosun Sm";
-	src: url("../fonts/chosun-sm.woff2") format("woff2");
-	/* 단일 굵기 파일이다. 400 만 선언해 700 은 브라우저 합성에 맡긴다 —
-	   `400 700` 으로 범위를 주면 합성이 꺼져 제목이 본문 굵기로 주저앉는다. */
+	font-family: "Bookk Myungjo";
+	src: url("../fonts/bookk-myungjo-400.woff2") format("woff2");
 	font-weight: 400;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Bookk Myungjo";
+	src: url("../fonts/bookk-myungjo-700.woff2") format("woff2");
+	font-weight: 700;
 	font-style: normal;
 	font-display: swap;
 }
@@ -50,14 +58,14 @@
 }
 
 :root {
-	/* 제목·카드/히어로 제목·aside·pagination — 한글은 조선일보명조, 라틴도 함께. */
+	/* 제목·카드/히어로 제목·aside·pagination — 한글은 부크크명조, 라틴도 함께. */
 	--sl-exquisitus-font-register:
-		"Chosun Sm", "Alegreya Sans", "Alegreya Sans Fallback", system-ui,
+		"Bookk Myungjo", "Alegreya Sans", "Alegreya Sans Fallback", system-ui,
 		-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-	/* 본문 reading column — 제목과 같은 조선일보명조. 라틴까지 함께 간다. */
+	/* 본문 reading column — 제목과 같은 부크크명조. 라틴까지 함께 간다. */
 	--sl-exquisitus-font-reading:
-		"Chosun Sm", "Literata Variable", "Literata Fallback", Georgia,
+		"Bookk Myungjo", "Literata Variable", "Literata Fallback", Georgia,
 		"Times New Roman", serif;
 
 	/* 코드블록·인라인코드 — 라틴은 JetBrains Mono 유지, 한글(주석)만 Elice 로 받는다.

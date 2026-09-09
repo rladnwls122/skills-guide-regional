@@ -8,7 +8,7 @@
 
 - 콘텐츠: `src/content/docs/` — `basics/`(사전 지식 15) · `exam/`(대회 이해 3) · `axis/`(과제 축 6) · `drill/`(훈련 3)
 - 디자인: [starlight-theme-exquisitus](https://github.com/anaxite/starlight-theme-exquisitus) — 팔레트·서체는 테마가 전담
-- 한글 서체: 제목·본문 조선일보명조 · UI Pretendard · 코드 Elice Digital Coding — `src/styles/korean-fonts.css`
+- 한글 서체: 제목·본문 부크크명조 · UI Pretendard · 코드 Elice Digital Coding — `src/styles/korean-fonts.css`
 
 ## 근거
 
