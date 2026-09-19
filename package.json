@@ -9,7 +9,8 @@
     "icons:aws": "node scripts/build-aws-icons.mjs",
     "icons:k8s": "node scripts/build-k8s-icons.mjs",
     "check:icons": "node scripts/check-mermaid-icons.mjs",
-    "test:auth": "node src/lib/server/auth.test.mjs"
+    "test:auth": "node src/lib/server/auth.test.mjs",
+    "check:progress": "node src/lib/progress-store.test.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.3",

@@ -49,7 +49,12 @@ function scan() {
 	const root = document.querySelector('.sl-markdown-content');
 	if (!root || root.dataset.progressReady === '1') return;
 
-	const boxes = [...root.querySelectorAll('input[type="checkbox"][disabled]')];
+	/* 퀴즈의 원본 `[x]`/`[ ]`도 처음에는 GFM task list라 disabled 상태다.
+	   이를 학습 진도 항목으로 풀어 저장값을 씌우면 `[x]` 정답 표식이 사라져,
+	   starlight-quiz가 모든 선택지를 오답으로 읽는다. 퀴즈는 자체 상태 저장소를
+	   쓰므로 여기서 건드리지 않는다. */
+	const boxes = [...root.querySelectorAll('input[type="checkbox"][disabled]')]
+		.filter((box) => !box.closest('sl-quiz'));
 	if (!boxes.length) return;
 	root.dataset.progressReady = '1';
 

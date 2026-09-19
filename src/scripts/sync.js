@@ -58,8 +58,12 @@ export async function pull() {
 	try {
 		const res = await fetch('/api/progress', { headers: { accept: 'application/json' } });
 		if (!res.ok) return false;
-		const changed = applyRemote(await res.json());
+		const { changed, currentPageQuizChanged } = applyRemote(await res.json());
 		if (changed) window.dispatchEvent(new CustomEvent(CHANGED_EVENT));
+		/* starlight-quiz는 초기화할 때 localStorage를 한 번만 읽는다. 이미 열린
+		   퀴즈의 서버 상태가 들어왔으면 한 번 새로 열어 선택지·정오답 색을 복원한다.
+		   재로딩 뒤에는 같은 timestamp를 다시 적용하지 않으므로 루프가 생기지 않는다. */
+		if (currentPageQuizChanged && document.querySelector('sl-quiz')) location.reload();
 		return changed;
 	} catch {
 		return false;

@@ -158,11 +158,14 @@ export function snapshot() {
 
 /**
  * 서버가 돌려준 값을 이 브라우저에 얹는다. 경로마다 나중에 고친 쪽을 남긴다.
- * 바뀐 것이 있으면 true — 호출한 쪽이 화면을 다시 그릴지 정한다.
+ * 바뀐 여부와, 현재 페이지 퀴즈 상태가 바뀌었는지를 돌려준다.
  */
 export function applyRemote(remote) {
-	if (!remote || typeof remote !== 'object') return false;
+	if (!remote || typeof remote !== 'object') {
+		return { changed: false, currentPageQuizChanged: false };
+	}
 	let changed = false;
+	let currentPageQuizChanged = false;
 
 	const checks = loadChecks();
 	for (const [path, entry] of Object.entries(remote.checks || {})) {
@@ -181,10 +184,13 @@ export function applyRemote(remote) {
 		stamps[path] = entry.updatedAt || Date.now();
 		stampsChanged = true;
 		changed = true;
+		if (typeof location !== 'undefined' && path === location.pathname) {
+			currentPageQuizChanged = true;
+		}
 	}
 	if (stampsChanged) writeJson(QUIZ_STAMP_KEY, stamps);
 
-	return changed;
+	return { changed, currentPageQuizChanged };
 }
 
 /** 매니페스트를 경로 접두사별 퀴즈 문항 수로 바꾼다. */
