@@ -1,80 +1,136 @@
 ---
-title: 지방기능경기대회 클라우드컴퓨팅 훈련 문서
-description: 2023~2026 지방 기출을 축으로 분해해 반복 출제 지점을 훈련한다.
+title: 지방기능경기대회 클라우드컴퓨팅
+description: 2023~2026 지방대회 기출과 채점기준을 바탕으로 클라우드컴퓨팅 실기 과제를 단계별로 학습한다.
 template: splash
 hero:
-  title: 4시간 × 2과제. 깊이보다 누락 없음.
-  tagline: 네 해 기출의 과제지·채점기준·채점 스크립트를 분해했다. 매년 나오는 축을 찾아 반복 훈련한다.
+  title: 지방기능경기대회 클라우드컴퓨팅
+  tagline: 기출로 배우고, 반복해서 연습하는 실기 교재
   image:
     file: ../../assets/skills-logo.png
     alt: 기능경기대회 로고
   actions:
-    - text: 지형도부터 보기
+    - text: 대회 구성 살펴보기
       link: /exam/00-competition-map/
       icon: right-arrow
       variant: primary
-    - text: AWS 가 처음이라면
+    - text: 기초부터 공부하기
       link: /basics/00-index/
       variant: minimal
 ---
 
 import { CardGrid, LinkCard, Steps } from '@astrojs/starlight/components';
 
-[skills-guide](https://skills-2026-learn-module.vercel.app/)(전국대회판)의 지방대회 버전이다. 전국판이 "한 달에 걸쳐 개념부터 쌓는다"라면 이 문서는 **네 해 기출을 축으로 분해해 반복 출제 지점을 훈련한다**에 가깝다.
+[skills-guide](https://skills-2026-learn-module.vercel.app/)(전국대회판)의 지방대회 버전이다. 전국판이 개념을 순서대로 쌓아가는 교재라면, 이 책은 **2023~2026년 지방대회 기출을 중심으로 실제 출제 내용을 익히고 반복해서 연습하는 것**에 초점을 맞췄다.
 
-지방대회는 4시간 × 2과제이고, 과제 하나가 다루는 서비스 수는 많지만 각 항목의 깊이는 전국보다 얕다. 그래서 훈련 전략이 다르다 — 깊이보다 **속도와 누락 없음**이다.
+지방대회는 4시간 동안 2과제를 수행한다. 한 과제에서 여러 AWS 서비스를 다루지만, 각 서비스의 설정은 전국대회보다 비교적 단순한 편이다. 따라서 이 교재에서는 하나의 기술을 깊게 파기보다 **기출에서 반복해서 등장하는 구성을 익히고, 제한 시간 안에 요구사항을 빠짐없이 구현하는 연습**에 집중한다.
 
-**AWS 를 처음 만지는 사람 기준으로 썼다.** 서버·네트워크가 뭔지부터 궁금하면 [사전 지식](/basics/00-index/) 15편을 먼저 본다. 필요한 것만 골라 봐도 된다.
+AWS가 처음인 사람도 따라올 수 있도록 기본 개념부터 설명한다. 서버와 네트워크가 익숙하지 않다면 [사전 지식](/basics/00-index/)부터 시작하고, 이미 AWS를 사용해 본 적이 있다면 필요한 부분만 골라서 공부해도 된다.
 
-## 시간이 없다면
+## 학습 순서
 
 <Steps>
 
-0. **AWS 가 처음이면 [사전 지식 01·02·03](/basics/00-index/)** 부터 (반나절)
+1. **기초 개념 익히기**
 
-   셸과 AWS CLI, VPC, IAM 셋만 알면 나머지 문서가 읽힌다.
+   AWS CLI, VPC, IAM 등 뒤의 내용을 이해하는 데 필요한 기본 개념을 먼저 익힌다.
 
-1. **[채점 해부](/exam/02-scoring/)** 를 먼저 읽는다
+2. **대회와 채점 방식 이해하기**
 
-   채점이 CLI 출력 대조라는 사실 하나에서 이 대회의 감점 규칙 거의 전부가 나온다.
+   실제 과제의 구성과 채점 기준을 살펴보면서 무엇을 정확하게 구현해야 하는지 알아본다.
 
-2. **[축 1 — 네트워크](/axis/03-axis-network/)** 로 간다
+3. **반복 출제 영역 연습하기**
 
-   4년 연속 나왔고 2026엔 1과제 배점의 31%다.
+   네트워크, Bastion, IAM, 애플리케이션 배포, 데이터 저장소, 관측 등 기출에서 반복해서 등장한 영역을 하나씩 연습한다.
 
-3. **[축 2 — Bastion·IAM](/axis/04-axis-bastion/)** 을 확인한다
+4. **2과제 유형 익히기**
 
-   배점은 작지만 무너지면 나머지 전부가 0이다.
+   2023~2026년 2과제를 유형별로 살펴보고, 새로운 과제가 나와도 대응할 수 있도록 연습한다.
+
+5. **실전 훈련하기**
+
+   제한 시간 안에 과제를 처음부터 끝까지 수행하고, 마지막에는 체크리스트를 이용해 누락된 항목을 확인한다.
 
 </Steps>
 
-## 근거
+## 이 교재의 근거
 
-이 문서의 모든 수치·명령·이름표는 실제로 시행된 과제지·채점기준·채점 스크립트에서 왔다.
+본문의 수치와 명령어, 리소스 이름은 실제로 시행된 과제지·채점기준·채점 스크립트를 바탕으로 정리했다.
 
-| 해 | 자료 | 1과제 | 2과제 |
+| 연도 | 자료 | 1과제 | 2과제 |
 | --- | --- | --- | --- |
 | 2023 | 과제지 PDF, 1과제 채점기준(답지) | Web Service Provisioning | Automation (ETL) |
 | 2024 | 과제지·채점기준표·mark.sh·배포파일 | Web Service Provisioning | Automation (CI/CD) |
 | 2025 | 과제지·채점기준·배포파일 | Solution Architecture | Small Challenge ×4 |
-| 2026 | 과제지·채점기준·mark.sh·배포파일 | Solution architecture | Small challenge ×4 |
+| 2026 | 과제지·채점기준·mark.sh·배포파일 | Solution Architecture | Small Challenge ×4 |
 
-추론한 내용에는 문서에서 "추정"이라고 적었다. 근거가 있는 것과 없는 것을 섞지 않는다.
+자료만으로 직접 확인하기 어려운 내용은 **"추정"**으로 표시했다. 확인된 내용과 해석을 구분해서 정리한다.
 
-## 문서
+## 교재 구성
 
 <CardGrid>
-  <LinkCard title="사전 지식 (15편)" href="/basics/00-index/" description="AWS 가 처음이라면 여기부터. 지방 기출에 실제로 나온 것만." />
-  <LinkCard title="지방대회 지형도" href="/exam/00-competition-map/" description="형식·시간·배점·채점 흐름이 4년간 어떻게 바뀌었나." />
-  <LinkCard title="기출 분해" href="/exam/01-past-exams/" description="2023~2026 과제 전문 요약과 축 대조표." />
-  <LinkCard title="채점 해부" href="/exam/02-scoring/" description="채점 스크립트가 실제로 보는 것과 감점 지뢰." />
-  <LinkCard title="축 1 — 네트워크" href="/axis/03-axis-network/" description="매년 나오고 배점이 가장 큰 축." />
-  <LinkCard title="축 2 — Bastion·IAM" href="/axis/04-axis-bastion/" description="틀리면 나머지 전부가 0이 되는 축." />
-  <LinkCard title="축 3 — 앱 배포와 ALB" href="/axis/05-axis-compute/" description="형태만 바뀌고 매년 나오는 축." />
-  <LinkCard title="축 4 — 데이터 저장소" href="/axis/06-axis-data/" description="서비스는 바뀌어도 요구는 같은 축." />
-  <LinkCard title="축 5 — 관측" href="/axis/07-axis-observability/" description="배점 대비 가장 싸게 얻는 축." />
-  <LinkCard title="2과제 유형 카탈로그" href="/axis/08-task2-catalog/" description="4년치 2과제 16개 유형 전부." />
-  <LinkCard title="훈련 계획과 드릴" href="/drill/09-drills/" description="무엇을 며칠에 어떤 순서로." />
-  <LinkCard title="종료 전 체크리스트" href="/drill/10-checklist/" description="마지막 30분에 볼 것." />
-  <LinkCard title="공식 문서 링크 맵" href="/drill/11-links/" description="축별로 어느 문서의 어느 절을 읽나." />
+  <LinkCard
+    title="제1장. AWS 기초"
+    href="/basics/00-index/"
+    description="AWS CLI, VPC, IAM 등 실기 과제를 이해하는 데 필요한 기본 개념을 익힌다."
+  />
+  <LinkCard
+    title="제2장. 대회와 채점"
+    href="/exam/00-competition-map/"
+    description="대회 진행 방식과 과제 구성, 시간과 배점, 채점 흐름을 살펴본다."
+  />
+  <LinkCard
+    title="제3장. 기출 분석"
+    href="/exam/01-past-exams/"
+    description="2023~2026년 기출을 비교하며 해마다 반복되는 내용을 찾아본다."
+  />
+  <LinkCard
+    title="제4장. 채점 기준"
+    href="/exam/02-scoring/"
+    description="채점 스크립트와 채점 기준을 통해 실제로 확인되는 항목을 익힌다."
+  />
+  <LinkCard
+    title="제5장. 네트워크"
+    href="/axis/03-axis-network/"
+    description="VPC, 서브넷, 라우팅 등 기출에서 반복해서 등장하는 네트워크 구성을 연습한다."
+  />
+  <LinkCard
+    title="제6장. Bastion과 IAM"
+    href="/axis/04-axis-bastion/"
+    description="Bastion 구성과 IAM 설정을 기출 과제와 함께 학습한다."
+  />
+  <LinkCard
+    title="제7장. 애플리케이션과 ALB"
+    href="/axis/05-axis-compute/"
+    description="서버와 애플리케이션을 배포하고 ALB를 구성하는 과정을 연습한다."
+  />
+  <LinkCard
+    title="제8장. 데이터 저장소"
+    href="/axis/06-axis-data/"
+    description="기출에 등장한 데이터 저장 관련 서비스와 구성 방법을 정리한다."
+  />
+  <LinkCard
+    title="제9장. 관측과 모니터링"
+    href="/axis/07-axis-observability/"
+    description="로그와 모니터링 등 운영 상태를 확인하기 위한 구성을 학습한다."
+  />
+  <LinkCard
+    title="제10장. 2과제 유형"
+    href="/axis/08-task2-catalog/"
+    description="2023~2026년 2과제 16개 유형을 비교하고 유형별 특징을 익힌다."
+  />
+  <LinkCard
+    title="제11장. 실전 훈련"
+    href="/drill/09-drills/"
+    description="학습한 내용을 제한 시간 안에 수행할 수 있도록 단계별 훈련 방법을 정리한다."
+  />
+  <LinkCard
+    title="제12장. 최종 점검"
+    href="/drill/10-checklist/"
+    description="제출 전에 설정과 요구사항을 빠짐없이 확인하기 위한 최종 체크리스트다."
+  />
+  <LinkCard
+    title="부록. 공식 문서"
+    href="/drill/11-links/"
+    description="각 주제별로 참고할 AWS 공식 문서를 한곳에 모았다."
+  />
 </CardGrid>
